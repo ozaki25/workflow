@@ -1,9 +1,10 @@
 var $ = jQuery = require('jquery');
 require('bootstrap');
-var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
 var TestView = require('./views/TestView');
 
-var App = new Marionette.Application({
+var App = new Backbone.Marionette.Application({
     regions: {
         main: '#main'
     },

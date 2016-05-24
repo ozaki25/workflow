@@ -1,7 +1,7 @@
 var Backbone = require('backbone');
-var Marionette = require('backbone.marionette');
+Backbone.Marionette = require('backbone.marionette');
 
-module.exports = Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.ItemView.extend({
     template: '#test_view'
 });
 

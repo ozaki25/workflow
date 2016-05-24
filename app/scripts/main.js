@@ -1,3 +1,5 @@
+var $ = jQuery = require('jquery');
+require('bootstrap');
 var Marionette = require('backbone.marionette');
 var TestView = require('./views/TestView');
 

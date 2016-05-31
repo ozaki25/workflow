@@ -3,29 +3,42 @@ var $ = jQuery = require('jquery');
 require('bootstrap');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var HeaderView = require('./views/HeaderView');
 var TestView = require('./views/TestView');
 
 var App = new Backbone.Marionette.Application({
     regions: {
+        header: '#header',
         main: '#main'
     },
     onStart: function() {
+        this.getRegion('header').show(new HeaderView());
         this.getRegion('main').show(new TestView());
     }
 });
 
 App.start();
 
-},{"./views/TestView":2,"backbone":"backbone","backbone.marionette":4,"bootstrap":"bootstrap","jquery":"jquery"}],2:[function(require,module,exports){
+},{"./views/HeaderView":2,"./views/TestView":3,"backbone":"backbone","backbone.marionette":5,"bootstrap":"bootstrap","jquery":"jquery"}],2:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
 module.exports = Backbone.Marionette.ItemView.extend({
+    template: '#header_view'
+});
+
+
+},{"backbone":"backbone","backbone.marionette":5}],3:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'container',
     template: '#test_view'
 });
 
 
-},{"backbone":"backbone","backbone.marionette":4}],3:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":5}],4:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11
@@ -217,10 +230,10 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],4:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],5:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
-// v2.4.5
+// v2.4.7
 //
 // Copyright (c)2016 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -251,7 +264,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
   var Marionette = Backbone.Marionette = {};
 
-  Marionette.VERSION = '2.4.5';
+  Marionette.VERSION = '2.4.7';
 
   Marionette.noConflict = function() {
     root.Marionette = previousMarionette;
@@ -2077,6 +2090,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
     reorder: function() {
       var children = this.children;
       var models = this._filteredSortedModels();
+  
+      if (!models.length && this._showingEmptyView) { return this; }
+  
       var anyModelsAdded = _.some(models, function(model) {
         return !children.findByModel(model);
       });
@@ -3728,7 +3744,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
   return Marionette;
 }));
 
-},{"backbone":"backbone","backbone.babysitter":3,"backbone.wreqr":5,"underscore":"underscore"}],5:[function(require,module,exports){
+},{"backbone":"backbone","backbone.babysitter":4,"backbone.wreqr":6,"underscore":"underscore"}],6:[function(require,module,exports){
 // Backbone.Wreqr (Backbone.Marionette)
 // ----------------------------------
 // v1.3.6
@@ -4165,7 +4181,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],6:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],7:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -4329,7 +4345,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -4425,7 +4441,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -4547,7 +4563,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -4786,7 +4802,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -4999,7 +5015,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -5166,7 +5182,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -5505,7 +5521,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -5615,7 +5631,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -5789,7 +5805,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -5946,7 +5962,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -6462,7 +6478,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -9072,9 +9088,9 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":6,"../../js/alert.js":7,"../../js/button.js":8,"../../js/carousel.js":9,"../../js/collapse.js":10,"../../js/dropdown.js":11,"../../js/modal.js":12,"../../js/popover.js":13,"../../js/scrollspy.js":14,"../../js/tab.js":15,"../../js/tooltip.js":16,"../../js/transition.js":17}],"jquery":[function(require,module,exports){
+},{"../../js/affix.js":7,"../../js/alert.js":8,"../../js/button.js":9,"../../js/carousel.js":10,"../../js/collapse.js":11,"../../js/dropdown.js":12,"../../js/modal.js":13,"../../js/popover.js":14,"../../js/scrollspy.js":15,"../../js/tab.js":16,"../../js/tooltip.js":17,"../../js/transition.js":18}],"jquery":[function(require,module,exports){
 /*!
- * jQuery JavaScript Library v2.2.3
+ * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
  *
  * Includes Sizzle.js
@@ -9084,7 +9100,7 @@ require('../../js/affix.js')
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2016-04-05T19:26Z
+ * Date: 2016-05-20T17:23Z
  */
 
 (function( global, factory ) {
@@ -9140,7 +9156,7 @@ var support = {};
 
 
 var
-	version = "2.2.3",
+	version = "2.2.4",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -14081,13 +14097,14 @@ jQuery.Event.prototype = {
 	isDefaultPrevented: returnFalse,
 	isPropagationStopped: returnFalse,
 	isImmediatePropagationStopped: returnFalse,
+	isSimulated: false,
 
 	preventDefault: function() {
 		var e = this.originalEvent;
 
 		this.isDefaultPrevented = returnTrue;
 
-		if ( e ) {
+		if ( e && !this.isSimulated ) {
 			e.preventDefault();
 		}
 	},
@@ -14096,7 +14113,7 @@ jQuery.Event.prototype = {
 
 		this.isPropagationStopped = returnTrue;
 
-		if ( e ) {
+		if ( e && !this.isSimulated ) {
 			e.stopPropagation();
 		}
 	},
@@ -14105,7 +14122,7 @@ jQuery.Event.prototype = {
 
 		this.isImmediatePropagationStopped = returnTrue;
 
-		if ( e ) {
+		if ( e && !this.isSimulated ) {
 			e.stopImmediatePropagation();
 		}
 
@@ -15035,19 +15052,6 @@ function getWidthOrHeight( elem, name, extra ) {
 		val = name === "width" ? elem.offsetWidth : elem.offsetHeight,
 		styles = getStyles( elem ),
 		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
-
-	// Support: IE11 only
-	// In IE 11 fullscreen elements inside of an iframe have
-	// 100x too small dimensions (gh-1764).
-	if ( document.msFullscreenElement && window.top !== window ) {
-
-		// Support: IE11 only
-		// Running getBoundingClientRect on a disconnected node
-		// in IE throws an error.
-		if ( elem.getClientRects().length ) {
-			val = Math.round( elem.getBoundingClientRect()[ name ] * 100 );
-		}
-	}
 
 	// Some non-html elements return undefined for offsetWidth, so check for null/undefined
 	// svg - https://bugzilla.mozilla.org/show_bug.cgi?id=649285
@@ -16939,6 +16943,7 @@ jQuery.extend( jQuery.event, {
 	},
 
 	// Piggyback on a donor event to simulate a different one
+	// Used only for `focus(in | out)` events
 	simulate: function( type, elem, event ) {
 		var e = jQuery.extend(
 			new jQuery.Event(),
@@ -16946,27 +16951,10 @@ jQuery.extend( jQuery.event, {
 			{
 				type: type,
 				isSimulated: true
-
-				// Previously, `originalEvent: {}` was set here, so stopPropagation call
-				// would not be triggered on donor event, since in our own
-				// jQuery.event.stopPropagation function we had a check for existence of
-				// originalEvent.stopPropagation method, so, consequently it would be a noop.
-				//
-				// But now, this "simulate" function is used only for events
-				// for which stopPropagation() is noop, so there is no need for that anymore.
-				//
-				// For the 1.x branch though, guard for "click" and "submit"
-				// events is still used, but was moved to jQuery.event.stopPropagation function
-				// because `originalEvent` should point to the original event for the constancy
-				// with other events and for more focused logic
 			}
 		);
 
 		jQuery.event.trigger( e, null, elem );
-
-		if ( e.isDefaultPrevented() ) {
-			event.preventDefault();
-		}
 	}
 
 } );

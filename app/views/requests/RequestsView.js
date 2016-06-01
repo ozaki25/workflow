@@ -2,14 +2,14 @@ var $ = require('jquery');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
-var User = require('../../models/User');
-var UserView = require('./UserView');
+var Request = require('../../models/Request');
+var RequestView = require('./RequestView');
 
 module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'container',
-    childView: UserView,
-    childViewContainer: '#user_list',
-    template: '#users_view',
+    childView: RequestView,
+    childViewContainer: '#request_list',
+    template: '#requests_view',
     ui: {
         inputName: 'input.name',
         inputAge: 'input.age',
@@ -20,7 +20,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         'click @ui.createBtn': 'onClickCreate'
     },
     onClickCreate: function() {
-        this.model = new User();
+        this.model = new Request();
         this.bindBackboneValidation();
 
         var name = this.ui.inputName.val().trim();

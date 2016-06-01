@@ -1,28 +1,28 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-var Users = require('./collections/Users');
+var Requests = require('./collections/Requests');
 var HeaderView = require('./views/HeaderView');
 var TestView = require('./views/test/TestView');
-var UsersView = require('./views/users/UsersView');
+var RequestsView = require('./views/requests/RequestsView');
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "": "test",
-        "test": "test",
-        "users": "users"
+        "": "index",
+        "requests": "index",
+        "request/new": "newRequest"
     },
     initialize: function() {
         app.getRegion('header').show(new HeaderView());
     },
     controller: {
-        test: function() {
+        index: function() {
             app.getRegion('main').show(new TestView());
         },
-        users: function() {
-            var users = new Users();
-            users.fetch().done(function() {
-                var usersView = new UsersView({collection: users});
-                app.getRegion('main').show(usersView);
+        newRequest: function() {
+            var requests = new Requests();
+            requests.fetch().done(function() {
+                var requestsView = new RequestsView({collection: requests});
+                app.getRegion('main').show(requestsView);
             });
         }
     }

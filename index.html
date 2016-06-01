@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title>backbone_moarionette_template</title>
+    <title>workflow system</title>
     <link rel="stylesheet" media="screen" href="./app/assets/css/bootstrap.min.css">
     <meta charset="UTF-8">
   </head>
@@ -19,12 +19,12 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a href="#" class="navbar-brand">Backbone Marionette Template</a>
+            <a href="#" class="navbar-brand">Workflow System</a>
           </div>
           <div class="collapse navbar-collapse" id="navbar_links">
             <ul class="nav navbar-nav">
-              <li><a href="#test">Test</a></li>
-              <li><a href="#users">Users</a></li>
+              <li><a href="#requests">Index</a></li>
+              <li><a href="#request/new">New</a></li>
             </ul>
           </div>
         </div>
@@ -32,10 +32,10 @@
     </script>
 
     <script id="test_view" type="text/template">
-      <h1>Backbone Moarionette Template</h1>
+      <h1>Workflow System</h1>
     </script>
 
-    <script id="users_view" type="text/template">
+    <script id="requests_view" type="text/template">
       <form class="form-inline">
         <div class="form-group">
           <label class="control-label">Name</label>
@@ -49,10 +49,10 @@
         </div>
         <button type="button" class="btn btn-default create-btn">Submit</button
       </form>
-      <ul id="user_list"></ul>
+      <ul id="request_list"></ul>
     </script>
 
-    <script id="user_view" type="text/template">
+    <script id="request_view" type="text/template">
       <%- name %>(<%- age %>)
       <a href="#" class="btn btn-link delete">&times;</a>
     </script>

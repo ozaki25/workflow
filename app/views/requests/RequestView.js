@@ -3,7 +3,7 @@ Backbone.Marionette = require('backbone.marionette');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'li',
-    template: '#user_view',
+    template: '#request_view',
     events: {
         'click .delete': 'onClickDelete'
     },

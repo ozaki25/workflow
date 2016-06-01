@@ -1,25 +1,79 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.LocalStorage = require('backbone.localstorage');
+var User = require('../models/User');
+
+module.exports = Backbone.Collection.extend({
+    model: User,
+    localStorage: new Backbone.LocalStorage('BackboneMarionetteTemplate.Users')
+});
+
+},{"../models/User":3,"backbone":"backbone","backbone.localstorage":9}],2:[function(require,module,exports){
 var $ = jQuery = require('jquery');
 require('bootstrap');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var Users = require('./collections/Users');
 var HeaderView = require('./views/HeaderView');
-var TestView = require('./views/TestView');
+var TestView = require('./views/test/TestView');
+var UsersView = require('./views/users/UsersView');
 
-var App = new Backbone.Marionette.Application({
+var appRouter = Backbone.Marionette.AppRouter.extend({
+    appRoutes: {
+        "": "test",
+        "test": "test",
+        "users": "users"
+    },
+    initialize: function() {
+        app.getRegion('header').show(new HeaderView());
+    },
+    controller: {
+        test: function() {
+            app.getRegion('main').show(new TestView());
+        },
+        users: function() {
+            var users = new Users();
+            users.fetch().done(function() {
+                var usersView = new UsersView({collection: users});
+                app.getRegion('main').show(usersView);
+            });
+        }
+    }
+});
+
+var app = new Backbone.Marionette.Application({
     regions: {
         header: '#header',
         main: '#main'
     },
     onStart: function() {
-        this.getRegion('header').show(new HeaderView());
-        this.getRegion('main').show(new TestView());
+        new appRouter();
+        Backbone.history.start();
     }
 });
 
-App.start();
+app.start();
 
-},{"./views/HeaderView":2,"./views/TestView":3,"backbone":"backbone","backbone.marionette":5,"bootstrap":"bootstrap","jquery":"jquery"}],2:[function(require,module,exports){
+},{"./collections/Users":1,"./views/HeaderView":4,"./views/test/TestView":5,"./views/users/UsersView":7,"backbone":"backbone","backbone.marionette":10,"bootstrap":"bootstrap","jquery":"jquery"}],3:[function(require,module,exports){
+var Backbone = require('backbone');
+
+module.exports = Backbone.Model.extend({
+    validation: {
+        name: {
+            required: true,
+            msg: '必須項目です。'
+        },
+        age: [{
+            required: true,
+            msg: '必須項目です。'
+        }, {
+            range: [0, 100],
+            msg: '0〜100を入力して下さい。'
+        }]
+    }
+});
+
+},{"backbone":"backbone"}],4:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -28,7 +82,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 });
 
 
-},{"backbone":"backbone","backbone.marionette":5}],3:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":10}],5:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -38,7 +92,74 @@ module.exports = Backbone.Marionette.ItemView.extend({
 });
 
 
-},{"backbone":"backbone","backbone.marionette":5}],4:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":10}],6:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    tagName: 'li',
+    template: '#user_view',
+    events: {
+        'click .delete': 'onClickDelete'
+    },
+    onClickDelete: function(e) {
+        e.preventDefault();
+        this.model.destroy({wait: true});
+    }
+});
+
+},{"backbone":"backbone","backbone.marionette":10}],7:[function(require,module,exports){
+var $ = require('jquery');
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+Backbone.Validation = require('backbone.validation');
+var User = require('../../models/User');
+var UserView = require('./UserView');
+
+module.exports = Backbone.Marionette.CompositeView.extend({
+    className: 'container',
+    childView: UserView,
+    childViewContainer: '#user_list',
+    template: '#users_view',
+    ui: {
+        inputName: 'input.name',
+        inputAge: 'input.age',
+        inputs: 'input',
+        createBtn: '.create-btn'
+    },
+    events: {
+        'click @ui.createBtn': 'onClickCreate'
+    },
+    onClickCreate: function() {
+        this.model = new User();
+        this.bindBackboneValidation();
+
+        var name = this.ui.inputName.val().trim();
+        var age = this.ui.inputAge.val().trim();
+        this.model.set({name: name, age: age});
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model, {wait: true});
+            this.ui.inputs.val('');
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error').find('.help-inline').empty();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error').find('.help-inline').text(error);
+            }
+        });
+    }
+});
+
+
+},{"../../models/User":3,"./UserView":6,"backbone":"backbone","backbone.marionette":10,"backbone.validation":"backbone.validation","jquery":"jquery"}],8:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11
@@ -230,7 +351,267 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],5:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],9:[function(require,module,exports){
+/**
+ * Backbone localStorage Adapter
+ * Version 1.1.16
+ *
+ * https://github.com/jeromegn/Backbone.localStorage
+ */
+(function (root, factory) {
+  if (typeof exports === 'object' && typeof require === 'function') {
+    module.exports = factory(require("backbone"));
+  } else if (typeof define === "function" && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(["backbone"], function(Backbone) {
+      // Use global variables if the locals are undefined.
+      return factory(Backbone || root.Backbone);
+    });
+  } else {
+    factory(Backbone);
+  }
+}(this, function(Backbone) {
+// A simple module to replace `Backbone.sync` with *localStorage*-based
+// persistence. Models are given GUIDS, and saved into a JSON object. Simple
+// as that.
+
+// Generate four random hex digits.
+function S4() {
+   return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+};
+
+// Generate a pseudo-GUID by concatenating random hexadecimal.
+function guid() {
+   return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+};
+
+function isObject(item) {
+  return item === Object(item);
+}
+
+function contains(array, item) {
+  var i = array.length;
+  while (i--) if (array[i] === item) return true;
+  return false;
+}
+
+function extend(obj, props) {
+  for (var key in props) obj[key] = props[key]
+  return obj;
+}
+
+function result(object, property) {
+    if (object == null) return void 0;
+    var value = object[property];
+    return (typeof value === 'function') ? object[property]() : value;
+}
+
+// Our Store is represented by a single JS object in *localStorage*. Create it
+// with a meaningful name, like the name you'd give a table.
+// window.Store is deprectated, use Backbone.LocalStorage instead
+Backbone.LocalStorage = window.Store = function(name, serializer) {
+  if( !this.localStorage ) {
+    throw "Backbone.localStorage: Environment does not support localStorage."
+  }
+  this.name = name;
+  this.serializer = serializer || {
+    serialize: function(item) {
+      return isObject(item) ? JSON.stringify(item) : item;
+    },
+    // fix for "illegal access" error on Android when JSON.parse is passed null
+    deserialize: function (data) {
+      return data && JSON.parse(data);
+    }
+  };
+  var store = this.localStorage().getItem(this.name);
+  this.records = (store && store.split(",")) || [];
+};
+
+extend(Backbone.LocalStorage.prototype, {
+
+  // Save the current state of the **Store** to *localStorage*.
+  save: function() {
+    this.localStorage().setItem(this.name, this.records.join(","));
+  },
+
+  // Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
+  // have an id of it's own.
+  create: function(model) {
+    if (!model.id && model.id !== 0) {
+      model.id = guid();
+      model.set(model.idAttribute, model.id);
+    }
+    this.localStorage().setItem(this._itemName(model.id), this.serializer.serialize(model));
+    this.records.push(model.id.toString());
+    this.save();
+    return this.find(model);
+  },
+
+  // Update a model by replacing its copy in `this.data`.
+  update: function(model) {
+    this.localStorage().setItem(this._itemName(model.id), this.serializer.serialize(model));
+    var modelId = model.id.toString();
+    if (!contains(this.records, modelId)) {
+      this.records.push(modelId);
+      this.save();
+    }
+    return this.find(model);
+  },
+
+  // Retrieve a model from `this.data` by id.
+  find: function(model) {
+    return this.serializer.deserialize(this.localStorage().getItem(this._itemName(model.id)));
+  },
+
+  // Return the array of all models currently in storage.
+  findAll: function() {
+    var result = [];
+    for (var i = 0, id, data; i < this.records.length; i++) {
+      id = this.records[i];
+      data = this.serializer.deserialize(this.localStorage().getItem(this._itemName(id)));
+      if (data != null) result.push(data);
+    }
+    return result;
+  },
+
+  // Delete a model from `this.data`, returning it.
+  destroy: function(model) {
+    this.localStorage().removeItem(this._itemName(model.id));
+    var modelId = model.id.toString();
+    for (var i = 0, id; i < this.records.length; i++) {
+      if (this.records[i] === modelId) {
+        this.records.splice(i, 1);
+      }
+    }
+    this.save();
+    return model;
+  },
+
+  localStorage: function() {
+    return localStorage;
+  },
+
+  // Clear localStorage for specific collection.
+  _clear: function() {
+    var local = this.localStorage(),
+      itemRe = new RegExp("^" + this.name + "-");
+
+    // Remove id-tracking item (e.g., "foo").
+    local.removeItem(this.name);
+
+    // Match all data items (e.g., "foo-ID") and remove.
+    for (var k in local) {
+      if (itemRe.test(k)) {
+        local.removeItem(k);
+      }
+    }
+
+    this.records.length = 0;
+  },
+
+  // Size of localStorage.
+  _storageSize: function() {
+    return this.localStorage().length;
+  },
+
+  _itemName: function(id) {
+    return this.name+"-"+id;
+  }
+
+});
+
+// localSync delegate to the model or collection's
+// *localStorage* property, which should be an instance of `Store`.
+// window.Store.sync and Backbone.localSync is deprecated, use Backbone.LocalStorage.sync instead
+Backbone.LocalStorage.sync = window.Store.sync = Backbone.localSync = function(method, model, options) {
+  var store = result(model, 'localStorage') || result(model.collection, 'localStorage');
+
+  var resp, errorMessage;
+  //If $ is having Deferred - use it.
+  var syncDfd = Backbone.$ ?
+    (Backbone.$.Deferred && Backbone.$.Deferred()) :
+    (Backbone.Deferred && Backbone.Deferred());
+
+  try {
+
+    switch (method) {
+      case "read":
+        resp = model.id != undefined ? store.find(model) : store.findAll();
+        break;
+      case "create":
+        resp = store.create(model);
+        break;
+      case "update":
+        resp = store.update(model);
+        break;
+      case "delete":
+        resp = store.destroy(model);
+        break;
+    }
+
+  } catch(error) {
+    if (error.code === 22 && store._storageSize() === 0)
+      errorMessage = "Private browsing is unsupported";
+    else
+      errorMessage = error.message;
+  }
+
+  if (resp) {
+    if (options && options.success) {
+      if (Backbone.VERSION === "0.9.10") {
+        options.success(model, resp, options);
+      } else {
+        options.success(resp);
+      }
+    }
+    if (syncDfd) {
+      syncDfd.resolve(resp);
+    }
+
+  } else {
+    errorMessage = errorMessage ? errorMessage
+                                : "Record Not Found";
+
+    if (options && options.error)
+      if (Backbone.VERSION === "0.9.10") {
+        options.error(model, errorMessage, options);
+      } else {
+        options.error(errorMessage);
+      }
+
+    if (syncDfd)
+      syncDfd.reject(errorMessage);
+  }
+
+  // add compatibility with $.ajax
+  // always execute callback for success and error
+  if (options && options.complete) options.complete(resp);
+
+  return syncDfd && syncDfd.promise();
+};
+
+Backbone.ajaxSync = Backbone.sync;
+
+Backbone.getSyncMethod = function(model, options) {
+  var forceAjaxSync = options && options.ajaxSync;
+
+  if(!forceAjaxSync && (result(model, 'localStorage') || result(model.collection, 'localStorage'))) {
+    return Backbone.localSync;
+  }
+
+  return Backbone.ajaxSync;
+};
+
+// Override 'Backbone.sync' to default to localSync,
+// the original 'Backbone.sync' is still available in 'Backbone.ajaxSync'
+Backbone.sync = function(method, model, options) {
+  return Backbone.getSyncMethod(model, options).apply(this, [method, model, options]);
+};
+
+return Backbone.LocalStorage;
+}));
+
+},{"backbone":"backbone"}],10:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
 // v2.4.7
@@ -3744,7 +4125,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
   return Marionette;
 }));
 
-},{"backbone":"backbone","backbone.babysitter":4,"backbone.wreqr":6,"underscore":"underscore"}],6:[function(require,module,exports){
+},{"backbone":"backbone","backbone.babysitter":8,"backbone.wreqr":11,"underscore":"underscore"}],11:[function(require,module,exports){
 // Backbone.Wreqr (Backbone.Marionette)
 // ----------------------------------
 // v1.3.6
@@ -4181,7 +4562,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],7:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],12:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -4345,7 +4726,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],8:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -4441,7 +4822,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],9:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -4563,7 +4944,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],10:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -4802,7 +5183,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],11:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -5015,7 +5396,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],12:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -5182,7 +5563,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],13:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -5521,7 +5902,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -5631,7 +6012,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -5805,7 +6186,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -5962,7 +6343,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -6478,7 +6859,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -9088,7 +9469,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":7,"../../js/alert.js":8,"../../js/button.js":9,"../../js/carousel.js":10,"../../js/collapse.js":11,"../../js/dropdown.js":12,"../../js/modal.js":13,"../../js/popover.js":14,"../../js/scrollspy.js":15,"../../js/tab.js":16,"../../js/tooltip.js":17,"../../js/transition.js":18}],"jquery":[function(require,module,exports){
+},{"../../js/affix.js":12,"../../js/alert.js":13,"../../js/button.js":14,"../../js/carousel.js":15,"../../js/collapse.js":16,"../../js/dropdown.js":17,"../../js/modal.js":18,"../../js/popover.js":19,"../../js/scrollspy.js":20,"../../js/tab.js":21,"../../js/tooltip.js":22,"../../js/transition.js":23}],"jquery":[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -20454,4 +20835,4 @@ return jQuery;
   }
 }.call(this));
 
-},{}]},{},[1]);
+},{}]},{},[2]);

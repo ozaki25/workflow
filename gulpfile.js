@@ -16,10 +16,10 @@ gulp.task('build', () => {
 // browserify
 gulp.task('browserify', () => {
     browserify({
-        entries: ['./app/scripts/main.js'],
-        require: ['jquery', 'underscore','backbone', 'bootstrap', 'backbone.validation']
+        entries: ['./app/main.js'],
+        require: ['jquery', 'underscore','backbone', 'backbone.validation']
     })
     .bundle()
     .pipe(source('app.js'))
-    .pipe(gulp.dest('./app/scripts/'));
+    .pipe(gulp.dest('./app/'));
 });

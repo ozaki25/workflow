@@ -1,5 +1,3 @@
-var $ = jQuery = require('jquery');
-require('bootstrap');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Users = require('./collections/Users');

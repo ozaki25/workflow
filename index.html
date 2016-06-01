@@ -36,25 +36,34 @@
     </script>
 
     <script id="requests_view" type="text/template">
-      <form class="form-inline">
-        <div class="form-group">
-          <label class="control-label">Name</label>
-          <input type="text" class="name form-control" name="name">
-          <span class="help-inline text-danger"><span>
-        </div>
-        <div class="form-group">
-          <label class="control-label">Age</label>
-          <input type="text" class="age form-control" name="age">
-          <span class="help-inline text-danger"><span>
-        </div>
-        <button type="button" class="btn btn-default create-btn">Submit</button
-      </form>
       <ul id="request_list"></ul>
     </script>
 
     <script id="request_view" type="text/template">
-      <%- name %>(<%- age %>)
+      <%- id %> 【<%- title %>】<%- content %>
       <a href="#" class="btn btn-link delete">&times;</a>
+    </script>
+
+    <script id="form_view" type="text/template">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text" class="title form-control" name="title">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Content</label>
+          <div class="col-sm-10">
+            <textarea type="text" class="content form-control" name="content"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="button" class="btn btn-default create-btn">Submit</button>
+          </div>
+        </div>
+      </form>
     </script>
 
     <script src="./app/app.js"></script>

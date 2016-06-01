@@ -2,16 +2,14 @@ var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
     validation: {
-        name: {
+        title: {
             required: true,
             msg: '必須項目です。'
         },
-        age: [{
+        content: {
             required: true,
             msg: '必須項目です。'
-        }, {
-            range: [0, 100],
-            msg: '0〜100を入力して下さい。'
-        }]
+        },
+        userId: { }
     }
 });

@@ -13,8 +13,8 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Requests = require('./collections/Requests');
 var HeaderView = require('./views/HeaderView');
-var TestView = require('./views/test/TestView');
 var RequestsView = require('./views/requests/RequestsView');
+var FormView = require('./views/requests/FormView');
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -27,13 +27,17 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         index: function() {
-            app.getRegion('main').show(new TestView());
-        },
-        newRequest: function() {
             var requests = new Requests();
             requests.fetch().done(function() {
                 var requestsView = new RequestsView({collection: requests});
                 app.getRegion('main').show(requestsView);
+            });
+        },
+        newRequest: function() {
+            var requests = new Requests();
+            requests.fetch().done(function() {
+                var formView = new FormView({collection: requests});
+                app.getRegion('main').show(formView);
             });
         }
     }
@@ -52,22 +56,20 @@ var app = new Backbone.Marionette.Application({
 
 app.start();
 
-},{"./collections/Requests":1,"./views/HeaderView":4,"./views/requests/RequestsView":6,"./views/test/TestView":7,"backbone":"backbone","backbone.marionette":10}],3:[function(require,module,exports){
+},{"./collections/Requests":1,"./views/HeaderView":4,"./views/requests/FormView":5,"./views/requests/RequestsView":7,"backbone":"backbone","backbone.marionette":10}],3:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
     validation: {
-        name: {
+        title: {
             required: true,
             msg: '必須項目です。'
         },
-        age: [{
+        content: {
             required: true,
             msg: '必須項目です。'
-        }, {
-            range: [0, 100],
-            msg: '0〜100を入力して下さい。'
-        }]
+        },
+        userId: { }
     }
 });
 
@@ -81,6 +83,58 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
 
 },{"backbone":"backbone","backbone.marionette":10}],5:[function(require,module,exports){
+var $ = require('jquery');
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+Backbone.Validation = require('backbone.validation');
+var Request = require('../../models/Request');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'container',
+    template: '#form_view',
+    ui: {
+        inputTitle: 'input.title',
+        inputContent: 'textarea.content',
+        inputs: 'input, textarea',
+        createBtn: '.create-btn'
+    },
+    events: {
+        'click @ui.createBtn': 'onClickCreate'
+    },
+    onClickCreate: function() {
+        this.model = new Request();
+        this.bindBackboneValidation();
+
+        var title = this.ui.inputTitle.val().trim();
+        var content = this.ui.inputContent.val().trim();
+        this.model.set({title: title, content: content});
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model, {wait: true});
+            this.ui.inputs.val('');
+            Backbone.history.navigate('/requests', {trigger: true});
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error').find('.help-block').remove();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error')
+                if(group.find('.help-block').length == 0) {
+                    control.after('<p class="help-block"></p>');
+                }
+                group.find('.help-block').text(error);
+            }
+        });
+    }
+});
+
+},{"../../models/Request":3,"backbone":"backbone","backbone.marionette":10,"backbone.validation":"backbone.validation","jquery":"jquery"}],6:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -96,68 +150,20 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":10}],6:[function(require,module,exports){
-var $ = require('jquery');
+},{"backbone":"backbone","backbone.marionette":10}],7:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-Backbone.Validation = require('backbone.validation');
-var Request = require('../../models/Request');
 var RequestView = require('./RequestView');
 
 module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'container',
     childView: RequestView,
     childViewContainer: '#request_list',
-    template: '#requests_view',
-    ui: {
-        inputName: 'input.name',
-        inputAge: 'input.age',
-        inputs: 'input',
-        createBtn: '.create-btn'
-    },
-    events: {
-        'click @ui.createBtn': 'onClickCreate'
-    },
-    onClickCreate: function() {
-        this.model = new Request();
-        this.bindBackboneValidation();
-
-        var name = this.ui.inputName.val().trim();
-        var age = this.ui.inputAge.val().trim();
-        this.model.set({name: name, age: age});
-        if(this.model.isValid(true)) {
-            this.collection.create(this.model, {wait: true});
-            this.ui.inputs.val('');
-        }
-    },
-    bindBackboneValidation: function() {
-        Backbone.Validation.bind(this, {
-            valid: function(view, attr) {
-                var control = view.$('[name=' + attr + ']');
-                var group = control.closest('.form-group');
-                group.removeClass('has-error').find('.help-inline').empty();
-            },
-            invalid: function(view, attr, error) {
-                var control = view.$('[name=' + attr + ']');
-                var group = control.closest('.form-group');
-                group.addClass('has-error').find('.help-inline').text(error);
-            }
-        });
-    }
+    template: '#requests_view'
 });
 
 
-},{"../../models/Request":3,"./RequestView":5,"backbone":"backbone","backbone.marionette":10,"backbone.validation":"backbone.validation","jquery":"jquery"}],7:[function(require,module,exports){
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-
-module.exports = Backbone.Marionette.ItemView.extend({
-    className: 'container',
-    template: '#test_view'
-});
-
-
-},{"backbone":"backbone","backbone.marionette":10}],8:[function(require,module,exports){
+},{"./RequestView":6,"backbone":"backbone","backbone.marionette":10}],8:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11

@@ -2,8 +2,8 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Requests = require('./collections/Requests');
 var HeaderView = require('./views/HeaderView');
-var TestView = require('./views/test/TestView');
 var RequestsView = require('./views/requests/RequestsView');
+var FormView = require('./views/requests/FormView');
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -16,13 +16,17 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         index: function() {
-            app.getRegion('main').show(new TestView());
-        },
-        newRequest: function() {
             var requests = new Requests();
             requests.fetch().done(function() {
                 var requestsView = new RequestsView({collection: requests});
                 app.getRegion('main').show(requestsView);
+            });
+        },
+        newRequest: function() {
+            var requests = new Requests();
+            requests.fetch().done(function() {
+                var formView = new FormView({collection: requests});
+                app.getRegion('main').show(formView);
             });
         }
     }

@@ -1,8 +1,8 @@
 var Backbone = require('backbone');
 Backbone.LocalStorage = require('backbone.localstorage');
-var Request = require('../models/Request');
+var User = require('../models/User');
 
 module.exports = Backbone.Collection.extend({
-    model: Request,
-    localStorage: new Backbone.LocalStorage('Workflow.requests')
+    model: User,
+    localStorage: new Backbone.LocalStorage('Workflow.users')
 });

@@ -1,15 +1,18 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Requests = require('./collections/Requests');
+var Users = require('./collections/Users');
 var HeaderView = require('./views/HeaderView');
 var RequestsView = require('./views/requests/RequestsView');
 var FormView = require('./views/requests/FormView');
+var UsersMainView = require('./views/users/MainView');
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "": "index",
-        "requests": "index",
-        "request/new": "newRequest"
+        ""           : "index",
+        "requests"   : "index",
+        "request/new": "newRequest",
+        "users"      : "users"
     },
     initialize: function() {
         app.getRegion('header').show(new HeaderView());
@@ -27,6 +30,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             requests.fetch().done(function() {
                 var formView = new FormView({collection: requests});
                 app.getRegion('main').show(formView);
+            });
+        },
+        users: function() {
+            var users = new Users();
+            users.fetch().done(function() {
+                var usersMainView = new UsersMainView({collection: users});
+                app.getRegion('main').show(usersMainView);
             });
         }
     }

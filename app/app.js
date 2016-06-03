@@ -5,22 +5,35 @@ var Request = require('../models/Request');
 
 module.exports = Backbone.Collection.extend({
     model: Request,
-    localStorage: new Backbone.LocalStorage('BackboneMarionetteTemplate.requests')
+    localStorage: new Backbone.LocalStorage('Workflow.requests')
 });
 
-},{"../models/Request":3,"backbone":"backbone","backbone.localstorage":9}],2:[function(require,module,exports){
+},{"../models/Request":4,"backbone":"backbone","backbone.localstorage":15}],2:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.LocalStorage = require('backbone.localstorage');
+var User = require('../models/User');
+
+module.exports = Backbone.Collection.extend({
+    model: User,
+    localStorage: new Backbone.LocalStorage('Workflow.users')
+});
+
+},{"../models/User":5,"backbone":"backbone","backbone.localstorage":15}],3:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Requests = require('./collections/Requests');
+var Users = require('./collections/Users');
 var HeaderView = require('./views/HeaderView');
 var RequestsView = require('./views/requests/RequestsView');
 var FormView = require('./views/requests/FormView');
+var UsersMainView = require('./views/users/MainView');
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "": "index",
-        "requests": "index",
-        "request/new": "newRequest"
+        ""           : "index",
+        "requests"   : "index",
+        "request/new": "newRequest",
+        "users"      : "users"
     },
     initialize: function() {
         app.getRegion('header').show(new HeaderView());
@@ -39,6 +52,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 var formView = new FormView({collection: requests});
                 app.getRegion('main').show(formView);
             });
+        },
+        users: function() {
+            var users = new Users();
+            users.fetch().done(function() {
+                var usersMainView = new UsersMainView({collection: users});
+                app.getRegion('main').show(usersMainView);
+            });
         }
     }
 });
@@ -56,7 +76,7 @@ var app = new Backbone.Marionette.Application({
 
 app.start();
 
-},{"./collections/Requests":1,"./views/HeaderView":4,"./views/requests/FormView":5,"./views/requests/RequestsView":7,"backbone":"backbone","backbone.marionette":10}],3:[function(require,module,exports){
+},{"./collections/Requests":1,"./collections/Users":2,"./views/HeaderView":6,"./views/requests/FormView":7,"./views/requests/RequestsView":9,"./views/users/MainView":11,"backbone":"backbone","backbone.marionette":16}],4:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -73,7 +93,33 @@ module.exports = Backbone.Model.extend({
     }
 });
 
-},{"backbone":"backbone"}],4:[function(require,module,exports){
+},{"backbone":"backbone"}],5:[function(require,module,exports){
+var Backbone = require('backbone');
+
+module.exports = Backbone.Model.extend({
+    defaults: {
+        team: 'None',
+        jobLebel: 3,
+        admin: false
+    },
+    validation: {
+        name: {
+            required: true
+        },
+        uid: {
+            required: true
+        },
+        jobLebel: {
+            required: true,
+            range: [0, 4]
+        },
+        admin: {
+            required: true
+        }
+    }
+});
+
+},{"backbone":"backbone"}],6:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -82,7 +128,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 });
 
 
-},{"backbone":"backbone","backbone.marionette":10}],5:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":16}],7:[function(require,module,exports){
 var $ = require('jquery');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
@@ -134,7 +180,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"../../models/Request":3,"backbone":"backbone","backbone.marionette":10,"backbone.validation":"backbone.validation","jquery":"jquery"}],6:[function(require,module,exports){
+},{"../../models/Request":4,"backbone":"backbone","backbone.marionette":16,"backbone.validation":"backbone.validation","jquery":"jquery"}],8:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -150,7 +196,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":10}],7:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":16}],9:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var RequestView = require('./RequestView');
@@ -163,7 +209,141 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 });
 
 
-},{"./RequestView":6,"backbone":"backbone","backbone.marionette":10}],8:[function(require,module,exports){
+},{"./RequestView":8,"backbone":"backbone","backbone.marionette":16}],10:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var User = require('../../models/User');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'panel panel-default',
+    template: '#user_form_view',
+    ui: {
+        inputUid: 'input.uid',
+        inputName: 'input.name',
+        inputTeam: 'input.team',
+        inputJobLevel: 'select.job-level',
+        inputAdmin: 'input.admin',
+        newUserBtn: '.new-user'
+    },
+    events: {
+        'click @ui.newUserBtn': 'onClickNew'
+    },
+    onClickNew: function() {
+        this.model = new User();
+        this.bindBackboneValidation();
+
+        var uid = this.ui.inputUid.val().trim();
+        var name = this.ui.inputName.val().trim();
+        var team = this.ui.inputTeam.val().trim();
+        var jobLevel = this.ui.inputJobLevel.val().trim();
+        var admin = this.ui.inputAdmin.val().trim();
+        this.model.set({
+            uid: uid,
+            name: name,
+            team: team,
+            jobLevel: jobLevel,
+            admin: admin
+        });
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model, {wait: true});
+            this.ui.inputName.val('');
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error').find('.help-block').remove();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error');
+                if(group.find('.help-block').length == 0) {
+                    control.after('<p class="help-block"></p>');
+                }
+                group.find('.help-block').text(error);
+            }
+        });
+    }
+});
+
+
+},{"../../models/User":5,"backbone":"backbone","backbone.marionette":16}],11:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var UsersView = require('./UsersView');
+var FormView = require('./FormView');
+
+module.exports = Backbone.Marionette.LayoutView.extend({
+    className: 'container',
+    template: '#users_main_view',
+    regions: {
+        usersMain: '#users_main'
+    },
+    collectionEvents: {
+        'add': 'showIndex'
+    },
+    childEvents: {
+        'click:new': 'showNew'
+    },
+    onRender: function() {
+        var usersView = new UsersView({collection: this.collection});
+        this.getRegion('usersMain').show(usersView);
+    },
+    showNew: function() {
+        var formView = new FormView({collection: this.collection});
+        this.getRegion('usersMain').show(formView);
+    },
+    showIndex: function() {
+        var usersView = new UsersView({collection: this.collection});
+        this.getRegion('usersMain').show(usersView);
+    }
+});
+
+
+},{"./FormView":10,"./UsersView":13,"backbone":"backbone","backbone.marionette":16}],12:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    tagName: 'tr',
+    template: '#user_view',
+    events: {
+        'click .delete': 'onClickDelete'
+    },
+    onClickDelete: function(e) {
+        e.preventDefault();
+        this.model.destroy({wait: true});
+    }
+});
+
+},{"backbone":"backbone","backbone.marionette":16}],13:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var User = require('../../models/User');
+var UserView = require('./UserView');
+
+module.exports = Backbone.Marionette.CompositeView.extend({
+    className: 'panel panel-default',
+    childView: UserView,
+    childViewContainer: '#user_list',
+    template: '#users_view',
+    ui: {
+        newUserBtn: '.new-user'
+    },
+    events: {
+        'click @ui.newUserBtn': 'onClickNewBtn'
+    },
+    onClickNewBtn: function(e) {
+        e.preventDefault();
+        this.triggerMethod('click:new');
+    }
+});
+
+
+},{"../../models/User":5,"./UserView":12,"backbone":"backbone","backbone.marionette":16}],14:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11
@@ -355,7 +535,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],9:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],15:[function(require,module,exports){
 /**
  * Backbone localStorage Adapter
  * Version 1.1.16
@@ -615,7 +795,7 @@ Backbone.sync = function(method, model, options) {
 return Backbone.LocalStorage;
 }));
 
-},{"backbone":"backbone"}],10:[function(require,module,exports){
+},{"backbone":"backbone"}],16:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
 // v2.4.7
@@ -4129,7 +4309,7 @@ return Backbone.LocalStorage;
   return Marionette;
 }));
 
-},{"backbone":"backbone","backbone.babysitter":8,"backbone.wreqr":11,"underscore":"underscore"}],11:[function(require,module,exports){
+},{"backbone":"backbone","backbone.babysitter":14,"backbone.wreqr":17,"underscore":"underscore"}],17:[function(require,module,exports){
 // Backbone.Wreqr (Backbone.Marionette)
 // ----------------------------------
 // v1.3.6
@@ -18467,4 +18647,4 @@ return jQuery;
   }
 }.call(this));
 
-},{}]},{},[2]);
+},{}]},{},[3]);

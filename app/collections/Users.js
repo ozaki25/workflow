@@ -4,5 +4,14 @@ var User = require('../models/User');
 
 module.exports = Backbone.Collection.extend({
     model: User,
-    localStorage: new Backbone.LocalStorage('Workflow.users')
+    localStorage: new Backbone.LocalStorage('Workflow.users'),
+    addDefaultUser: function() {
+        this.create({
+            uid: 'admin1234',
+            name: 'テストユーザ',
+            team: 'テスト',
+            jobLevel: '1',
+            admin: true
+        }, {wait: true});
+    }
 });

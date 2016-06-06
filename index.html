@@ -27,6 +27,9 @@
               <li><a href="#request/new">New</a></li>
               <li><a href="#users">Users</a></li>
             </ul>
+            <ul class="nav navbar-nav pull-right">
+              <li><a href=""><%= username() %></a></li>
+            </ul>
           </div>
         </div>
       </nav>
@@ -153,6 +156,36 @@
           </div>
         </form>
       </div>
+    </script>
+
+    <script id="login_view" type="text/template">
+      <div class="row">
+        <div id="users_main" class="col-md-offset-2 col-md-8"></div>
+      </div>
+    </script>
+
+    <script id="login_users_view" type="text/template">
+      <div class="panel-heading">User List</div>
+      <table class="table">
+        <tr>
+          <th>UserId</th>
+          <th>Name</th>
+          <th>Team</th>
+          <th>JobLevel</th>
+          <th>Admin</th>
+          <th></th>
+        </tr>
+        <tbody id="user_list"></tbody>
+      </table>
+    </script>
+
+    <script id="login_user_view" type="text/template">
+      <td><%- uid %></td>
+      <td><%- name %></td>
+      <td><%- team %></td>
+      <td><%- jobLevel %></td>
+      <td><%- admin %></td>
+      <td><a class="btn btn-default btn-xs login">Login</a></td>
     </script>
 
     <script src="./app/app.js"></script>

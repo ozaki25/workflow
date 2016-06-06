@@ -36,12 +36,31 @@
     </script>
 
     <script id="requests_view" type="text/template">
-      <ul id="request_list"></ul>
+      <div class="panel panel-default">
+        <div class="panel-heading">Request List</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Title</th>
+              <th>User</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="request_list"></tbody>
+        </table>
+      </div>
     </script>
 
     <script id="request_view" type="text/template">
-      <%- id %> 【<%- title %>】<%- content %> (<%- user.name %>)
-      <a href="#" class="btn btn-link delete">&times;</a>
+      <td><%- id %></td>
+      <td><%- title %></td>
+      <td><%- user.name %></td>
+      <td><a href="#" class="btn btn-default btn-xs show-request">Show</a></td>
+      <td><a href="#" class="btn btn-default btn-xs edit-request">Edit</a></td>
+      <td><a href="#" class="btn btn-link btn-xs delete-request">Delete</a></td>
     </script>
 
     <script id="form_view" type="text/template">

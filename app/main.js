@@ -10,6 +10,9 @@ var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
 var LoginView = require('./views/login/LoginView');
 
+var requests = new Requests();
+var users = new Users();
+
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
         "login"        : "login",
@@ -25,7 +28,6 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         login: function() {
-            var users = new Users();
             users.fetch().done(function() {
                 if(users.length == 0) users.addDefaultUser();
                 var loginView = new LoginView({collection: users, app: app});
@@ -33,14 +35,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             });
         },
         index: function() {
-            var requests = new Requests();
             requests.fetch().done(function() {
                 var requestsView = new RequestsView({collection: requests});
                 app.getRegion('main').show(requestsView);
             });
         },
         newRequest: function() {
-            var requests = new Requests();
             requests.fetch().done(function() {
                 var formView = new RequestFormView({collection: requests, currentUser: app.currentUser});
                 app.getRegion('main').show(formView);
@@ -48,13 +48,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         },
         showRequest: function(id) {
             var request = new Request({id: id});
+            request.collection = requests; // backbone.localstorage用
             request.fetch().done(function() {
                 var showView = new ShowRequestView({model: request});
                 app.getRegion('main').show(showView);
             });
         },
         users: function() {
-            var users = new Users();
             users.fetch().done(function() {
                 var usersMainView = new UsersMainView({collection: users});
                 app.getRegion('main').show(usersMainView);

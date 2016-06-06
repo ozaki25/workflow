@@ -40,6 +40,9 @@ var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
 var LoginView = require('./views/login/LoginView');
 
+var requests = new Requests();
+var users = new Users();
+
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
         "login"        : "login",
@@ -55,7 +58,6 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         login: function() {
-            var users = new Users();
             users.fetch().done(function() {
                 if(users.length == 0) users.addDefaultUser();
                 var loginView = new LoginView({collection: users, app: app});
@@ -63,28 +65,27 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             });
         },
         index: function() {
-            var requests = new Requests();
             requests.fetch().done(function() {
                 var requestsView = new RequestsView({collection: requests});
                 app.getRegion('main').show(requestsView);
             });
         },
         newRequest: function() {
-            var requests = new Requests();
             requests.fetch().done(function() {
                 var formView = new RequestFormView({collection: requests, currentUser: app.currentUser});
                 app.getRegion('main').show(formView);
             });
         },
         showRequest: function(id) {
+            console.log(requests);
             var request = new Request({id: id});
+            request.collection = requests; // backbone.localstorage用
             request.fetch().done(function() {
                 var showView = new ShowRequestView({model: request});
                 app.getRegion('main').show(showView);
             });
         },
         users: function() {
-            var users = new Users();
             users.fetch().done(function() {
                 var usersMainView = new UsersMainView({collection: users});
                 app.getRegion('main').show(usersMainView);
@@ -108,10 +109,8 @@ app.start();
 
 },{"./collections/Requests":1,"./collections/Users":2,"./models/Request":4,"./views/HeaderView":6,"./views/login/LoginView":7,"./views/requests/FormView":10,"./views/requests/RequestsView":12,"./views/requests/ShowView":13,"./views/users/MainView":15,"backbone":"backbone","backbone.marionette":20}],4:[function(require,module,exports){
 var Backbone = require('backbone');
-Backbone.LocalStorage = require('backbone.localstorage');
 
 module.exports = Backbone.Model.extend({
-    localStorage: new Backbone.LocalStorage('Workflow.requests'),
     validation: {
         title: {
             required: true,
@@ -120,12 +119,11 @@ module.exports = Backbone.Model.extend({
         content: {
             required: true,
             msg: '必須項目です。'
-        },
-        userId: { }
+        }
     }
 });
 
-},{"backbone":"backbone","backbone.localstorage":19}],5:[function(require,module,exports){
+},{"backbone":"backbone"}],5:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -192,7 +190,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     login: function(view) {
         this.app.currentUser = view.model;
-        Backbone.history.navigate('', {trigger: true});
+        Backbone.history.navigate('requests/24e8c05c-f725-297a-c06f-afeb11d47b2a', {trigger: true});
     }
 });
 

@@ -15,12 +15,13 @@ var users = new Users();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "login"        : "login",
-        ""             : "index",
-        "requests"     : "index",
-        "requests/new" : "newRequest",
-        "requests/:id" : "showRequest",
-        "users"        : "users"
+        "login"             : "login",
+        ""                  : "index",
+        "requests"          : "index",
+        "requests/new"      : "newRequest",
+        "requests/:id"      : "showRequest",
+        "requests/:id/edit" : "editRequest",
+        "users"             : "users"
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -52,6 +53,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             request.fetch().done(function() {
                 var showView = new ShowRequestView({model: request});
                 app.getRegion('main').show(showView);
+            });
+        },
+        editRequest: function(id) {
+            requests.fetch().done(function() {
+                var request = requests.find({id: id});
+                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser});
+                app.getRegion('main').show(formView);
             });
         },
         users: function() {

@@ -19,8 +19,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
     initialize: function(options) {
         this.currentUser = options.currentUser;
     },
+    onRender: function() {
+        if(this.model) {
+            this.ui.inputTitle.val(this.model.get('title'));
+            this.ui.inputContent.val(this.model.get('content'));
+        }
+    },
     onClickCreate: function() {
-        this.model = new Request();
+        if(!this.model) this.model = new Request();
         this.bindBackboneValidation();
 
         var title = this.ui.inputTitle.val().trim();

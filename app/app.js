@@ -45,12 +45,13 @@ var users = new Users();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "login"        : "login",
-        ""             : "index",
-        "requests"     : "index",
-        "requests/new" : "newRequest",
-        "requests/:id" : "showRequest",
-        "users"        : "users"
+        "login"             : "login",
+        ""                  : "index",
+        "requests"          : "index",
+        "requests/new"      : "newRequest",
+        "requests/:id"      : "showRequest",
+        "requests/:id/edit" : "editRequest",
+        "users"             : "users"
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -77,12 +78,19 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             });
         },
         showRequest: function(id) {
-            console.log(requests);
             var request = new Request({id: id});
             request.collection = requests; // backbone.localstorage用
             request.fetch().done(function() {
                 var showView = new ShowRequestView({model: request});
                 app.getRegion('main').show(showView);
+            });
+        },
+        editRequest: function(id) {
+            requests.fetch().done(function() {
+                var request = requests.find({id: id});
+                console.log(request);
+                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser});
+                app.getRegion('main').show(formView);
             });
         },
         users: function() {
@@ -190,7 +198,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     login: function(view) {
         this.app.currentUser = view.model;
-        Backbone.history.navigate('requests/24e8c05c-f725-297a-c06f-afeb11d47b2a', {trigger: true});
+        Backbone.history.navigate('', {trigger: true});
     }
 });
 
@@ -247,8 +255,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
     initialize: function(options) {
         this.currentUser = options.currentUser;
     },
+    onRender: function() {
+        if(this.model) {
+            this.ui.inputTitle.val(this.model.get('title'));
+            this.ui.inputContent.val(this.model.get('content'));
+        }
+    },
     onClickCreate: function() {
-        this.model = new Request();
+        if(!this.model) this.model = new Request();
         this.bindBackboneValidation();
 
         var title = this.ui.inputTitle.val().trim();

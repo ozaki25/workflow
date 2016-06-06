@@ -8,7 +8,12 @@
   </head>
   <body>
     <div id="header"></div>
-    <div id="main"></div>
+    <div class="container">
+      <div class="row">
+        <div id="side_menu" class="col-sm-2"></div>
+        <div id="main" class="col-sm-10"></div>
+      </div>
+    </div>
 
     <script id="header_view" type="text/template">
       <nav class="navbar navbar-default">
@@ -22,36 +27,35 @@
             <a href="#" class="navbar-brand">Workflow System</a>
           </div>
           <div class="collapse navbar-collapse" id="navbar_links">
-            <ul class="nav navbar-nav">
-              <li><a href="#requests">Index</a></li>
-              <li><a href="#requests/new">New</a></li>
-              <li><a href="#users">Users</a></li>
-            </ul>
             <ul class="nav navbar-nav pull-right">
-              <li><a href=""><%= username() %></a></li>
+              <li><a href="#"><%= username() %></a></li>
             </ul>
           </div>
         </div>
       </nav>
     </script>
 
+    <script id="side_menu_view" type="text/template">
+      <li><a href="#requests">Index</a></li>
+      <li><a href="#requests/new">New</a></li>
+      <li><a href="#users">Users</a></li>
+    </script>
+
     <script id="requests_view" type="text/template">
-      <div class="panel panel-default">
-        <div class="panel-heading">Request List</div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Title</th>
-              <th>User</th>
-              <th></th>
-              <th></th>
-              <th></th>
+      <div class="panel-heading">Request List</div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>User</th>
+            <th></th>
+            <th></th>
+            <th></th>
             </tr>
-          </thead>
-          <tbody id="request_list"></tbody>
-        </table>
-      </div>
+        </thead>
+        <tbody id="request_list"></tbody>
+      </table>
     </script>
 
     <script id="request_view" type="text/template">
@@ -64,50 +68,50 @@
     </script>
 
     <script id="request_form_view" type="text/template">
-      <form class="form-horizontal">
-        <div class="form-group">
-          <label class="col-sm-2 control-label">Title</label>
-          <div class="col-sm-10">
-            <input type="text" class="title form-control" name="title">
+      <div class="panel-heading">Request Form</div>
+      <div class="panel-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Title</label>
+            <div class="col-sm-10">
+              <input type="text" class="title form-control" name="title">
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="col-sm-2 control-label">Content</label>
-          <div class="col-sm-10">
-            <textarea type="text" class="content form-control" name="content"></textarea>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Content</label>
+            <div class="col-sm-10">
+              <textarea type="text" class="content form-control" name="content"></textarea>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
-            <button type="button" class="btn btn-default create-btn">Submit</button>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" class="btn btn-default create-btn">Submit</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </script>
 
     <script id="show_request_view" type="text/template">
-      <div class="panel panel-default">
-        <div class="panel-heading">Show Request</div>
-        <div class="panel-body">
-          <dl class="dl-horizontal">
-            <dt>ID</dt>
-            <dd><%- id %></dd>
-            <dt>User</dt>
-            <dd><%- user.name %></dd>
-            <dt>Team</dt>
-            <dd><%- user.team %></dd>
-            <dt>Title</dt>
-            <dd><%- title %></dd>
-            <dt>Content</dt>
-            <dd><%- content %></dd>
-          </dl>
-        </div>
+      <div class="panel-heading">Show Request</div>
+      <div class="panel-body">
+        <dl class="dl-horizontal">
+          <dt>ID</dt>
+          <dd><%- id %></dd>
+          <dt>User</dt>
+          <dd><%- user.name %></dd>
+          <dt>Team</dt>
+          <dd><%- user.team %></dd>
+          <dt>Title</dt>
+          <dd><%- title %></dd>
+          <dt>Content</dt>
+          <dd><%- content %></dd>
+        </dl>
+      </div>
     </script>
 
     <script id="users_main_view" type="text/template">
-      <div class="row">
-        <div id="users_main" class="col-md-offset-2 col-md-8"></div>
-      </div>
+      <div id="users_main"></div>
     </script>
 
     <script id="users_view" type="text/template">
@@ -193,9 +197,7 @@
     </script>
 
     <script id="login_view" type="text/template">
-      <div class="row">
-        <div id="users_main" class="col-md-offset-2 col-md-8"></div>
-      </div>
+      <div id="users_main"></div>
     </script>
 
     <script id="login_users_view" type="text/template">

@@ -3,7 +3,6 @@ Backbone.Marionette = require('backbone.marionette');
 var UsersView = require('./UsersView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
-    className: 'container',
     template: '#users_main_view',
     regions: {
         usersMain: '#users_main'

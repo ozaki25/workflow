@@ -8,7 +8,7 @@ module.exports = Backbone.Collection.extend({
     localStorage: new Backbone.LocalStorage('Workflow.requests')
 });
 
-},{"../models/Request":4,"backbone":"backbone","backbone.localstorage":19}],2:[function(require,module,exports){
+},{"../models/Request":4,"backbone":"backbone","backbone.localstorage":20}],2:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.LocalStorage = require('backbone.localstorage');
 var User = require('../models/User');
@@ -27,13 +27,14 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"../models/User":5,"backbone":"backbone","backbone.localstorage":19}],3:[function(require,module,exports){
+},{"../models/User":5,"backbone":"backbone","backbone.localstorage":20}],3:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var HeaderView = require('./views/HeaderView');
+var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
@@ -52,6 +53,9 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/:id"      : "showRequest",
         "requests/:id/edit" : "editRequest",
         "users"             : "users"
+    },
+    initialize: function() {
+        app.getRegion('sideMenu').show(new SideMenuView());
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -88,7 +92,6 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         editRequest: function(id) {
             requests.fetch().done(function() {
                 var request = requests.find({id: id});
-                console.log(request);
                 var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser});
                 app.getRegion('main').show(formView);
             });
@@ -105,6 +108,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
 var app = new Backbone.Marionette.Application({
     regions: {
         header: '#header',
+        sideMenu: '#side_menu',
         main: '#main'
     },
     onStart: function() {
@@ -115,7 +119,7 @@ var app = new Backbone.Marionette.Application({
 
 app.start();
 
-},{"./collections/Requests":1,"./collections/Users":2,"./models/Request":4,"./views/HeaderView":6,"./views/login/LoginView":7,"./views/requests/FormView":10,"./views/requests/RequestsView":12,"./views/requests/ShowView":13,"./views/users/MainView":15,"backbone":"backbone","backbone.marionette":20}],4:[function(require,module,exports){
+},{"./collections/Requests":1,"./collections/Users":2,"./models/Request":4,"./views/HeaderView":6,"./views/SideMenuView":7,"./views/login/LoginView":8,"./views/requests/FormView":11,"./views/requests/RequestsView":13,"./views/requests/ShowView":14,"./views/users/MainView":16,"backbone":"backbone","backbone.marionette":21}],4:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -175,13 +179,22 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":20}],7:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":21}],7:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    tagName: 'ul',
+    className: 'nav nav-pills nav-stacked',
+    template: '#side_menu_view'
+});
+
+},{"backbone":"backbone","backbone.marionette":21}],8:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UsersView = require('./UsersView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
-    className: 'container',
     template: '#users_main_view',
     regions: {
         usersMain: '#users_main'
@@ -203,7 +216,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 });
 
 
-},{"./UsersView":9,"backbone":"backbone","backbone.marionette":20}],8:[function(require,module,exports){
+},{"./UsersView":10,"backbone":"backbone","backbone.marionette":21}],9:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -219,7 +232,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":20}],9:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":21}],10:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
@@ -233,7 +246,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 });
 
 
-},{"../../models/User":5,"./UserView":8,"backbone":"backbone","backbone.marionette":20}],10:[function(require,module,exports){
+},{"../../models/User":5,"./UserView":9,"backbone":"backbone","backbone.marionette":21}],11:[function(require,module,exports){
 var $ = require('jquery');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
@@ -241,7 +254,7 @@ Backbone.Validation = require('backbone.validation');
 var Request = require('../../models/Request');
 
 module.exports = Backbone.Marionette.ItemView.extend({
-    className: 'container',
+    className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
         inputTitle: 'input.title',
@@ -297,7 +310,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"../../models/Request":4,"backbone":"backbone","backbone.marionette":20,"backbone.validation":"backbone.validation","jquery":"jquery"}],11:[function(require,module,exports){
+},{"../../models/Request":4,"backbone":"backbone","backbone.marionette":21,"backbone.validation":"backbone.validation","jquery":"jquery"}],12:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -323,28 +336,28 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":20}],12:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":21}],13:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var RequestView = require('./RequestView');
 
 module.exports = Backbone.Marionette.CompositeView.extend({
-    className: 'container',
+    className: 'panel panel-default',
     childView: RequestView,
     childViewContainer: '#request_list',
     template: '#requests_view'
 });
 
-},{"./RequestView":11,"backbone":"backbone","backbone.marionette":20}],13:[function(require,module,exports){
+},{"./RequestView":12,"backbone":"backbone","backbone.marionette":21}],14:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
 module.exports = Backbone.Marionette.ItemView.extend({
-    className: 'container',
+    className: 'panel panel-default',
     template: '#show_request_view'
 });
 
-},{"backbone":"backbone","backbone.marionette":20}],14:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":21}],15:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
@@ -404,14 +417,13 @@ module.exports = Backbone.Marionette.ItemView.extend({
 });
 
 
-},{"../../models/User":5,"backbone":"backbone","backbone.marionette":20}],15:[function(require,module,exports){
+},{"../../models/User":5,"backbone":"backbone","backbone.marionette":21}],16:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UsersView = require('./UsersView');
 var FormView = require('./FormView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
-    className: 'container',
     template: '#users_main_view',
     regions: {
         usersMain: '#users_main'
@@ -437,7 +449,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 });
 
 
-},{"./FormView":14,"./UsersView":17,"backbone":"backbone","backbone.marionette":20}],16:[function(require,module,exports){
+},{"./FormView":15,"./UsersView":18,"backbone":"backbone","backbone.marionette":21}],17:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -453,7 +465,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":20}],17:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":21}],18:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
@@ -477,7 +489,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 });
 
 
-},{"../../models/User":5,"./UserView":16,"backbone":"backbone","backbone.marionette":20}],18:[function(require,module,exports){
+},{"../../models/User":5,"./UserView":17,"backbone":"backbone","backbone.marionette":21}],19:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11
@@ -669,7 +681,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],19:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],20:[function(require,module,exports){
 /**
  * Backbone localStorage Adapter
  * Version 1.1.16
@@ -929,7 +941,7 @@ Backbone.sync = function(method, model, options) {
 return Backbone.LocalStorage;
 }));
 
-},{"backbone":"backbone"}],20:[function(require,module,exports){
+},{"backbone":"backbone"}],21:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
 // v2.4.7
@@ -4443,7 +4455,7 @@ return Backbone.LocalStorage;
   return Marionette;
 }));
 
-},{"backbone":"backbone","backbone.babysitter":18,"backbone.wreqr":21,"underscore":"underscore"}],21:[function(require,module,exports){
+},{"backbone":"backbone","backbone.babysitter":19,"backbone.wreqr":22,"underscore":"underscore"}],22:[function(require,module,exports){
 // Backbone.Wreqr (Backbone.Marionette)
 // ----------------------------------
 // v1.3.6

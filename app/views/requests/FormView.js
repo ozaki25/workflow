@@ -5,7 +5,7 @@ Backbone.Validation = require('backbone.validation');
 var Request = require('../../models/Request');
 
 module.exports = Backbone.Marionette.ItemView.extend({
-    className: 'container',
+    className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
         inputTitle: 'input.title',

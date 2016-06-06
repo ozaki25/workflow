@@ -2,6 +2,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
 module.exports = Backbone.Marionette.ItemView.extend({
-    className: 'panel panel-default',
-    template: '#show_request_view'
+    tagName: 'ul',
+    className: 'nav nav-pills nav-stacked',
+    template: '#side_menu_view'
 });

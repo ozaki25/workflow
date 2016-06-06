@@ -4,6 +4,7 @@ var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var HeaderView = require('./views/HeaderView');
+var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
@@ -22,6 +23,9 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/:id"      : "showRequest",
         "requests/:id/edit" : "editRequest",
         "users"             : "users"
+    },
+    initialize: function() {
+        app.getRegion('sideMenu').show(new SideMenuView());
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -74,6 +78,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
 var app = new Backbone.Marionette.Application({
     regions: {
         header: '#header',
+        sideMenu: '#side_menu',
         main: '#main'
     },
     onStart: function() {

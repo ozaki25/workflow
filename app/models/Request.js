@@ -1,6 +1,8 @@
 var Backbone = require('backbone');
+Backbone.LocalStorage = require('backbone.localstorage');
 
 module.exports = Backbone.Model.extend({
+    localStorage: new Backbone.LocalStorage('Workflow.requests'),
     validation: {
         title: {
             required: true,

@@ -1,20 +1,23 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var HeaderView = require('./views/HeaderView');
 var RequestsView = require('./views/requests/RequestsView');
-var FormView = require('./views/requests/FormView');
+var RequestFormView = require('./views/requests/FormView');
+var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
 var LoginView = require('./views/login/LoginView');
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "login"      : "login",
-        ""           : "index",
-        "requests"   : "index",
-        "request/new": "newRequest",
-        "users"      : "users"
+        "login"        : "login",
+        ""             : "index",
+        "requests"     : "index",
+        "requests/new" : "newRequest",
+        "requests/:id" : "showRequest",
+        "users"        : "users"
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -39,8 +42,15 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         newRequest: function() {
             var requests = new Requests();
             requests.fetch().done(function() {
-                var formView = new FormView({collection: requests, currentUser: app.currentUser});
+                var formView = new RequestFormView({collection: requests, currentUser: app.currentUser});
                 app.getRegion('main').show(formView);
+            });
+        },
+        showRequest: function(id) {
+            var request = new Request({id: id});
+            request.fetch().done(function() {
+                var showView = new ShowRequestView({model: request});
+                app.getRegion('main').show(showView);
             });
         },
         users: function() {

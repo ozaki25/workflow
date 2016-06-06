@@ -24,7 +24,7 @@
           <div class="collapse navbar-collapse" id="navbar_links">
             <ul class="nav navbar-nav">
               <li><a href="#requests">Index</a></li>
-              <li><a href="#request/new">New</a></li>
+              <li><a href="#requests/new">New</a></li>
               <li><a href="#users">Users</a></li>
             </ul>
             <ul class="nav navbar-nav pull-right">
@@ -63,7 +63,7 @@
       <td><a href="#" class="btn btn-link btn-xs delete-request">Delete</a></td>
     </script>
 
-    <script id="form_view" type="text/template">
+    <script id="request_form_view" type="text/template">
       <form class="form-horizontal">
         <div class="form-group">
           <label class="col-sm-2 control-label">Title</label>
@@ -83,6 +83,25 @@
           </div>
         </div>
       </form>
+    </script>
+
+    <script id="show_request_view" type="text/template">
+      <div class="panel panel-default">
+        <div class="panel-heading">Show Request</div>
+        <div class="panel-body">
+          <dl class="dl-horizontal">
+            <dt>ID</dt>
+            <dd><%- id %></dd>
+            <dt>User</dt>
+            <dd><%- user.name %></dd>
+            <dt>Team</dt>
+            <dd><%- user.team %></dd>
+            <dt>Title</dt>
+            <dd><%- title %></dd>
+            <dt>Content</dt>
+            <dd><%- content %></dd>
+          </dl>
+        </div>
     </script>
 
     <script id="users_main_view" type="text/template">

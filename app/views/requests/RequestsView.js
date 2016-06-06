@@ -8,4 +8,3 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     childViewContainer: '#request_list',
     template: '#requests_view'
 });
-

@@ -6,7 +6,7 @@ var Request = require('../../models/Request');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'container',
-    template: '#form_view',
+    template: '#request_form_view',
     ui: {
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
@@ -32,7 +32,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         });
         if(this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
-            this.ui.inputs.val('');
             Backbone.history.navigate('/requests', {trigger: true});
         }
     },

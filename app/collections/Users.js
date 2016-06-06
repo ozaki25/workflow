@@ -9,7 +9,7 @@ module.exports = Backbone.Collection.extend({
         this.create({
             uid: 'admin1234',
             name: 'テストユーザ',
-            team: 'テスト',
+            team: 'テストチーム',
             jobLevel: '1',
             admin: true
         }, {wait: true});

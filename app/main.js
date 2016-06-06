@@ -39,7 +39,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         newRequest: function() {
             var requests = new Requests();
             requests.fetch().done(function() {
-                var formView = new FormView({collection: requests});
+                var formView = new FormView({collection: requests, currentUser: app.currentUser});
                 app.getRegion('main').show(formView);
             });
         },

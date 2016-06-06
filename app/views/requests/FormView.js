@@ -16,13 +16,20 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click @ui.createBtn': 'onClickCreate'
     },
+    initialize: function(options) {
+        this.currentUser = options.currentUser;
+    },
     onClickCreate: function() {
         this.model = new Request();
         this.bindBackboneValidation();
 
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
-        this.model.set({title: title, content: content});
+        this.model.set({
+            title: title,
+            content: content,
+            user: this.currentUser
+        });
         if(this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
             this.ui.inputs.val('');

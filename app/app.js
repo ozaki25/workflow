@@ -69,7 +69,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         newRequest: function() {
             var requests = new Requests();
             requests.fetch().done(function() {
-                var formView = new FormView({collection: requests});
+                var formView = new FormView({collection: requests, currentUser: app.currentUser});
                 app.getRegion('main').show(formView);
             });
         },
@@ -134,6 +134,9 @@ module.exports = Backbone.Model.extend({
             range: [0, 4]
         },
         admin: {
+            required: true
+        },
+        user: {
             required: true
         }
     }
@@ -231,13 +234,20 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click @ui.createBtn': 'onClickCreate'
     },
+    initialize: function(options) {
+        this.currentUser = options.currentUser;
+    },
     onClickCreate: function() {
         this.model = new Request();
         this.bindBackboneValidation();
 
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
-        this.model.set({title: title, content: content});
+        this.model.set({
+            title: title,
+            content: content,
+            user: this.currentUser
+        });
         if(this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
             this.ui.inputs.val('');

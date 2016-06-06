@@ -19,6 +19,9 @@ module.exports = Backbone.Model.extend({
         },
         admin: {
             required: true
+        },
+        user: {
+            required: true
         }
     }
 });

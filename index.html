@@ -81,12 +81,24 @@
         </div>
       </div>
       <table class="table">
+        <tr>
+          <th>UserId</th>
+          <th>Name</th>
+          <th>Team</th>
+          <th>JobLevel</th>
+          <th>Admin</th>
+          <th></th>
+        </tr>
         <tbody id="user_list"></tbody>
       </table>
     </script>
 
     <script id="user_view" type="text/template">
+      <td><%- uid %></td>
       <td><%- name %></td>
+      <td><%- team %></td>
+      <td><%- jobLevel %></td>
+      <td><%- admin %></td>
       <td><a class="btn btn-link btn-xs delete">Delete</a></td>
     </script>
 

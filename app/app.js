@@ -99,7 +99,7 @@ var Backbone = require('backbone');
 module.exports = Backbone.Model.extend({
     defaults: {
         team: 'None',
-        jobLebel: 3,
+        jobLeel: 3,
         admin: false
     },
     validation: {
@@ -109,7 +109,7 @@ module.exports = Backbone.Model.extend({
         uid: {
             required: true
         },
-        jobLebel: {
+        jobLevel: {
             required: true,
             range: [0, 4]
         },
@@ -236,7 +236,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
         var name = this.ui.inputName.val().trim();
         var team = this.ui.inputTeam.val().trim();
         var jobLevel = this.ui.inputJobLevel.val().trim();
-        var admin = this.ui.inputAdmin.val().trim();
+        var admin = this.ui.inputAdmin.is(':checked');
         this.model.set({
             uid: uid,
             name: name,
@@ -246,7 +246,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         });
         if(this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
-            this.ui.inputName.val('');
         }
     },
     bindBackboneValidation: function() {

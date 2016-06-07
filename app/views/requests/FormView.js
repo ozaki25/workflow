@@ -29,7 +29,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     templateHelpers: function() {
         return {
             id: function() {
-                if(this.model) {
+                if(!this.model.isNew()) {
                     return '<div class="form-group">' +
                              '<label class="col-sm-2 control-label">ID</label>' +
                              '<div class="col-sm-10">' +
@@ -39,7 +39,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
                 }
             }.bind(this),
             status: function() {
-                if(this.model) {
+                if(!this.model.isNew()) {
                     return '<div class="form-group">' +
                              '<label class="col-sm-2 control-label">Status</label>' +
                              '<div class="col-sm-10">' +
@@ -63,7 +63,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
         }
     },
     onRender: function() {
-        if(this.model) {
+        if(!this.model.isNew()) {
             this.ui.inputTitle.val(this.model.get('title'));
             this.ui.inputContent.val(this.model.get('content'));
         }
@@ -81,7 +81,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         this.saveRequest(0, true);
     },
     saveRequest: function(nextStatus, validate) {
-        if(!this.model) this.model = new Request();
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
@@ -93,7 +92,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
             status: status
         });
         if(!validate || this.model.isValid(true)) {
-            this.collection.create(this.model, {wait: true});
+            this.model.save({}, {wait: true});
             Backbone.history.navigate('/requests', {trigger: true});
         }
     },
@@ -119,9 +118,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
         Backbone.Validation.unbind(this);
     },
     isCreate: function() {
-        return !this.model || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
+        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
     },
     isApproval: function() {
-        return this.model && this.model.isWaitingApproval() && this.currentUser.isApproveUser()
+        return !this.model.isNew() && this.model.isWaitingApproval() && this.currentUser.isApproveUser()
     }
 });

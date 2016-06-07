@@ -23,14 +23,14 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         ""                  : "index",
         "requests"          : "index",
         "requests/new"      : "newRequest",
-        "requests/:id"      : "showRequest",
         "requests/:id/edit" : "editRequest",
+        "requests/:id"      : "showRequest",
         "users"             : "users",
         "status_list"       : "statusList"
     },
     initialize: function() {
         statusList.fetch();
-        if(statusList.length == 0) statusList.addDefaultStatus();
+        if(statusList.length === 0) statusList.addDefaultStatus();
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -40,7 +40,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     controller: {
         login: function() {
             users.fetch().done(function() {
-                if(users.length == 0) users.addDefaultUser();
+                if(users.length === 0) users.addDefaultUser();
                 var loginView = new LoginView({collection: users, app: app});
                 app.getRegion('main').show(loginView);
             });
@@ -52,24 +52,22 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             });
         },
         newRequest: function() {
-            requests.fetch().done(function() {
-                var formView = new RequestFormView({collection: requests, currentUser: app.currentUser, statusList: statusList});
+            var request = new Request({}, {collection: requests});
+            var formView = new RequestFormView({model: request, currentUser: app.currentUser, statusList: statusList});
+            app.getRegion('main').show(formView);
+        },
+        editRequest: function(id) {
+            var request = new Request({id: id}, {collection: requests});
+            request.fetch().done(function() {
+                var formView = new RequestFormView({model: request, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(formView);
             });
         },
         showRequest: function(id) {
-            var request = new Request({id: id});
-            request.collection = requests; // backbone.localstorage用
+            var request = new Request({id: id}, {collection: requests});
             request.fetch().done(function() {
                 var showView = new ShowRequestView({model: request});
                 app.getRegion('main').show(showView);
-            });
-        },
-        editRequest: function(id) {
-            requests.fetch().done(function() {
-                var request = requests.find({id: id});
-                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser, statusList: statusList});
-                app.getRegion('main').show(formView);
             });
         },
         users: function() {

@@ -39,6 +39,7 @@
       <li><a href="#requests">Index</a></li>
       <li><a href="#requests/new">New</a></li>
       <li><a href="#users">Users</a></li>
+      <li><a href="#statuses">Statuses</a></li>
     </script>
 
     <script id="requests_view" type="text/template">
@@ -213,6 +214,22 @@
         </tr>
         <tbody id="user_list"></tbody>
       </table>
+    </script>
+
+    <script id="statuses_view" type="text/template">
+      <div class="panel-heading">Status List</div>
+      <table class="table">
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+        </tr>
+        <tbody id="status_list"></tbody>
+      </table>
+    </script>
+
+    <script id="status_view" type="text/template">
+      <td><%- code %></td>
+      <td><%- name %></td>
     </script>
 
     <script id="login_user_view" type="text/template">

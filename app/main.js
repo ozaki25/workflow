@@ -3,16 +3,19 @@ Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
+var Statuses = require('./collections/Statuses');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
+var StatusesView = require('./views/statuses/StatusesView');
 var LoginView = require('./views/login/LoginView');
 
 var requests = new Requests();
 var users = new Users();
+var statuses = new Statuses();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -22,7 +25,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/new"      : "newRequest",
         "requests/:id"      : "showRequest",
         "requests/:id/edit" : "editRequest",
-        "users"             : "users"
+        "users"             : "users",
+        "statuses"          : "statuses"
     },
     initialize: function() {
         app.getRegion('sideMenu').show(new SideMenuView());
@@ -70,6 +74,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             users.fetch().done(function() {
                 var usersMainView = new UsersMainView({collection: users});
                 app.getRegion('main').show(usersMainView);
+            });
+        },
+        statuses: function() {
+            statuses.fetch().done(function() {
+                if(statuses.length == 0) statuses.addDefaultStatus();
+                var statusesView = new StatusesView({collection: statuses});
+                app.getRegion('main').show(statusesView);
             });
         }
     }

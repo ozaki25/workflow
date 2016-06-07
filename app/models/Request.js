@@ -10,5 +10,11 @@ module.exports = Backbone.Model.extend({
             required: true,
             msg: '必須項目です。'
         }
+    },
+    isCreating: function() {
+        return this.get('status').code == 0;
+    },
+    isWaitingApproval: function() {
+        return this.get('status').code == 1;
     }
 });

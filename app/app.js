@@ -159,6 +159,12 @@ module.exports = Backbone.Model.extend({
             required: true,
             msg: '必須項目です。'
         }
+    },
+    isCreating: function() {
+        return this.get('status').code == 0;
+    },
+    isWaitingApproval: function() {
+        return this.get('status').code == 1;
     }
 });
 
@@ -327,11 +333,15 @@ module.exports = Backbone.Marionette.ItemView.extend({
         inputContent: 'textarea.content',
         inputs: 'input, textarea',
         saveBtn: '.save-btn',
-        submitBtn: '.submit-btn'
+        submitBtn: '.submit-btn',
+        approvalBtn: '.approval-btn',
+        rejectBtn: '.reject-btn'
     },
     events: {
         'click @ui.saveBtn': 'onClickSave',
-        'click @ui.submitBtn': 'onClickSubmit'
+        'click @ui.submitBtn': 'onClickSubmit',
+        'click @ui.approvalBtn': 'onClickApproval',
+        'click @ui.rejectBtn': 'onClickReject'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -360,10 +370,16 @@ module.exports = Backbone.Marionette.ItemView.extend({
                 }
             }.bind(this),
             save: function() {
-                if(!this.model || this.model.get('status').code == 0) return '<button type="button" class="btn btn-default save-btn">Save</button>'
+                if(!this.model || this.model.isCreating()) return '<button type="button" class="btn btn-default save-btn">Save</button>'
             }.bind(this),
             submit: function() {
-                if(!this.model || this.model.get('status').code == 0) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
+                if(!this.model || this.model.isCreating()) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
+            }.bind(this),
+            approval: function() {
+                if(this.model && this.model.isWaitingApproval()) return '<button type="button" class="btn btn-default approval-btn">Approval</button>'
+            }.bind(this),
+            reject: function() {
+                if(this.model && this.model.isWaitingApproval()) return '<button type="button" class="btn btn-default reject-btn">Reject</button>'
             }.bind(this)
         }
     },
@@ -378,6 +394,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     onClickSubmit: function() {
         this.saveRequest(1, true);
+    },
+    onClickApproval: function() {
+        this.saveRequest(2, true);
+    },
+    onClickReject: function() {
+        this.saveRequest(0, true);
     },
     saveRequest: function(nextStatus, validate) {
         if(!this.model) this.model = new Request();

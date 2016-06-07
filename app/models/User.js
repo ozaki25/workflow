@@ -3,7 +3,7 @@ var Backbone = require('backbone');
 module.exports = Backbone.Model.extend({
     defaults: {
         team: 'None',
-        jobLeel: 3,
+        jobLevel: 3,
         admin: false
     },
     validation: {
@@ -18,9 +18,6 @@ module.exports = Backbone.Model.extend({
             range: [0, 4]
         },
         admin: {
-            required: true
-        },
-        user: {
             required: true
         }
     }

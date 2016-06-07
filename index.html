@@ -74,6 +74,8 @@
       <div class="panel-heading">Request Form</div>
       <div class="panel-body">
         <form class="form-horizontal">
+          <%= id() %>
+          <%= status() %>
           <div class="form-group">
             <label class="col-sm-2 control-label">Title</label>
             <div class="col-sm-10">
@@ -102,6 +104,8 @@
         <dl class="dl-horizontal">
           <dt>ID</dt>
           <dd><%- id %></dd>
+          <dt>Status</dt>
+          <dd><%- status.name %></dd>
           <dt>User</dt>
           <dd><%- user.name %></dd>
           <dt>Team</dt>

@@ -337,6 +337,31 @@ module.exports = Backbone.Marionette.ItemView.extend({
         this.currentUser = options.currentUser;
         this.statusList = options.statusList;
     },
+    templateHelpers: function() {
+        return {
+            id: function() {
+                if(this.model) {
+                    return '<div class="form-group">' +
+                             '<label class="col-sm-2 control-label">ID</label>' +
+                             '<div class="col-sm-10">' +
+                               '<p class="form-control-static">' + this.model.id + '</p>' +
+                             '</div>' +
+                           '</div>'
+                }
+            }.bind(this),
+            status: function() {
+                if(this.model) {
+                    return '<div class="form-group">' +
+                             '<label class="col-sm-2 control-label">Status</label>' +
+                             '<div class="col-sm-10">' +
+                               '<p class="form-control-static">' + this.model.get('status').name + '</p>' +
+                             '</div>' +
+                           '</div>'
+                }
+            }.bind(this)
+
+        }
+    },
     onRender: function() {
         if(this.model) {
             this.ui.inputTitle.val(this.model.get('title'));

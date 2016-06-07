@@ -208,7 +208,13 @@ module.exports = Backbone.Model.extend({
         admin: {
             required: true
         }
-    }
+    },
+    isRequestUser: function(request) {
+        return this.id === request.get('user').id;
+    },
+    isApproveUser: function() {
+        return this.get('jobLevel') < 3;
+    },
 });
 
 },{"backbone":"backbone"}],8:[function(require,module,exports){
@@ -373,16 +379,16 @@ module.exports = Backbone.Marionette.ItemView.extend({
                 }
             }.bind(this),
             save: function() {
-                if(!this.model || this.model.isCreating()) return '<button type="button" class="btn btn-default save-btn">Save</button>'
+                if(this.isCreate()) return '<button type="button" class="btn btn-default save-btn">Save</button>'
             }.bind(this),
             submit: function() {
-                if(!this.model || this.model.isCreating()) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
+                if(this.isCreate()) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
             }.bind(this),
             approval: function() {
-                if(this.model && this.model.isWaitingApproval()) return '<button type="button" class="btn btn-default approval-btn">Approval</button>'
+                if(this.isApproval()) return '<button type="button" class="btn btn-default approval-btn">Approval</button>'
             }.bind(this),
             reject: function() {
-                if(this.model && this.model.isWaitingApproval()) return '<button type="button" class="btn btn-default reject-btn">Reject</button>'
+                if(this.isApproval()) return '<button type="button" class="btn btn-default reject-btn">Reject</button>'
             }.bind(this)
         }
     },
@@ -441,6 +447,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     unbindBackboneValidation: function() {
         Backbone.Validation.unbind(this);
+    },
+    isCreate: function() {
+        return !this.model || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
+    },
+    isApproval: function() {
+        return this.model && this.model.isWaitingApproval() && this.currentUser.isApproveUser()
     }
 });
 

@@ -20,5 +20,11 @@ module.exports = Backbone.Model.extend({
         admin: {
             required: true
         }
-    }
+    },
+    isRequestUser: function(request) {
+        return this.id === request.get('user').id;
+    },
+    isApproveUser: function() {
+        return this.get('jobLevel') < 3;
+    },
 });

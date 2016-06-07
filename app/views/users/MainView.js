@@ -9,10 +9,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         usersMain: '#users_main'
     },
     collectionEvents: {
-        'add': 'showIndex'
+        'add change': 'showIndex'
     },
     childEvents: {
-        'click:new': 'showNew'
+        'click:new': 'showNew',
+        'click:edit': 'showEdit'
     },
     onRender: function() {
         var usersView = new UsersView({collection: this.collection});
@@ -20,6 +21,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     showNew: function() {
         var formView = new FormView({collection: this.collection});
+        this.getRegion('usersMain').show(formView);
+    },
+    showEdit: function(view) {
+        var formView = new FormView({collection: this.collection, model: view.model});
         this.getRegion('usersMain').show(formView);
     },
     showIndex: function() {

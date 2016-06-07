@@ -16,8 +16,22 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click @ui.newUserBtn': 'onClickNew'
     },
+    templateHelpers: function() {
+        return {
+            submit: !!this.model ? 'Update' : 'Create'
+        }
+    },
+    onRender: function() {
+        if(this.model) {
+            this.ui.inputUid.val(this.model.get('uid'));
+            this.ui.inputName.val(this.model.get('name'));
+            this.ui.inputTeam.val(this.model.get('team'));
+            this.ui.inputJobLevel.val(this.model.get('jobLevel'));
+            if(this.model.get('admin')) this.ui.inputAdmin.attr('checked', 'checked');
+        }
+    },
     onClickNew: function() {
-        this.model = new User();
+        if(!this.model) this.model = new User();
         this.bindBackboneValidation();
 
         var uid = this.ui.inputUid.val().trim();

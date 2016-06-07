@@ -11,7 +11,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
     ui: {
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
-        inputs: 'input, textarea',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approvalBtn: '.approval-btn',

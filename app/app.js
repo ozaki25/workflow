@@ -34,12 +34,19 @@ module.exports = Backbone.Collection.extend({
     model: User,
     localStorage: new Backbone.LocalStorage('Workflow.users'),
     addDefaultUser: function() {
+        this.createUser('ABC0001', 'アドミンユーザ', '管理チーム', 0, true);
+        this.createUser('ABC0002', '一般ユーザ', '開発チーム', 3, false);
+        this.createUser('ABC0003', '役席ユーザ', '開発チーム', 2, false);
+        this.createUser('ABC0004', '受付ユーザ', '運用チーム', 2, true);
+        this.createUser('ABC0005', '担当ユーザ', '運用チーム', 4, false);
+    },
+    createUser: function(uid, name, team, jobLevel, admin) {
         this.create({
-            uid: 'admin1234',
-            name: 'テストユーザ',
-            team: 'テストチーム',
-            jobLevel: '1',
-            admin: true
+            uid: uid,
+            name: name,
+            team: team,
+            jobLevel: jobLevel,
+            admin: admin
         }, {wait: true});
     }
 });
@@ -328,7 +335,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
     ui: {
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
-        inputs: 'input, textarea',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approvalBtn: '.approval-btn',
@@ -526,8 +532,22 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click @ui.newUserBtn': 'onClickNew'
     },
+    templateHelpers: function() {
+        return {
+            submit: !!this.model ? 'Update' : 'Create'
+        }
+    },
+    onRender: function() {
+        if(this.model) {
+            this.ui.inputUid.val(this.model.get('uid'));
+            this.ui.inputName.val(this.model.get('name'));
+            this.ui.inputTeam.val(this.model.get('team'));
+            this.ui.inputJobLevel.val(this.model.get('jobLevel'));
+            if(this.model.get('admin')) this.ui.inputAdmin.attr('checked', 'checked');
+        }
+    },
     onClickNew: function() {
-        this.model = new User();
+        if(!this.model) this.model = new User();
         this.bindBackboneValidation();
 
         var uid = this.ui.inputUid.val().trim();
@@ -579,10 +599,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         usersMain: '#users_main'
     },
     collectionEvents: {
-        'add': 'showIndex'
+        'add change': 'showIndex'
     },
     childEvents: {
-        'click:new': 'showNew'
+        'click:new': 'showNew',
+        'click:edit': 'showEdit'
     },
     onRender: function() {
         var usersView = new UsersView({collection: this.collection});
@@ -590,6 +611,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     showNew: function() {
         var formView = new FormView({collection: this.collection});
+        this.getRegion('usersMain').show(formView);
+    },
+    showEdit: function(view) {
+        var formView = new FormView({collection: this.collection, model: view.model});
         this.getRegion('usersMain').show(formView);
     },
     showIndex: function() {
@@ -606,10 +631,19 @@ Backbone.Marionette = require('backbone.marionette');
 module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'tr',
     template: '#user_view',
-    events: {
-        'click .delete': 'onClickDelete'
+    ui: {
+        editBtn: '.edit',
+        deleteBtn: '.delete'
     },
-    onClickDelete: function(e) {
+    events: {
+        'click @ui.editBtn': 'onClickEditBtn',
+        'click @ui.deleteBtn': 'onClickDeleteBtn'
+    },
+    onClickEditBtn: function(e) {
+        e.preventDefault();
+        this.triggerMethod('click:edit');
+    },
+    onClickDeleteBtn: function(e) {
         e.preventDefault();
         this.model.destroy({wait: true});
     }

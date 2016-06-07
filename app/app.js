@@ -76,13 +76,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"       : "statusList"
     },
     initialize: function() {
-        app.getRegion('sideMenu').show(new SideMenuView());
         statusList.fetch();
         if(statusList.length == 0) statusList.addDefaultStatus();
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
         app.getRegion('header').show(new HeaderView({model: app.currentUser}));
+        app.getRegion('sideMenu').show(new SideMenuView());
     },
     controller: {
         login: function() {
@@ -223,7 +223,35 @@ Backbone.Marionette = require('backbone.marionette');
 module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'ul',
     className: 'nav nav-pills nav-stacked',
-    template: '#side_menu_view'
+    template: '#side_menu_view',
+    ui: {
+        requests: '.requests',
+        newRequest: '.new-request',
+        users: '.users',
+        statusList: '.status-list'
+    },
+    events: {
+        'click @ui.requests': 'onClickRequestsLink',
+        'click @ui.newRequest': 'onClickNewRequestLink',
+        'click @ui.users': 'onClickUsersLink',
+        'click @ui.statusList': 'onClickStatusListLink'
+    },
+    onClickRequestsLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('requests', {trigger: true});
+    },
+    onClickNewRequestLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('requests/new', {trigger: true});
+    },
+    onClickUsersLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('users', {trigger: true});
+    },
+    onClickStatusListLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('status_list', {trigger: true});
+    }
 });
 
 },{"backbone":"backbone","backbone.marionette":25}],10:[function(require,module,exports){

@@ -4,5 +4,33 @@ Backbone.Marionette = require('backbone.marionette');
 module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'ul',
     className: 'nav nav-pills nav-stacked',
-    template: '#side_menu_view'
+    template: '#side_menu_view',
+    ui: {
+        requests: '.requests',
+        newRequest: '.new-request',
+        users: '.users',
+        statusList: '.status-list'
+    },
+    events: {
+        'click @ui.requests': 'onClickRequestsLink',
+        'click @ui.newRequest': 'onClickNewRequestLink',
+        'click @ui.users': 'onClickUsersLink',
+        'click @ui.statusList': 'onClickStatusListLink'
+    },
+    onClickRequestsLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('requests', {trigger: true});
+    },
+    onClickNewRequestLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('requests/new', {trigger: true});
+    },
+    onClickUsersLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('users', {trigger: true});
+    },
+    onClickStatusListLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('status_list', {trigger: true});
+    }
 });

@@ -29,13 +29,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"       : "statusList"
     },
     initialize: function() {
-        app.getRegion('sideMenu').show(new SideMenuView());
         statusList.fetch();
         if(statusList.length == 0) statusList.addDefaultStatus();
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
         app.getRegion('header').show(new HeaderView({model: app.currentUser}));
+        app.getRegion('sideMenu').show(new SideMenuView());
     },
     controller: {
         login: function() {

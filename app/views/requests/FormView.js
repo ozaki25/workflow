@@ -44,8 +44,13 @@ module.exports = Backbone.Marionette.ItemView.extend({
                              '</div>' +
                            '</div>'
                 }
+            }.bind(this),
+            save: function() {
+                if(!this.model || this.model.get('status').code == 0) return '<button type="button" class="btn btn-default save-btn">Save</button>'
+            }.bind(this),
+            submit: function() {
+                if(!this.model || this.model.get('status').code == 0) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
             }.bind(this)
-
         }
     },
     onRender: function() {

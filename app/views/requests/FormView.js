@@ -3,6 +3,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 var Request = require('../../models/Request');
+var Status = require('../../models/Status');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
@@ -11,13 +12,16 @@ module.exports = Backbone.Marionette.ItemView.extend({
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         inputs: 'input, textarea',
-        createBtn: '.create-btn'
+        saveBtn: '.save-btn',
+        submitBtn: '.submit-btn'
     },
     events: {
-        'click @ui.createBtn': 'onClickCreate'
+        'click @ui.saveBtn': 'onClickSave',
+        'click @ui.submitBtn': 'onClickSubmit'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
+        this.statusList = options.statusList;
     },
     onRender: function() {
         if(this.model) {
@@ -25,18 +29,25 @@ module.exports = Backbone.Marionette.ItemView.extend({
             this.ui.inputContent.val(this.model.get('content'));
         }
     },
-    onClickCreate: function() {
+    onClickSave: function() {
+        this.saveRequest(0, false);
+    },
+    onClickSubmit: function() {
+        this.saveRequest(1, true);
+    },
+    saveRequest: function(nextStatus, validate) {
         if(!this.model) this.model = new Request();
-        this.bindBackboneValidation();
-
+        validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
+        var status = this.statusList.findWhere({code: nextStatus});
         this.model.set({
             title: title,
             content: content,
-            user: this.currentUser
+            user: this.currentUser,
+            status: status
         });
-        if(this.model.isValid(true)) {
+        if(!validate || this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
             Backbone.history.navigate('/requests', {trigger: true});
         }
@@ -58,5 +69,8 @@ module.exports = Backbone.Marionette.ItemView.extend({
                 group.find('.help-block').text(error);
             }
         });
+    },
+    unbindBackboneValidation: function() {
+        Backbone.Validation.unbind(this);
     }
 });

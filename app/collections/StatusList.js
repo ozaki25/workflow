@@ -5,7 +5,7 @@ var Status = require('../models/Status');
 
 module.exports = Backbone.Collection.extend({
     model: Status,
-    localStorage: new Backbone.LocalStorage('Workflow.users'),
+    localStorage: new Backbone.LocalStorage('Workflow.status'),
     addDefaultStatus: function() {
         var statusList = ['作成中', '承認待ち', '完了'];
         _(statusList).each(function(status, i) {

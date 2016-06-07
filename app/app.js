@@ -16,7 +16,7 @@ var Status = require('../models/Status');
 
 module.exports = Backbone.Collection.extend({
     model: Status,
-    localStorage: new Backbone.LocalStorage('Workflow.users'),
+    localStorage: new Backbone.LocalStorage('Workflow.status'),
     addDefaultStatus: function() {
         var statusList = ['作成中', '承認待ち', '完了'];
         _(statusList).each(function(status, i) {
@@ -50,19 +50,19 @@ Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
-var Statuses = require('./collections/Statuses');
+var StatusList = require('./collections/StatusList');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
-var StatusesView = require('./views/statuses/StatusesView');
+var StatusListView = require('./views/statusList/StatusListView');
 var LoginView = require('./views/login/LoginView');
 
 var requests = new Requests();
 var users = new Users();
-var statuses = new Statuses();
+var statusList = new StatusList();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -73,10 +73,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/:id"      : "showRequest",
         "requests/:id/edit" : "editRequest",
         "users"             : "users",
-        "statuses"          : "statuses"
+        "status_list"       : "statusList"
     },
     initialize: function() {
         app.getRegion('sideMenu').show(new SideMenuView());
+        statusList.fetch();
+        if(statusList.length == 0) statusList.addDefaultStatus();
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -98,7 +100,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         },
         newRequest: function() {
             requests.fetch().done(function() {
-                var formView = new RequestFormView({collection: requests, currentUser: app.currentUser});
+                var formView = new RequestFormView({collection: requests, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(formView);
             });
         },
@@ -113,7 +115,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         editRequest: function(id) {
             requests.fetch().done(function() {
                 var request = requests.find({id: id});
-                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser});
+                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(formView);
             });
         },
@@ -123,12 +125,9 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 app.getRegion('main').show(usersMainView);
             });
         },
-        statuses: function() {
-            statuses.fetch().done(function() {
-                if(statuses.length == 0) statuses.addDefaultStatus();
-                var statusesView = new StatusesView({collection: statuses});
-                app.getRegion('main').show(statusesView);
-            });
+        statusList: function() {
+            var statusListView = new StatusListView({collection: statusList});
+            app.getRegion('main').show(statusListView);
         }
     }
 });
@@ -147,7 +146,7 @@ var app = new Backbone.Marionette.Application({
 
 app.start();
 
-},{"./collections/Requests":1,"./collections/Statuses":2,"./collections/Users":3,"./models/Request":5,"./views/HeaderView":8,"./views/SideMenuView":9,"./views/login/LoginView":10,"./views/requests/FormView":13,"./views/requests/RequestsView":15,"./views/requests/ShowView":16,"./views/statuses/StatusesView":18,"./views/users/MainView":20,"backbone":"backbone","backbone.marionette":25}],5:[function(require,module,exports){
+},{"./collections/Requests":1,"./collections/StatusList":2,"./collections/Users":3,"./models/Request":5,"./views/HeaderView":8,"./views/SideMenuView":9,"./views/login/LoginView":10,"./views/requests/FormView":13,"./views/requests/RequestsView":15,"./views/requests/ShowView":16,"./views/statusList/StatusListView":17,"./views/users/MainView":20,"backbone":"backbone","backbone.marionette":25}],5:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -290,6 +289,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 var Request = require('../../models/Request');
+var Status = require('../../models/Status');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
@@ -298,13 +298,16 @@ module.exports = Backbone.Marionette.ItemView.extend({
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         inputs: 'input, textarea',
-        createBtn: '.create-btn'
+        saveBtn: '.save-btn',
+        submitBtn: '.submit-btn'
     },
     events: {
-        'click @ui.createBtn': 'onClickCreate'
+        'click @ui.saveBtn': 'onClickSave',
+        'click @ui.submitBtn': 'onClickSubmit'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
+        this.statusList = options.statusList;
     },
     onRender: function() {
         if(this.model) {
@@ -312,18 +315,25 @@ module.exports = Backbone.Marionette.ItemView.extend({
             this.ui.inputContent.val(this.model.get('content'));
         }
     },
-    onClickCreate: function() {
+    onClickSave: function() {
+        this.saveRequest(0, false);
+    },
+    onClickSubmit: function() {
+        this.saveRequest(1, true);
+    },
+    saveRequest: function(nextStatus, validate) {
         if(!this.model) this.model = new Request();
-        this.bindBackboneValidation();
-
+        validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
+        var status = this.statusList.findWhere({code: nextStatus});
         this.model.set({
             title: title,
             content: content,
-            user: this.currentUser
+            user: this.currentUser,
+            status: status
         });
-        if(this.model.isValid(true)) {
+        if(!validate || this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
             Backbone.history.navigate('/requests', {trigger: true});
         }
@@ -345,10 +355,13 @@ module.exports = Backbone.Marionette.ItemView.extend({
                 group.find('.help-block').text(error);
             }
         });
+    },
+    unbindBackboneValidation: function() {
+        Backbone.Validation.unbind(this);
     }
 });
 
-},{"../../models/Request":5,"backbone":"backbone","backbone.marionette":25,"backbone.validation":"backbone.validation","jquery":"jquery"}],14:[function(require,module,exports){
+},{"../../models/Request":5,"../../models/Status":6,"backbone":"backbone","backbone.marionette":25,"backbone.validation":"backbone.validation","jquery":"jquery"}],14:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -398,26 +411,26 @@ module.exports = Backbone.Marionette.ItemView.extend({
 },{"backbone":"backbone","backbone.marionette":25}],17:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-
-module.exports = Backbone.Marionette.ItemView.extend({
-    tagName: 'tr',
-    template: '#status_view'
-});
-
-},{"backbone":"backbone","backbone.marionette":25}],18:[function(require,module,exports){
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
 var StatusView = require('./StatusView');
 
 module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'panel panel-default',
     childView: StatusView,
     childViewContainer: '#status_list',
-    template: '#statuses_view'
+    template: '#status_list_view'
 });
 
 
-},{"./StatusView":17,"backbone":"backbone","backbone.marionette":25}],19:[function(require,module,exports){
+},{"./StatusView":18,"backbone":"backbone","backbone.marionette":25}],18:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    tagName: 'tr',
+    template: '#status_view'
+});
+
+},{"backbone":"backbone","backbone.marionette":25}],19:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');

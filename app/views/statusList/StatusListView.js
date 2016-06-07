@@ -6,6 +6,6 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'panel panel-default',
     childView: StatusView,
     childViewContainer: '#status_list',
-    template: '#statuses_view'
+    template: '#status_list_view'
 });
 

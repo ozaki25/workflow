@@ -3,19 +3,19 @@ Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
-var Statuses = require('./collections/Statuses');
+var StatusList = require('./collections/StatusList');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
-var StatusesView = require('./views/statuses/StatusesView');
+var StatusListView = require('./views/statusList/StatusListView');
 var LoginView = require('./views/login/LoginView');
 
 var requests = new Requests();
 var users = new Users();
-var statuses = new Statuses();
+var statusList = new StatusList();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -26,10 +26,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/:id"      : "showRequest",
         "requests/:id/edit" : "editRequest",
         "users"             : "users",
-        "statuses"          : "statuses"
+        "status_list"       : "statusList"
     },
     initialize: function() {
         app.getRegion('sideMenu').show(new SideMenuView());
+        statusList.fetch();
+        if(statusList.length == 0) statusList.addDefaultStatus();
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -51,7 +53,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         },
         newRequest: function() {
             requests.fetch().done(function() {
-                var formView = new RequestFormView({collection: requests, currentUser: app.currentUser});
+                var formView = new RequestFormView({collection: requests, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(formView);
             });
         },
@@ -66,7 +68,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         editRequest: function(id) {
             requests.fetch().done(function() {
                 var request = requests.find({id: id});
-                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser});
+                var formView = new RequestFormView({collection: requests, model: request, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(formView);
             });
         },
@@ -76,12 +78,9 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 app.getRegion('main').show(usersMainView);
             });
         },
-        statuses: function() {
-            statuses.fetch().done(function() {
-                if(statuses.length == 0) statuses.addDefaultStatus();
-                var statusesView = new StatusesView({collection: statuses});
-                app.getRegion('main').show(statusesView);
-            });
+        statusList: function() {
+            var statusListView = new StatusListView({collection: statusList});
+            app.getRegion('main').show(statusListView);
         }
     }
 });

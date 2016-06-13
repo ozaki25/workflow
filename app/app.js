@@ -18,9 +18,15 @@ module.exports = Backbone.Collection.extend({
     model: Status,
     localStorage: new Backbone.LocalStorage('Workflow.status'),
     addDefaultStatus: function() {
-        var statusList = ['作成中', '承認待ち', '完了'];
-        _(statusList).each(function(status, i) {
-            this.create({code: i, name: status}, {wait: true});
+        var statusList = [{code: 1, name: '作成中'},
+                          {code: 2, name: '承認待ち'},
+                          {code: 3, name: '受付待ち'},
+                          {code: 4, name: '作業完了待ち'},
+                          {code: 5, name: '作業完了承認待ち'},
+                          {code: 6, name: '作業確認待ち'},
+                          {code: 7, name: '完了'}];
+        _(statusList).each(function(status) {
+            this.create(status, {wait: true});
         }.bind(this));
     }
 });
@@ -120,7 +126,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         showRequest: function(id) {
             var request = new Request({id: id}, {collection: requests});
             request.fetch().done(function() {
-                var showView = new ShowRequestView({model: request});
+                var showView = new ShowRequestView({model: request, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(showView);
             });
         },
@@ -166,10 +172,10 @@ module.exports = Backbone.Model.extend({
         }
     },
     isCreating: function() {
-        return this.get('status').code == 0;
+        return this.get('status').code == 1;
     },
     isWaitingApproval: function() {
-        return this.get('status').code == 1;
+        return this.get('status').code == 2;
     }
 });
 
@@ -340,15 +346,11 @@ module.exports = Backbone.Marionette.ItemView.extend({
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         saveBtn: '.save-btn',
-        submitBtn: '.submit-btn',
-        approvalBtn: '.approval-btn',
-        rejectBtn: '.reject-btn'
+        submitBtn: '.submit-btn'
     },
     events: {
         'click @ui.saveBtn': 'onClickSave',
-        'click @ui.submitBtn': 'onClickSubmit',
-        'click @ui.approvalBtn': 'onClickApproval',
-        'click @ui.rejectBtn': 'onClickReject'
+        'click @ui.submitBtn': 'onClickSubmit'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -375,18 +377,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
                              '</div>' +
                            '</div>'
                 }
-            }.bind(this),
-            save: function() {
-                if(this.isCreate()) return '<button type="button" class="btn btn-default save-btn">Save</button>'
-            }.bind(this),
-            submit: function() {
-                if(this.isCreate()) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
-            }.bind(this),
-            approval: function() {
-                if(this.isApproval()) return '<button type="button" class="btn btn-default approval-btn">Approval</button>'
-            }.bind(this),
-            reject: function() {
-                if(this.isApproval()) return '<button type="button" class="btn btn-default reject-btn">Reject</button>'
             }.bind(this)
         }
     },
@@ -397,22 +387,18 @@ module.exports = Backbone.Marionette.ItemView.extend({
         }
     },
     onClickSave: function() {
-        this.saveRequest(0, false);
+        this.saveRequest(1, false);
     },
     onClickSubmit: function() {
-        this.saveRequest(1, true);
-    },
-    onClickApproval: function() {
         this.saveRequest(2, true);
-    },
-    onClickReject: function() {
-        this.saveRequest(0, true);
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var status = this.statusList.findWhere({code: nextStatus});
+        console.log(this.statusList);
+        console.log(status);
         this.model.set({
             title: title,
             content: content,
@@ -444,12 +430,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     unbindBackboneValidation: function() {
         Backbone.Validation.unbind(this);
-    },
-    isCreate: function() {
-        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
-    },
-    isApproval: function() {
-        return !this.model.isNew() && this.model.isWaitingApproval() && this.currentUser.isApproveUser()
     }
 });
 
@@ -497,7 +477,43 @@ Backbone.Marionette = require('backbone.marionette');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
-    template: '#show_request_view'
+    template: '#show_request_view',
+    ui: {
+        approvalBtn: '.approval-btn',
+        rejectBtn: '.reject-btn'
+    },
+    events: {
+        'click @ui.approvalBtn': 'onClickApproval',
+        'click @ui.rejectBtn': 'onClickReject'
+    },
+    templateHelpers: function() {
+        return {
+            approval: function() {
+                if(this.isApproval()) return '<button type="button" class="btn btn-default approval-btn">Approval</button>'
+            }.bind(this),
+            reject: function() {
+                if(this.isApproval()) return '<button type="button" class="btn btn-default reject-btn">Reject</button>'
+            }.bind(this)
+        }
+    },
+    initialize: function(options) {
+        this.currentUser = options.currentUser;
+        this.statusList = options.statusList;
+    },
+    onClickApproval: function() {
+        this.updateStatus(3);
+    },
+    onClickReject: function() {
+        this.updateStatus(1);
+    },
+    updateStatus: function(nextStatus) {
+        var status = this.statusList.findWhere({code: nextStatus});
+        this.model.save({status: status}, {wait: true});
+        Backbone.history.navigate('/requests', {trigger: true});
+    },
+    isApproval: function() {
+        return this.model.isWaitingApproval() && this.currentUser.isApproveUser();
+    }
 });
 
 },{"backbone":"backbone","backbone.marionette":25}],17:[function(require,module,exports){

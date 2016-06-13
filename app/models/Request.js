@@ -12,9 +12,9 @@ module.exports = Backbone.Model.extend({
         }
     },
     isCreating: function() {
-        return this.get('status').code == 0;
+        return this.get('status').code == 1;
     },
     isWaitingApproval: function() {
-        return this.get('status').code == 1;
+        return this.get('status').code == 2;
     }
 });

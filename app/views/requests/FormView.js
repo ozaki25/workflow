@@ -12,15 +12,11 @@ module.exports = Backbone.Marionette.ItemView.extend({
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         saveBtn: '.save-btn',
-        submitBtn: '.submit-btn',
-        approvalBtn: '.approval-btn',
-        rejectBtn: '.reject-btn'
+        submitBtn: '.submit-btn'
     },
     events: {
         'click @ui.saveBtn': 'onClickSave',
-        'click @ui.submitBtn': 'onClickSubmit',
-        'click @ui.approvalBtn': 'onClickApproval',
-        'click @ui.rejectBtn': 'onClickReject'
+        'click @ui.submitBtn': 'onClickSubmit'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -47,18 +43,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
                              '</div>' +
                            '</div>'
                 }
-            }.bind(this),
-            save: function() {
-                if(this.isCreate()) return '<button type="button" class="btn btn-default save-btn">Save</button>'
-            }.bind(this),
-            submit: function() {
-                if(this.isCreate()) return '<button type="button" class="btn btn-default submit-btn">Submit</button>'
-            }.bind(this),
-            approval: function() {
-                if(this.isApproval()) return '<button type="button" class="btn btn-default approval-btn">Approval</button>'
-            }.bind(this),
-            reject: function() {
-                if(this.isApproval()) return '<button type="button" class="btn btn-default reject-btn">Reject</button>'
             }.bind(this)
         }
     },
@@ -69,22 +53,18 @@ module.exports = Backbone.Marionette.ItemView.extend({
         }
     },
     onClickSave: function() {
-        this.saveRequest(0, false);
+        this.saveRequest(1, false);
     },
     onClickSubmit: function() {
-        this.saveRequest(1, true);
-    },
-    onClickApproval: function() {
         this.saveRequest(2, true);
-    },
-    onClickReject: function() {
-        this.saveRequest(0, true);
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var status = this.statusList.findWhere({code: nextStatus});
+        console.log(this.statusList);
+        console.log(status);
         this.model.set({
             title: title,
             content: content,
@@ -116,11 +96,5 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     unbindBackboneValidation: function() {
         Backbone.Validation.unbind(this);
-    },
-    isCreate: function() {
-        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
-    },
-    isApproval: function() {
-        return !this.model.isNew() && this.model.isWaitingApproval() && this.currentUser.isApproveUser()
     }
 });

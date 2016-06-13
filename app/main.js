@@ -66,7 +66,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         showRequest: function(id) {
             var request = new Request({id: id}, {collection: requests});
             request.fetch().done(function() {
-                var showView = new ShowRequestView({model: request});
+                var showView = new ShowRequestView({model: request, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(showView);
             });
         },

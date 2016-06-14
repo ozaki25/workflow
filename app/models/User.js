@@ -1,11 +1,6 @@
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
-    defaults: {
-        team: 'None',
-        jobLevel: 3,
-        admin: false
-    },
     validation: {
         name: {
             required: true
@@ -26,5 +21,5 @@ module.exports = Backbone.Model.extend({
     },
     isApproveUser: function() {
         return this.get('jobLevel') < 3;
-    },
+    }
 });

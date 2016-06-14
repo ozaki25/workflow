@@ -63,8 +63,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var status = this.statusList.findWhere({code: nextStatus});
-        console.log(this.statusList);
-        console.log(status);
         this.model.set({
             title: title,
             content: content,

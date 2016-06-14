@@ -3,6 +3,7 @@ Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
+var Categories = require('./collections/Categories');
 var StatusList = require('./collections/StatusList');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
@@ -10,12 +11,14 @@ var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
+var CategoriesMainView = require('./views/categories/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
 var LoginView = require('./views/login/LoginView');
 
 var requests = new Requests();
 var users = new Users();
 var statusList = new StatusList();
+var categories = new Categories();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -26,6 +29,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/:id/edit" : "editRequest",
         "requests/:id"      : "showRequest",
         "users"             : "users",
+        "categories"        : "categories",
         "status_list"       : "statusList"
     },
     initialize: function() {
@@ -74,6 +78,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             users.fetch().done(function() {
                 var usersMainView = new UsersMainView({collection: users});
                 app.getRegion('main').show(usersMainView);
+            });
+        },
+        categories: function() {
+            categories.fetch().done(function() {
+                if(categories.length === 0) categories.addDefaultCategories();
+                var categoriesMainView = new CategoriesMainView({collection: categories});
+                app.getRegion('main').show(categoriesMainView);
             });
         },
         statusList: function() {

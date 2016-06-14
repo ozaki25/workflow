@@ -9,12 +9,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
         requests: '.requests',
         newRequest: '.new-request',
         users: '.users',
+        categories: '.categories',
         statusList: '.status-list'
     },
     events: {
         'click @ui.requests': 'onClickRequestsLink',
         'click @ui.newRequest': 'onClickNewRequestLink',
         'click @ui.users': 'onClickUsersLink',
+        'click @ui.categories': 'onClickCategoriesLink',
         'click @ui.statusList': 'onClickStatusListLink'
     },
     onClickRequestsLink: function(e) {
@@ -28,6 +30,10 @@ module.exports = Backbone.Marionette.ItemView.extend({
     onClickUsersLink: function(e) {
         e.preventDefault();
         Backbone.history.navigate('users', {trigger: true});
+    },
+    onClickCategoriesLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('categories', {trigger: true});
     },
     onClickStatusListLink: function(e) {
         e.preventDefault();

@@ -1,4 +1,24 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var _ = require('underscore');
+var Backbone = require('backbone');
+Backbone.LocalStorage = require('backbone.localstorage');
+var Category = require('../models/Category');
+
+module.exports = Backbone.Collection.extend({
+    model: Category,
+    localStorage: new Backbone.LocalStorage('Workflow.categories'),
+    addDefaultCategories: function() {
+        var categoryList = [{code: 1, name: '投手'},
+                            {code: 2, name: '捕手'},
+                            {code: 2, name: '内野手'},
+                            {code: 4, name: '外野手'}];
+        _(categoryList).each(function(category) {
+            this.create(category, {wait: true});
+        }.bind(this));
+    }
+});
+
+},{"../models/Category":6,"backbone":"backbone","backbone.localstorage":30,"underscore":"underscore"}],2:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.LocalStorage = require('backbone.localstorage');
 var Request = require('../models/Request');
@@ -8,7 +28,7 @@ module.exports = Backbone.Collection.extend({
     localStorage: new Backbone.LocalStorage('Workflow.requests')
 });
 
-},{"../models/Request":5,"backbone":"backbone","backbone.localstorage":24}],2:[function(require,module,exports){
+},{"../models/Request":7,"backbone":"backbone","backbone.localstorage":30}],3:[function(require,module,exports){
 var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.LocalStorage = require('backbone.localstorage');
@@ -31,7 +51,7 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"../models/Status":6,"backbone":"backbone","backbone.localstorage":24,"underscore":"underscore"}],3:[function(require,module,exports){
+},{"../models/Status":8,"backbone":"backbone","backbone.localstorage":30,"underscore":"underscore"}],4:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.LocalStorage = require('backbone.localstorage');
 var User = require('../models/User');
@@ -57,12 +77,13 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"../models/User":7,"backbone":"backbone","backbone.localstorage":24}],4:[function(require,module,exports){
+},{"../models/User":9,"backbone":"backbone","backbone.localstorage":30}],5:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
+var Categories = require('./collections/Categories');
 var StatusList = require('./collections/StatusList');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
@@ -70,12 +91,14 @@ var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
+var CategoriesMainView = require('./views/categories/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
 var LoginView = require('./views/login/LoginView');
 
 var requests = new Requests();
 var users = new Users();
 var statusList = new StatusList();
+var categories = new Categories();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -86,6 +109,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "requests/:id/edit" : "editRequest",
         "requests/:id"      : "showRequest",
         "users"             : "users",
+        "categories"        : "categories",
         "status_list"       : "statusList"
     },
     initialize: function() {
@@ -136,6 +160,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 app.getRegion('main').show(usersMainView);
             });
         },
+        categories: function() {
+            categories.fetch().done(function() {
+                if(categories.length === 0) categories.addDefaultCategories();
+                var categoriesMainView = new CategoriesMainView({collection: categories});
+                app.getRegion('main').show(categoriesMainView);
+            });
+        },
         statusList: function() {
             var statusListView = new StatusListView({collection: statusList});
             app.getRegion('main').show(statusListView);
@@ -157,7 +188,21 @@ var app = new Backbone.Marionette.Application({
 
 app.start();
 
-},{"./collections/Requests":1,"./collections/StatusList":2,"./collections/Users":3,"./models/Request":5,"./views/HeaderView":8,"./views/SideMenuView":9,"./views/login/LoginView":10,"./views/requests/FormView":13,"./views/requests/RequestsView":15,"./views/requests/ShowView":16,"./views/statusList/StatusListView":17,"./views/users/MainView":20,"backbone":"backbone","backbone.marionette":25}],5:[function(require,module,exports){
+},{"./collections/Categories":1,"./collections/Requests":2,"./collections/StatusList":3,"./collections/Users":4,"./models/Request":7,"./views/HeaderView":10,"./views/SideMenuView":11,"./views/categories/MainView":15,"./views/login/LoginView":16,"./views/requests/FormView":19,"./views/requests/RequestsView":21,"./views/requests/ShowView":22,"./views/statusList/StatusListView":23,"./views/users/MainView":26,"backbone":"backbone","backbone.marionette":31}],6:[function(require,module,exports){
+var Backbone = require('backbone');
+
+module.exports = Backbone.Model.extend({
+    validation: {
+        code: {
+            required: true
+        },
+        name: {
+            required: true
+        }
+    }
+});
+
+},{"backbone":"backbone"}],7:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -179,25 +224,16 @@ module.exports = Backbone.Model.extend({
     }
 });
 
-},{"backbone":"backbone"}],6:[function(require,module,exports){
+},{"backbone":"backbone"}],8:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
-    defaults: {
-        code: 1,
-        name: '作成中'
-    }
 });
 
-},{"backbone":"backbone"}],7:[function(require,module,exports){
+},{"backbone":"backbone"}],9:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
-    defaults: {
-        team: 'None',
-        jobLevel: 3,
-        admin: false
-    },
     validation: {
         name: {
             required: true
@@ -218,10 +254,10 @@ module.exports = Backbone.Model.extend({
     },
     isApproveUser: function() {
         return this.get('jobLevel') < 3;
-    },
+    }
 });
 
-},{"backbone":"backbone"}],8:[function(require,module,exports){
+},{"backbone":"backbone"}],10:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -236,7 +272,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],9:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],11:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -248,12 +284,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
         requests: '.requests',
         newRequest: '.new-request',
         users: '.users',
+        categories: '.categories',
         statusList: '.status-list'
     },
     events: {
         'click @ui.requests': 'onClickRequestsLink',
         'click @ui.newRequest': 'onClickNewRequestLink',
         'click @ui.users': 'onClickUsersLink',
+        'click @ui.categories': 'onClickCategoriesLink',
         'click @ui.statusList': 'onClickStatusListLink'
     },
     onClickRequestsLink: function(e) {
@@ -268,13 +306,162 @@ module.exports = Backbone.Marionette.ItemView.extend({
         e.preventDefault();
         Backbone.history.navigate('users', {trigger: true});
     },
+    onClickCategoriesLink: function(e) {
+        e.preventDefault();
+        Backbone.history.navigate('categories', {trigger: true});
+    },
     onClickStatusListLink: function(e) {
         e.preventDefault();
         Backbone.history.navigate('status_list', {trigger: true});
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],10:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],12:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var Category = require('../../models/Category');
+var CategoryView = require('./CategoryView');
+
+module.exports = Backbone.Marionette.CompositeView.extend({
+    className: 'panel panel-default',
+    childView: CategoryView,
+    childViewContainer: '#category_list',
+    template: '#categories_view',
+    ui: {
+        newCategoryBtn: '.new-category'
+    },
+    events: {
+        'click @ui.newCategoryBtn': 'onClickNewBtn'
+    },
+    onClickNewBtn: function(e) {
+        e.preventDefault();
+        this.triggerMethod('click:new');
+    }
+});
+
+
+},{"../../models/Category":6,"./CategoryView":13,"backbone":"backbone","backbone.marionette":31}],13:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    tagName: 'tr',
+    template: '#category_view',
+    ui: {
+        editBtn: '.edit',
+        deleteBtn: '.delete'
+    },
+    events: {
+        'click @ui.editBtn': 'onClickEditBtn',
+        'click @ui.deleteBtn': 'onClickDeleteBtn'
+    },
+    onClickEditBtn: function(e) {
+        e.preventDefault();
+        this.triggerMethod('click:edit');
+    },
+    onClickDeleteBtn: function(e) {
+        e.preventDefault();
+        this.model.destroy({wait: true});
+    }
+});
+
+},{"backbone":"backbone","backbone.marionette":31}],14:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var Category = require('../../models/Category');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'panel panel-default',
+    template: '#category_form_view',
+    ui: {
+        inputCode: 'input.code',
+        inputName: 'input.name',
+        newCategoryBtn: '.new-category'
+    },
+    events: {
+        'click @ui.newCategoryBtn': 'onClickNew'
+    },
+    templateHelpers: function() {
+        return {
+            submit: !!this.model ? 'Update' : 'Create'
+        }
+    },
+    onRender: function() {
+        if(this.model) {
+            this.ui.inputCode.val(this.model.get('code'));
+            this.ui.inputName.val(this.model.get('name'));
+        }
+    },
+    onClickNew: function() {
+        if(!this.model) this.model = new Category();
+        this.bindBackboneValidation();
+
+        var code = this.ui.inputCode.val().trim();
+        var name = this.ui.inputName.val().trim();
+        this.model.set({code: code, name: name});
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model, {wait: true});
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error').find('.help-block').remove();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error');
+                if(group.find('.help-block').length == 0) {
+                    control.after('<p class="help-block"></p>');
+                }
+                group.find('.help-block').text(error);
+            }
+        });
+    }
+});
+
+
+},{"../../models/Category":6,"backbone":"backbone","backbone.marionette":31}],15:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var CategoriesView = require('./CategoriesView');
+var FormView = require('./FormView');
+
+module.exports = Backbone.Marionette.LayoutView.extend({
+    template: '#categories_main_view',
+    regions: {
+        categoriesMain: '#categories_main'
+    },
+    collectionEvents: {
+        'add change': 'showIndex'
+    },
+    childEvents: {
+        'click:new': 'showNew',
+        'click:edit': 'showEdit'
+    },
+    onRender: function() {
+        var categoriesView = new CategoriesView({collection: this.collection});
+        this.getRegion('categoriesMain').show(categoriesView);
+    },
+    showNew: function() {
+        var formView = new FormView({collection: this.collection});
+        this.getRegion('categoriesMain').show(formView);
+    },
+    showEdit: function(view) {
+        var formView = new FormView({collection: this.collection, model: view.model});
+        this.getRegion('categoriesMain').show(formView);
+    },
+    showIndex: function() {
+        var categoriesView = new CategoriesView({collection: this.collection});
+        this.getRegion('categoriesMain').show(categoriesView);
+    }
+});
+
+
+},{"./CategoriesView":12,"./FormView":14,"backbone":"backbone","backbone.marionette":31}],16:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UsersView = require('./UsersView');
@@ -301,7 +488,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 });
 
 
-},{"./UsersView":12,"backbone":"backbone","backbone.marionette":25}],11:[function(require,module,exports){
+},{"./UsersView":18,"backbone":"backbone","backbone.marionette":31}],17:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -317,7 +504,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],12:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],18:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
@@ -331,7 +518,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 });
 
 
-},{"../../models/User":7,"./UserView":11,"backbone":"backbone","backbone.marionette":25}],13:[function(require,module,exports){
+},{"../../models/User":9,"./UserView":17,"backbone":"backbone","backbone.marionette":31}],19:[function(require,module,exports){
 var $ = require('jquery');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
@@ -397,8 +584,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var status = this.statusList.findWhere({code: nextStatus});
-        console.log(this.statusList);
-        console.log(status);
         this.model.set({
             title: title,
             content: content,
@@ -433,7 +618,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"../../models/Request":5,"../../models/Status":6,"backbone":"backbone","backbone.marionette":25,"backbone.validation":"backbone.validation","jquery":"jquery"}],14:[function(require,module,exports){
+},{"../../models/Request":7,"../../models/Status":8,"backbone":"backbone","backbone.marionette":31,"backbone.validation":"backbone.validation","jquery":"jquery"}],20:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -459,7 +644,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],15:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],21:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var RequestView = require('./RequestView');
@@ -471,7 +656,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     template: '#requests_view'
 });
 
-},{"./RequestView":14,"backbone":"backbone","backbone.marionette":25}],16:[function(require,module,exports){
+},{"./RequestView":20,"backbone":"backbone","backbone.marionette":31}],22:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -516,7 +701,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],17:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],23:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var StatusView = require('./StatusView');
@@ -529,7 +714,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 });
 
 
-},{"./StatusView":18,"backbone":"backbone","backbone.marionette":25}],18:[function(require,module,exports){
+},{"./StatusView":24,"backbone":"backbone","backbone.marionette":31}],24:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -538,7 +723,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     template: '#status_view'
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],19:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],25:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
@@ -612,7 +797,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 });
 
 
-},{"../../models/User":7,"backbone":"backbone","backbone.marionette":25}],20:[function(require,module,exports){
+},{"../../models/User":9,"backbone":"backbone","backbone.marionette":31}],26:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UsersView = require('./UsersView');
@@ -649,7 +834,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 });
 
 
-},{"./FormView":19,"./UsersView":22,"backbone":"backbone","backbone.marionette":25}],21:[function(require,module,exports){
+},{"./FormView":25,"./UsersView":28,"backbone":"backbone","backbone.marionette":31}],27:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
@@ -674,7 +859,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 });
 
-},{"backbone":"backbone","backbone.marionette":25}],22:[function(require,module,exports){
+},{"backbone":"backbone","backbone.marionette":31}],28:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
@@ -698,7 +883,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 });
 
 
-},{"../../models/User":7,"./UserView":21,"backbone":"backbone","backbone.marionette":25}],23:[function(require,module,exports){
+},{"../../models/User":9,"./UserView":27,"backbone":"backbone","backbone.marionette":31}],29:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11
@@ -890,7 +1075,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],24:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],30:[function(require,module,exports){
 /**
  * Backbone localStorage Adapter
  * Version 1.1.16
@@ -1150,7 +1335,7 @@ Backbone.sync = function(method, model, options) {
 return Backbone.LocalStorage;
 }));
 
-},{"backbone":"backbone"}],25:[function(require,module,exports){
+},{"backbone":"backbone"}],31:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
 // v2.4.7
@@ -4664,7 +4849,7 @@ return Backbone.LocalStorage;
   return Marionette;
 }));
 
-},{"backbone":"backbone","backbone.babysitter":23,"backbone.wreqr":26,"underscore":"underscore"}],26:[function(require,module,exports){
+},{"backbone":"backbone","backbone.babysitter":29,"backbone.wreqr":32,"underscore":"underscore"}],32:[function(require,module,exports){
 // Backbone.Wreqr (Backbone.Marionette)
 // ----------------------------------
 // v1.3.6
@@ -19002,4 +19187,4 @@ return jQuery;
   }
 }.call(this));
 
-},{}]},{},[4]);
+},{}]},{},[5]);

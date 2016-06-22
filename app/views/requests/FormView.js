@@ -66,8 +66,8 @@ module.exports = Backbone.Marionette.ItemView.extend({
         this.model.set({
             title: title,
             content: content,
-            user: this.currentUser,
-            status: status
+            user: {id: this.currentUser.id},
+            status: {id: status.id}
         });
         if(!validate || this.model.isValid(true)) {
             this.model.save({}, {wait: true});

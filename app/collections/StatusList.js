@@ -1,11 +1,10 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
-Backbone.LocalStorage = require('backbone.localstorage');
 var Status = require('../models/Status');
 
 module.exports = Backbone.Collection.extend({
     model: Status,
-    localStorage: new Backbone.LocalStorage('Workflow.status'),
+    url: 'http://localhost:8080/statuses',
     addDefaultStatus: function() {
         var statusList = [{code: 1, name: '作成中'},
                           {code: 2, name: '承認待ち'},

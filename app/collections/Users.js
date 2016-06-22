@@ -1,10 +1,9 @@
 var Backbone = require('backbone');
-Backbone.LocalStorage = require('backbone.localstorage');
 var User = require('../models/User');
 
 module.exports = Backbone.Collection.extend({
     model: User,
-    localStorage: new Backbone.LocalStorage('Workflow.users'),
+    url: 'http://localhost:8080/users',
     addDefaultUser: function() {
         this.createUser('ABC0001', 'アドミンユーザ', '管理チーム', 0, true);
         this.createUser('ABC0002', '一般ユーザ', '開発チーム', 3, false);

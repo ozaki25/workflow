@@ -33,8 +33,9 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"       : "statusList"
     },
     initialize: function() {
-        statusList.fetch();
-        if(statusList.length === 0) statusList.addDefaultStatus();
+        statusList.fetch().done(function() {
+            if(statusList.length === 0) statusList.addDefaultStatus();
+        });
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});

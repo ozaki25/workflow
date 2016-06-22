@@ -20,23 +20,21 @@ module.exports = Backbone.Collection.extend({
 
 },{"../models/Category":6,"backbone":"backbone","backbone.localstorage":30,"underscore":"underscore"}],2:[function(require,module,exports){
 var Backbone = require('backbone');
-Backbone.LocalStorage = require('backbone.localstorage');
 var Request = require('../models/Request');
 
 module.exports = Backbone.Collection.extend({
     model: Request,
-    localStorage: new Backbone.LocalStorage('Workflow.requests')
+    url: 'http://localhost:8080/requests',
 });
 
-},{"../models/Request":7,"backbone":"backbone","backbone.localstorage":30}],3:[function(require,module,exports){
+},{"../models/Request":7,"backbone":"backbone"}],3:[function(require,module,exports){
 var _ = require('underscore');
 var Backbone = require('backbone');
-Backbone.LocalStorage = require('backbone.localstorage');
 var Status = require('../models/Status');
 
 module.exports = Backbone.Collection.extend({
     model: Status,
-    localStorage: new Backbone.LocalStorage('Workflow.status'),
+    url: 'http://localhost:8080/statuses',
     addDefaultStatus: function() {
         var statusList = [{code: 1, name: '作成中'},
                           {code: 2, name: '承認待ち'},
@@ -51,14 +49,13 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"../models/Status":8,"backbone":"backbone","backbone.localstorage":30,"underscore":"underscore"}],4:[function(require,module,exports){
+},{"../models/Status":8,"backbone":"backbone","underscore":"underscore"}],4:[function(require,module,exports){
 var Backbone = require('backbone');
-Backbone.LocalStorage = require('backbone.localstorage');
 var User = require('../models/User');
 
 module.exports = Backbone.Collection.extend({
     model: User,
-    localStorage: new Backbone.LocalStorage('Workflow.users'),
+    url: 'http://localhost:8080/users',
     addDefaultUser: function() {
         this.createUser('ABC0001', 'アドミンユーザ', '管理チーム', 0, true);
         this.createUser('ABC0002', '一般ユーザ', '開発チーム', 3, false);
@@ -77,7 +74,7 @@ module.exports = Backbone.Collection.extend({
     }
 });
 
-},{"../models/User":9,"backbone":"backbone","backbone.localstorage":30}],5:[function(require,module,exports){
+},{"../models/User":9,"backbone":"backbone"}],5:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
@@ -113,8 +110,9 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"       : "statusList"
     },
     initialize: function() {
-        statusList.fetch();
-        if(statusList.length === 0) statusList.addDefaultStatus();
+        statusList.fetch().done(function() {
+            if(statusList.length === 0) statusList.addDefaultStatus();
+        });
     },
     onRoute: function() {
         if(!app.currentUser) this.navigate('login', {trigger: true});
@@ -553,8 +551,8 @@ module.exports = Backbone.Marionette.ItemView.extend({
         this.model.set({
             title: title,
             content: content,
-            user: this.currentUser,
-            status: status
+            user: {id: this.currentUser.id},
+            status: {id: status.id}
         });
         if(!validate || this.model.isValid(true)) {
             this.model.save({}, {wait: true});

@@ -11,12 +11,20 @@ module.exports = Backbone.Marionette.ItemView.extend({
     ui: {
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
+        inputFile: 'input.file',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn'
     },
     events: {
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit'
+    },
+    modelEvents: {
+        'all': function(a, b, c) {
+            console.log(a);
+            console.log(b);
+            console.log(c);
+        }
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -62,15 +70,35 @@ module.exports = Backbone.Marionette.ItemView.extend({
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
+        var filename = this.ui.inputFile.val();
+        var file = this.ui.inputFile.prop("files")[0];
         var status = this.statusList.findWhere({code: nextStatus});
         this.model.set({
             title: title,
             content: content,
             user: {id: this.currentUser.id},
-            status: {id: status.id}
+            status: {id: status.id},
+            //file: file
         });
         if(!validate || this.model.isValid(true)) {
-            this.model.save({}, {wait: true});
+            var data = {
+                title: title,
+                content: content,
+                user: {id: this.currentUser.id},
+                status: {id: status.id},
+                file: file
+            }
+            var formData = new FormData();
+            formData.append('file', file);
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:8080/requests',
+                dataType: 'json',
+                processData: false,
+                cache: false,
+                contentType: false,
+                data: formData
+            });
             Backbone.history.navigate('/requests', {trigger: true});
         }
     },

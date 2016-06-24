@@ -21,5 +21,5 @@ gulp.task('browserify', () => {
     })
     .bundle()
     .pipe(source('app.js'))
-    .pipe(gulp.dest('./app/'));
+    .pipe(gulp.dest('../public/workflow/app/'));
 });

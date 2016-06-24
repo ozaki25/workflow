@@ -496,6 +496,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     ui: {
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
+        inputFile: 'input.file',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn'
     },
@@ -547,6 +548,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
+        var filename = this.ui.inputFile.val();
+        var file = this.ui.inputFile.prop("files")[0];
+        console.log(file);
         var status = this.statusList.findWhere({code: nextStatus});
         this.model.set({
             title: title,

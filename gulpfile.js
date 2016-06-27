@@ -10,7 +10,7 @@ gulp.task('default', ['build']);
 
 // build
 gulp.task('build', () => {
-    runSequence(['browserify']);
+    runSequence(['browserify', 'html']);
 });
 
 // browserify
@@ -21,5 +21,11 @@ gulp.task('browserify', () => {
     })
     .bundle()
     .pipe(source('app.js'))
-    .pipe(gulp.dest('./app/'));
+    .pipe(gulp.dest('../public/workflow/app/'));
+});
+
+// copy html
+gulp.task('html', function() {
+    gulp.src('index.html')
+        .pipe(gulp.dest('../public/workflow'));
 });

@@ -9,8 +9,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
-        inputTitle: 'input.title',
-        inputContent: 'textarea.content',
+        form: 'form',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn'
     },
@@ -43,13 +42,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
                              '</div>' +
                            '</div>'
                 }
-            }.bind(this)
-        }
-    },
-    onRender: function() {
-        if(!this.model.isNew()) {
-            this.ui.inputTitle.val(this.model.get('title'));
-            this.ui.inputContent.val(this.model.get('content'));
+            }.bind(this),
+            inputedTitle: this.model.isNew() ? '' : this.model.get('title'),
+            inputedContent: this.model.isNew() ? '' : this.model.get('content')
         }
     },
     onClickSave: function() {
@@ -60,17 +55,27 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
-        var title = this.ui.inputTitle.val().trim();
-        var content = this.ui.inputContent.val().trim();
         var status = this.statusList.findWhere({code: nextStatus});
+
+        var formData = new FormData(this.ui.form[0]);
+        formData.append('user', this.currentUser.id);
+        formData.append('status', status.id);
+
         this.model.set({
-            title: title,
-            content: content,
-            user: {id: this.currentUser.id},
-            status: {id: status.id}
+            title: formData.get('title'),
+            content: formData.get('title'),
+            user: {id: formData.get('user')},
+            status: {id: formData.get('status')}
         });
+
         if(!validate || this.model.isValid(true)) {
-            this.model.save({}, {wait: true});
+            var options = {
+                processData: false,
+                contentType: false,
+                data: formData,
+                wait: true
+            }
+            this.model.save({}, options);
             Backbone.history.navigate('/requests', {trigger: true});
         }
     },

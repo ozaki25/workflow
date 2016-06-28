@@ -29,6 +29,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     onRender: function() {
         var documents = new Documents(this.model.get('documents'));
+        documents.setUrl(this.model.id);
         var downloadFilesView = new DownloadFilesView({collection: documents});
         this.getRegion('downloadFiles').show(downloadFilesView);
     },

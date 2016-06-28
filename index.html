@@ -74,7 +74,7 @@
     <script id="request_form_view" type="text/template">
       <div class="panel-heading">Request Form</div>
       <div class="panel-body">
-        <form class="form-horizontal">
+        <form id="request_form" class="form-horizontal">
           <%= id() %>
           <%= status() %>
           <div class="form-group">
@@ -122,13 +122,17 @@
           <dt>Content</dt>
           <dd><%- content %></dd>
           <dt>File</dt>
-          <dd><a href="/requests/<%- id %>/download"><%- filename %></a></dd>
+          <span id="download_file_list"></span>
         </dl>
         <div class="pull-right">
-          <%= approval() %>
-          <%= reject() %>
+          <%= approval %>
+          <%= reject %>
         </div>
       </div>
+    </script>
+
+    <script id="download_file_view" type="text/template">
+      <a href="#"><%- filename %></a>
     </script>
 
     <script id="users_main_view" type="text/template">

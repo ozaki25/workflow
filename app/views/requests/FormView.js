@@ -4,12 +4,14 @@ Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 var Request = require('../../models/Request');
 var Status = require('../../models/Status');
+var Document = require('../../models/Document');
+var Documents = require('../../collections/Documents');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
-        form: 'form',
+        requestForm: '#request_form',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn'
     },
@@ -55,29 +57,41 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
+        var formData = new FormData(this.ui.requestForm[0]);
         var status = this.statusList.findWhere({code: nextStatus});
-
-        var formData = new FormData(this.ui.form[0]);
-        formData.append('user', this.currentUser.id);
-        formData.append('status', status.id);
-
+        var documents = this.model.isNew() ? null : this.model.get('documents');
         this.model.set({
             title: formData.get('title'),
-            content: formData.get('title'),
-            user: {id: formData.get('user')},
-            status: {id: formData.get('status')}
+            content: formData.get('content'),
+            user: {id: this.currentUser.id},
+            status: {id: status.id},
+            documents: documents
         });
-
-        if(!validate || this.model.isValid(true)) {
-            var options = {
-                processData: false,
-                contentType: false,
-                data: formData,
-                wait: true
+        var options = {
+            wait: true,
+            success: function(request) {
+                var file = formData.get('file');
+                if(file.size === 0) {
+                    Backbone.history.navigate('/requests', {trigger: true});
+                } else {
+                    var document = new Document();
+                    document.setUrl(request.id);
+                    var fileData = new FormData();
+                    fileData.append('file', file);
+                    var options = {
+                        processData: false,
+                        contentType: false,
+                        data: fileData,
+                        wait: true,
+                        success: function() {
+                            Backbone.history.navigate('/requests', {trigger: true})
+                        }
+                    }
+                    document.save({}, options);
+                }
             }
-            this.model.save({}, options);
-            Backbone.history.navigate('/requests', {trigger: true});
-        }
+        };
+        this.model.save({}, options);
     },
     bindBackboneValidation: function() {
         Backbone.Validation.bind(this, {

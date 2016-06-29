@@ -92,6 +92,7 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">File</label>
             <div class="col-sm-10">
+              <span id="download_file_list"></span>
               <input type="file" class="form-control file-tmp">
             </div>
           </div>
@@ -132,7 +133,10 @@
     </script>
 
     <script id="download_file_view" type="text/template">
-      <a href="<%= url %>"><%- filename %></a>
+      <p class="uploaded-<%- id %>">
+        <a href="<%= url %>"><%- filename %></a>
+        <a href="#" class="btn btn-link btn-xs remove-file">&times;</a>
+      </p>
     </script>
 
     <script id="users_main_view" type="text/template">

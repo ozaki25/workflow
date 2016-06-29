@@ -5,9 +5,11 @@ Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 var Request = require('../../models/Request');
 var Status = require('../../models/Status');
+var Document = require('../../models/Document');
 var Documents = require('../../collections/Documents');
+var DownloadFilesView = require('./DownloadFilesView');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
@@ -21,6 +23,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
         'click .remove-file': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit'
+    },
+    regions: {
+        downloadFiles: '#download_file_list'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -51,6 +56,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
             inputedTitle: this.model.isNew() ? '' : this.model.get('title'),
             inputedContent: this.model.isNew() ? '' : this.model.get('content')
         }
+    },
+    onRender: function() {
+        var documents = new Documents(this.model.get('documents'));
+        documents.setUrl(this.model.id);
+        var downloadFilesView = new DownloadFilesView({collection: documents});
+        this.getRegion('downloadFiles').show(downloadFilesView);
     },
     selectedFile: function(e) {
         var input = this.$(e.target);
@@ -95,31 +106,51 @@ module.exports = Backbone.Marionette.ItemView.extend({
         var options = {
             wait: true,
             success: function(request) {
-                var inputFiles = this.$('input.file');
-                console.log('File count : ', inputFiles.length);
-                if(inputFiles.length) {
-                    _(inputFiles).each(function(file) {
-                        var fileData = new FormData();
-                        fileData.append('file', this.$(file).prop('files')[0]);
-                        var options = {
-                            processData: false,
-                            contentType: false,
-                            data: fileData,
-                            wait: true,
-                            success: function() {
-                                Backbone.history.navigate('/requests', {trigger: true})
-                            }
-                        }
-                        var documents = new Documents();
-                        documents.setUrl(request.id);
-                        documents.create({}, options);
-                    }.bind(this))
-                } else {
-                    Backbone.history.navigate('/requests', {trigger: true});
-                }
+                this.saveFile(request);
+                this.deleteFile(request);
             }.bind(this)
         };
         this.model.save({}, options);
+    },
+    saveFile: function(request) {
+        var inputFiles = this.$('input.file');
+        if(inputFiles.length) {
+            _(inputFiles).each(function(file) {
+                var formData = new FormData();
+                formData.append('file', this.$(file).prop('files')[0]);
+                var options = {
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    wait: true
+                }
+                var documents = new Documents();
+                documents.setUrl(request.id);
+                documents.create({}, options);
+            }.bind(this));
+        } else {
+            Backbone.history.navigate('/requests', {trigger: true});
+        }
+    },
+    deleteFile: function(request) {
+        var removeFiles = this.$('input.remove-file');
+        if(removeFiles.length) {
+            _(removeFiles).each(function(file) {
+                var id = this.$(file).val();
+                var options = {
+                    wait: true,
+                    success: function() {
+                        Backbone.history.navigate('/requests', {trigger: true})
+                    }
+                }
+                var documents = new Documents();
+                documents.setUrl(request.id);
+                var document = new Document({id: id}, {collection: documents});
+                var result = document.destroy(options);
+            }.bind(this));
+        } else {
+            Backbone.history.navigate('/requests', {trigger: true});
+        }
     },
     bindBackboneValidation: function() {
         Backbone.Validation.bind(this, {

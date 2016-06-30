@@ -52,9 +52,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                              '</div>' +
                            '</div>'
                 }
-            }.bind(this),
-            inputedTitle: this.model.isNew() ? '' : this.model.get('title'),
-            inputedContent: this.model.isNew() ? '' : this.model.get('content')
+            }.bind(this)
         }
     },
     onRender: function() {

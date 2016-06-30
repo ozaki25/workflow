@@ -113,7 +113,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             success: function(request) {
                 this.saveFile(request);
                 this.deleteFile(request);
-                Backbone.history.navigate('/requests', {trigger: true});
+                Backbone.history.fragment === 'requests' ? Backbone.history.loadUrl(Backbone.history.fragment) : Backbone.history.navigate('/requests', {trigger: true});;
             }.bind(this)
         };
         this.model.set({

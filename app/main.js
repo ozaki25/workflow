@@ -7,7 +7,7 @@ var Categories = require('./collections/Categories');
 var StatusList = require('./collections/StatusList');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
-var RequestsView = require('./views/requests/RequestsView');
+var RequestsMainView = require('./views/requests/MainView');
 var RequestFormView = require('./views/requests/FormView');
 var UsersMainView = require('./views/users/MainView');
 var CategoriesMainView = require('./views/categories/MainView');
@@ -22,10 +22,9 @@ var categories = new Categories();
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
         "login"        : "login",
-        ""             : "index",
-        "requests"     : "index",
-        "requests/new" : "newRequest",
-        "requests/:id" : "editRequest",
+        ""             : "requests",
+        "requests"     : "requests",
+        "requests/:id" : "request",
         "users"        : "users",
         "categories"   : "categories",
         "status_list"  : "statusList"
@@ -48,18 +47,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 app.getRegion('main').show(loginView);
             });
         },
-        index: function() {
+        requests: function() {
             requests.fetch().done(function() {
-                var requestsView = new RequestsView({collection: requests});
-                app.getRegion('main').show(requestsView);
+                var requestsMainView = new RequestsMainView({collection: requests, currentUser: app.currentUser, statusList: statusList});
+                app.getRegion('main').show(requestsMainView);
             });
         },
-        newRequest: function() {
-            var request = new Request({}, {collection: requests});
-            var formView = new RequestFormView({model: request, currentUser: app.currentUser, statusList: statusList});
-            app.getRegion('main').show(formView);
-        },
-        editRequest: function(id) {
+        request: function(id) {
             var request = new Request({id: id}, {collection: requests});
             request.fetch().done(function() {
                 var formView = new RequestFormView({model: request, currentUser: app.currentUser, statusList: statusList});

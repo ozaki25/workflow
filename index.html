@@ -36,15 +36,23 @@
     </script>
 
     <script id="side_menu_view" type="text/template">
-      <li><a href="#requests/new">New</a></li>
-      <li><a href="#requests">Index</a></li>
+      <li><a href="#requests">Requests</a></li>
       <li><a href="#users">Users</a></li>
       <li><a href="#categories">Categories</a></li>
       <li><a href="#status_list">StatusList</a></li>
     </script>
 
+    <script id="requests_main_view" type="text/template">
+      <div id="requests_main"></div>
+    </script>
+
     <script id="requests_view" type="text/template">
-      <div class="panel-heading">Request List</div>
+      <div class="panel-heading">
+        Request List
+        <div class="pull-right">
+          <a class="btn btn-default btn-xs new-request" href="#">New</a>
+        </div>
+      </div>
       <table class="table">
         <thead>
           <tr>

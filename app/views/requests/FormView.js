@@ -14,13 +14,17 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         requestForm: '#request_form',
         inputFile: 'input.file-tmp',
         saveBtn: '.save-btn',
-        submitBtn: '.submit-btn'
+        submitBtn: '.submit-btn',
+        approvalBtn: '.approval-btn',
+        rejectBtn: '.reject-btn'
     },
     events: {
         'change @ui.inputFile': 'selectedFile',
         'click .remove-file': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
-        'click @ui.submitBtn': 'onClickSubmit'
+        'click @ui.submitBtn': 'onClickSubmit',
+        'click @ui.approvalBtn': 'onClickApproval',
+        'click @ui.rejectBtn': 'onClickReject'
     },
     regions: {
         downloadFiles: '#download_file_list'
@@ -52,7 +56,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                              '</div>' +
                            '</div>'
                 }
-            }.bind(this)
+            }.bind(this),
+            save: this.isCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
+            submit: this.isCreate() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
+            approval: this.isApproval() ? '<button type="button" class="btn btn-default approval-btn">Approval</button>' : '',
+            reject: this.isApproval() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : ''
         }
     },
     onRender: function() {
@@ -89,6 +97,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onClickSubmit: function() {
         this.saveRequest(2, true);
     },
+    onClickApproval: function() {
+        this.updateStatus(3);
+    },
+    onClickReject: function() {
+        this.updateStatus(1);
+    },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var formData = new FormData(this.ui.requestForm[0]);
@@ -109,6 +123,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             status: {id: statusId}
         });
         this.model.save({}, options);
+    },
+    updateStatus: function(nextStatus) {
+        var statusId = this.statusList.findWhere({code: nextStatus}).id;
+        this.model.save({status: {id: statusId}}, {wait: true});
+        Backbone.history.navigate('/requests', {trigger: true});
     },
     saveFile: function(request) {
         _(this.$('input.file')).each(function(file) {
@@ -150,5 +169,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     unbindBackboneValidation: function() {
         Backbone.Validation.unbind(this);
+    },
+    isCreate: function() {
+        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
+    },
+    isApproval: function() {
+        return !this.model.isNew() && this.model.isWaitingApproval() && this.currentUser.isApproveUser();
     }
 });

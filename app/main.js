@@ -9,7 +9,6 @@ var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
-var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
 var CategoriesMainView = require('./views/categories/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
@@ -22,15 +21,14 @@ var categories = new Categories();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "login"             : "login",
-        ""                  : "index",
-        "requests"          : "index",
-        "requests/new"      : "newRequest",
-        "requests/:id/edit" : "editRequest",
-        "requests/:id"      : "showRequest",
-        "users"             : "users",
-        "categories"        : "categories",
-        "status_list"       : "statusList"
+        "login"        : "login",
+        ""             : "index",
+        "requests"     : "index",
+        "requests/new" : "newRequest",
+        "requests/:id" : "editRequest",
+        "users"        : "users",
+        "categories"   : "categories",
+        "status_list"  : "statusList"
     },
     initialize: function() {
         statusList.fetch().done(function() {
@@ -66,13 +64,6 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             request.fetch().done(function() {
                 var formView = new RequestFormView({model: request, currentUser: app.currentUser, statusList: statusList});
                 app.getRegion('main').show(formView);
-            });
-        },
-        showRequest: function(id) {
-            var request = new Request({id: id}, {collection: requests});
-            request.fetch().done(function() {
-                var showView = new ShowRequestView({model: request, currentUser: app.currentUser, statusList: statusList});
-                app.getRegion('main').show(showView);
             });
         },
         users: function() {

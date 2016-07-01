@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+Backbone.csrf = require('../../csrf');
 var User = require('../../models/User');
 
 module.exports = Backbone.Marionette.ItemView.extend({

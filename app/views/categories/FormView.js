@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+Backbone.csrf = require('../../csrf');
 var Category = require('../../models/Category');
 
 module.exports = Backbone.Marionette.ItemView.extend({

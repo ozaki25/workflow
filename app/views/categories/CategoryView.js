@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+Backbone.csrf = require('../../csrf');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'tr',

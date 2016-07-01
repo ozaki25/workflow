@@ -21,7 +21,7 @@ gulp.task('browserify', () => {
     })
     .bundle()
     .pipe(source('app.js'))
-    .pipe(gulp.dest('../public/static/js/'));
+    .pipe(gulp.dest('../public/js/'));
 });
 
 // copy html

@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = function() {
     var token = $("meta[name='csrf-token']").attr('content') || '';
     var originalSync = Backbone.sync;
     Backbone.sync = function(method, model, options) {

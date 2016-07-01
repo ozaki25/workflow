@@ -25,7 +25,7 @@ gulp.task('browserify', () => {
 });
 
 // copy html
-gulp.task('html', function() {
+gulp.task('html', () => {
     gulp.src('index.html')
         .pipe(gulp.dest('../src/main/resources/templates/'));
 });

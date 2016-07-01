@@ -3,7 +3,7 @@ var User = require('../models/User');
 
 module.exports = Backbone.Collection.extend({
     model: User,
-    url: 'http://localhost:8080/users',
+    url: '/users',
     addDefaultUser: function() {
         this.createUser('ABC0001', 'アドミンユーザ', '管理チーム', 0, true);
         this.createUser('ABC0002', '一般ユーザ', '開発チーム', 3, false);

@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Request = require('./models/Request');
@@ -85,6 +86,14 @@ var app = new Backbone.Marionette.Application({
         header: '#header',
         sideMenu: '#side_menu',
         main: '#main'
+    },
+    onBeforeStart: function() {
+        // springbootのviewでunderscoreのtemplateを使えるようにタグを変更
+        _.templateSettings = {
+            evaluate:    /\{\{(.+?)\}\}/g,
+            interpolate: /\{\{=(.+?)\}\}/g,
+            escape:      /\{\{-(.+?)\}\}/g
+        };
     },
     onStart: function() {
         new appRouter();

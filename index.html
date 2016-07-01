@@ -3,8 +3,8 @@
 <html>
   <head>
     <title>workflow system</title>
-    <link rel="stylesheet" media="screen" href="./app/assets/css/bootstrap.min.css">
-    <meta charset="UTF-8">
+    <link rel="stylesheet" media="screen" href="css/bootstrap.min.css" />
+    <meta charset="UTF-8" />
   </head>
   <body>
     <div id="header"></div>
@@ -28,7 +28,7 @@
           </div>
           <div class="collapse navbar-collapse" id="navbar_links">
             <ul class="nav navbar-nav pull-right">
-              <li><a href="#"><%= username() %></a></li>
+              <li><a href="#">{{= username() }}</a></li>
             </ul>
           </div>
         </div>
@@ -68,10 +68,10 @@
     </script>
 
     <script id="request_view" type="text/template">
-      <td><%- id %></td>
-      <td><%- status.name %></td>
-      <td><%- title %></td>
-      <td><%- user.name %></td>
+      <td>{{- id }}</td>
+      <td>{{- status.name }}</td>
+      <td>{{- title }}</td>
+      <td>{{- user.name }}</td>
       <td><a href="#" class="btn btn-default btn-xs open-request">Open</a></td>
     </script>
 
@@ -79,33 +79,33 @@
       <div class="panel-heading">Request Form</div>
       <div class="panel-body">
         <form id="request_form" class="form-horizontal">
-          <%= id() %>
-          <%= status() %>
+          {{= id() }}
+          {{= status() }}
           <div class="form-group">
             <label class="col-sm-2 control-label">Title</label>
             <div class="col-sm-10">
-              <input type="text" class="title form-control" name="title" value="<%- title %>">
+              <input type="text" class="title form-control" name="title" value="{{- title }}" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Content</label>
             <div class="col-sm-10">
-              <textarea type="text" class="content form-control" name="content"><%- content %></textarea>
+              <textarea type="text" class="content form-control" name="content">{{- content }}</textarea>
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">File</label>
             <div class="col-sm-10">
               <span id="download_file_list"></span>
-              <input type="file" class="form-control file-tmp">
+              <input type="file" class="form-control file-tmp" />
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <%= save %>
-              <%= submit %>
-              <%= approval %>
-              <%= reject %>
+              {{= save }}
+              {{= submit }}
+              {{= approval }}
+              {{= reject }}
             </div>
           </div>
         </form>
@@ -113,8 +113,8 @@
     </script>
 
     <script id="download_file_view" type="text/template">
-      <p class="uploaded-<%- id %>">
-        <a href="<%= url %>"><%- filename %></a>
+      <p class="uploaded-{{- id }}">
+        <a href="{{= url }}">{{- filename }}</a>
         <a href="#" class="btn btn-link btn-xs remove-file">&times;</a>
       </p>
     </script>
@@ -145,11 +145,11 @@
     </script>
 
     <script id="user_view" type="text/template">
-      <td><%- uid %></td>
-      <td><%- name %></td>
-      <td><%- team %></td>
-      <td><%- jobLevel %></td>
-      <td><%- admin %></td>
+      <td>{{- uid }}</td>
+      <td>{{- name }}</td>
+      <td>{{- team }}</td>
+      <td>{{- jobLevel }}</td>
+      <td>{{- admin }}</td>
       <td><a class="btn btn-default btn-xs edit">Edit</a></td>
       <td><a class="btn btn-link btn-xs delete">Delete</a></td>
     </script>
@@ -161,19 +161,19 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">User Id</label>
             <div class="col-sm-10">
-              <input type="text" class="uid form-control" name="uid">
+              <input type="text" class="uid form-control" name="uid" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Name</label>
             <div class="col-sm-10">
-              <input type="text" class="name form-control" name="name">
+              <input type="text" class="name form-control" name="name" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Team</label>
             <div class="col-sm-10">
-              <input type="text" class="team form-control" name="team">
+              <input type="text" class="team form-control" name="team" />
             </div>
           </div>
           <div class="form-group">
@@ -183,7 +183,7 @@
                 <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
-                <option value="3" selected>3</option>
+                <option value="3" selected="selected">3</option>
                 <option value="4">4</option>
               </select>
             </div>
@@ -193,14 +193,14 @@
             <div class="col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" class="admin" name="admin">
+                  <input type="checkbox" class="admin" name="admin" />
                 </label>
               </div>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="button" class="btn btn-default new-user"><%= submit %></button>
+              <button type="button" class="btn btn-default new-user">{{= submit }}</button>
             </div>
           </div>
         </form>
@@ -249,8 +249,8 @@
     </script>
 
     <script id="category_view" type="text/template">
-      <td><%- code %></td>
-      <td><%- name %></td>
+      <td>{{- code }}</td>
+      <td>{{- name }}</td>
       <td><a class="btn btn-default btn-xs edit">Edit</a></td>
       <td><a class="btn btn-link btn-xs delete">Delete</a></td>
     </script>
@@ -262,18 +262,18 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">Code</label>
             <div class="col-sm-10">
-              <input type="text" class="code form-control" name="code">
+              <input type="text" class="code form-control" name="code" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Name</label>
             <div class="col-sm-10">
-              <input type="text" class="name form-control" name="name">
+              <input type="text" class="name form-control" name="name" />
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="button" class="btn btn-default new-category"><%= submit %></button>
+              <button type="button" class="btn btn-default new-category">{{= submit }}</button>
             </div>
           </div>
         </form>
@@ -292,21 +292,21 @@
     </script>
 
     <script id="status_view" type="text/template">
-      <td><%- code %></td>
-      <td><%- name %></td>
+      <td>{{- code }}</td>
+      <td>{{- name }}</td>
     </script>
 
     <script id="login_user_view" type="text/template">
-      <td><%- uid %></td>
-      <td><%- name %></td>
-      <td><%- team %></td>
-      <td><%- jobLevel %></td>
-      <td><%- admin %></td>
+      <td>{{- uid }}</td>
+      <td>{{- name }}</td>
+      <td>{{- team }}</td>
+      <td>{{- jobLevel }}</td>
+      <td>{{- admin }}</td>
       <td><a class="btn btn-default btn-xs login">Login</a></td>
     </script>
 
-    <script src="./app/app.js"></script>
-    <script src="./app/assets/js/jquery.min.js" type="text/javascript"></script>
-    <script src="./app/assets/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="js/app.js"></script>
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
   </body>
 </html>

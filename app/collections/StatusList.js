@@ -4,7 +4,7 @@ var Status = require('../models/Status');
 
 module.exports = Backbone.Collection.extend({
     model: Status,
-    url: 'http://localhost:8080/statuses',
+    url: '/statuses',
     addDefaultStatus: function() {
         var statusList = [{code: 1, name: '作成中'},
                           {code: 2, name: '承認待ち'},

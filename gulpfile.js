@@ -21,11 +21,11 @@ gulp.task('browserify', () => {
     })
     .bundle()
     .pipe(source('app.js'))
-    .pipe(gulp.dest('../public/workflow/app/'));
+    .pipe(gulp.dest('../public/static/js/'));
 });
 
 // copy html
 gulp.task('html', function() {
     gulp.src('index.html')
-        .pipe(gulp.dest('../public/workflow'));
+        .pipe(gulp.dest('../src/main/resources/templates/'));
 });

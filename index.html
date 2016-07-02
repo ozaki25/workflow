@@ -8,6 +8,7 @@
     <meta name="csrf-token" th:content="${_csrf.token}"/>
   </head>
   <body>
+    <input type="hidden" name="current-user" th:value="${user.uid}" />
     <div id="header"></div>
     <div class="container">
       <div class="row">

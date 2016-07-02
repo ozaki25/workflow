@@ -13,7 +13,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
-        requestForm: '#request_form',
+        inputTitle: 'input.title',
+        inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
@@ -107,7 +108,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
-        var formData = new FormData(this.ui.requestForm[0]);
+        var title = this.ui.inputTitle.val().trim();
+        var content = this.ui.inputContent.val().trim();
         var userId = this.model.isNew() ? this.currentUser.id : this.model.get('user').id;
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {
@@ -119,8 +121,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }.bind(this)
         };
         this.model.set({
-            title: formData.get('title'),
-            content: formData.get('content'),
+            title: title,
+            content: content,
             user: {id: userId},
             status: {id: statusId}
         });

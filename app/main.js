@@ -33,19 +33,20 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"  : "statusList"
     },
     initialize: function() {
+        var uid = Backbone.$('input[name="current-user"]').val();
+        users.fetch().done(function() {
+            if(users.length === 0) users.addDefaultUser();
+            else app.currentUser = users.findWhere({uid: uid});
+            app.getRegion('header').show(new HeaderView({model: app.currentUser}));
+        }.bind(this));
         statusList.fetch().done(function() {
             if(statusList.length === 0) statusList.addDefaultStatus();
         });
-    },
-    onRoute: function() {
-        if(!app.currentUser) this.navigate('login', {trigger: true});
-        app.getRegion('header').show(new HeaderView({model: app.currentUser}));
         app.getRegion('sideMenu').show(new SideMenuView());
     },
     controller: {
         login: function() {
             users.fetch().done(function() {
-                if(users.length === 0) users.addDefaultUser();
                 var loginView = new LoginView({collection: users, app: app});
                 app.getRegion('main').show(loginView);
             });

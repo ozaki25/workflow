@@ -4,6 +4,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 Backbone.csrf = require('../../csrf');
+Backbone.csrf();
 var Document = require('../../models/Document');
 var Documents = require('../../collections/Documents');
 var DownloadFilesView = require('./DownloadFilesView');

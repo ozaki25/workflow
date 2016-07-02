@@ -1,5 +1,7 @@
+var Backbone = require('backbone');
+
 module.exports = function() {
-    var token = $("meta[name='csrf-token']").attr('content') || '';
+    var token = Backbone.$("meta[name='csrf-token']").attr('content') || '';
     var originalSync = Backbone.sync;
     Backbone.sync = function(method, model, options) {
         if(method !== 'fetch') {

@@ -15,7 +15,6 @@ var RequestFormView = require('./views/requests/FormView');
 var UsersMainView = require('./views/users/MainView');
 var CategoriesMainView = require('./views/categories/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
-var LoginView = require('./views/login/LoginView');
 
 var requests = new Requests();
 var users = new Users();
@@ -24,7 +23,6 @@ var categories = new Categories();
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        "login"        : "login",
         ""             : "requests",
         "requests"     : "requests",
         "requests/:id" : "request",
@@ -33,49 +31,59 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"  : "statusList"
     },
     initialize: function() {
-        var uid = Backbone.$('input[name="current-user"]').val();
-        users.fetch().done(function() {
-            if(users.length === 0) users.addDefaultUser();
-            else app.currentUser = users.findWhere({uid: uid});
-            app.getRegion('header').show(new HeaderView({model: app.currentUser}));
-        }.bind(this));
-        statusList.fetch().done(function() {
-            if(statusList.length === 0) statusList.addDefaultStatus();
-        });
+        var usersFetchOption = {
+            success: function() {
+                var uid = Backbone.$('input[name="current-user"]').val();
+                app.currentUser = users.findWhere({uid: uid});
+                app.getRegion('header').show(new HeaderView({model: app.currentUser}));
+            }
+        };
+        statusList.fetch();
+        users.fetch(usersFetchOption);
         app.getRegion('sideMenu').show(new SideMenuView());
     },
     controller: {
-        login: function() {
-            users.fetch().done(function() {
-                var loginView = new LoginView({collection: users, app: app});
-                app.getRegion('main').show(loginView);
-            });
-        },
         requests: function() {
-            requests.fetch().done(function() {
-                var requestsMainView = new RequestsMainView({collection: requests, currentUser: app.currentUser, statusList: statusList});
-                app.getRegion('main').show(requestsMainView);
-            });
+            var requestsFetchOption = {
+                success: function() {
+                    var requestsMainView = new RequestsMainView({collection: requests,
+                                                                 currentUser: app.currentUser,
+                                                                 statusList: statusList});
+                    app.getRegion('main').show(requestsMainView);
+                }
+            };
+            requests.fetch(requestsFetchOption);
         },
         request: function(id) {
             var request = new Request({id: id}, {collection: requests});
-            request.fetch().done(function() {
-                var formView = new RequestFormView({model: request, currentUser: app.currentUser, statusList: statusList});
-                app.getRegion('main').show(formView);
-            });
+            var requestFetchOption = {
+                success: function() {
+                    var formView = new RequestFormView({model: request,
+                                                        currentUser: app.currentUser,
+                                                        statusList: statusList});
+                    app.getRegion('main').show(formView);
+                }
+            };
+            request.fetch(requestFetchOption);
         },
         users: function() {
-            users.fetch().done(function() {
-                var usersMainView = new UsersMainView({collection: users});
-                app.getRegion('main').show(usersMainView);
-            });
+            var usersFetchOption = {
+                success: function() {
+                    var usersMainView = new UsersMainView({collection: users});
+                    app.getRegion('main').show(usersMainView);
+                }
+            };
+            users.fetch(usersFetchOption);
         },
         categories: function() {
-            categories.fetch().done(function() {
-                if(categories.length === 0) categories.addDefaultCategories();
-                var categoriesMainView = new CategoriesMainView({collection: categories});
-                app.getRegion('main').show(categoriesMainView);
-            });
+            var categoriesFetchOption = {
+                success: function() {
+                    if(categories.length === 0) categories.addDefaultCategories();
+                    var categoriesMainView = new CategoriesMainView({collection: categories});
+                    app.getRegion('main').show(categoriesMainView);
+                }
+            };
+            categories.fetch(categoriesFetchOption);
         },
         statusList: function() {
             var statusListView = new StatusListView({collection: statusList});

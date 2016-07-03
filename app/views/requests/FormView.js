@@ -117,7 +117,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             success: function(request) {
                 this.saveFile(request);
                 this.deleteFile(request);
-                Backbone.history.fragment === 'requests' ? Backbone.history.loadUrl(Backbone.history.fragment) : Backbone.history.navigate('/requests', {trigger: true});;
+                Backbone.history.fragment === 'requests' ?
+                    Backbone.history.loadUrl(Backbone.history.fragment) :
+                    Backbone.history.navigate('/requests', {trigger: true});
             }.bind(this)
         };
         this.model.set({
@@ -130,8 +132,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     updateStatus: function(nextStatus) {
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
-        this.model.save({status: {id: statusId}}, {wait: true});
-        Backbone.history.navigate('/requests', {trigger: true});
+        var options = {
+            wait: true,
+            success: function() {
+                Backbone.history.navigate('/requests', {trigger: true});
+            }
+        };
+        this.model.save({status: {id: statusId}}, options);
     },
     saveFile: function(request) {
         _(this.$('input.file')).each(function(file) {

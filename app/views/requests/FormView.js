@@ -8,6 +8,7 @@ Backbone.csrf();
 var Document = require('../../models/Document');
 var Documents = require('../../collections/Documents');
 var DownloadFilesView = require('./DownloadFilesView');
+var UsersModalView = require('./UsersModalView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -31,7 +32,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.rejectBtn': 'onClickReject'
     },
     regions: {
-        downloadFiles: '#download_file_list'
+        downloadFiles: '#download_file_list',
+        authorizerModal: '#select_authorizer_modal'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -68,7 +70,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
                         '<input type="hidden" class="authorizer" value="' + this.model.get('authorizer').id + '" />';
                 } else {
-                    return '<input type="text" class="form-control authorizer" name="authorizer" />';
+                    return '<input type="text" class="form-control authorizer" name="authorizer" />' +
+                        '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
                 }
             }.bind(this),
             save: this.isCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
@@ -82,6 +85,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var downloadFilesView = new DownloadFilesView({collection: this.documents});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
+        if(this.isCreate()) this.getRegion('authorizerModal').show(new UsersModalView());
     },
     selectedFile: function(e) {
         var input = this.$(e.target);

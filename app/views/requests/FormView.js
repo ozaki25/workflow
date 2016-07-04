@@ -125,7 +125,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
-        var authorizerId = this.isCreate() ? this.ui.inputAuthorizer.val() : this.model.get('authorizer').id;
+        var authorizerId = this.isCreate() ? this.ui.inputAuthorizer.val().trim() : this.model.get('authorizer').id;
+        var authorizer = authorizerId ? {id: authorizerId} : '';
         var userId = this.model.isNew() ? this.currentUser.id : this.model.get('user').id;
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {
@@ -133,9 +134,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             success: function(request) {
                 this.saveFile(request);
                 this.deleteFile(request);
-                Backbone.history.fragment === 'requests' ?
-                    Backbone.history.loadUrl(Backbone.history.fragment) :
-                    Backbone.history.navigate('/requests', {trigger: true});
+                Backbone.history.navigate('/requests', {trigger: true});
             }.bind(this)
         };
         this.model.set({
@@ -143,9 +142,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             content: content,
             user: {id: userId},
             status: {id: statusId},
-            authorizer: {id: authorizerId}
+            authorizer: authorizer
         });
         this.model.save({}, options);
+        console.log(this.model);
     },
     updateStatus: function(nextStatus) {
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
@@ -173,8 +173,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     deleteFile: function(request) {
         _(this.$('input.remove-file')).each(function(file) {
-            var id = this.$(file).val();
-            this.documents.findWhere({id: parseInt(id)}).destroy({wait: true});
+            var id = parseInt(this.$(file).val());
+            this.documents.findWhere({id: id}).destroy({wait: true});
         }.bind(this));
     },
     bindBackboneValidation: function() {

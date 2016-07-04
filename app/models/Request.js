@@ -13,6 +13,10 @@ module.exports = Backbone.Model.extend({
         content: {
             required: true,
             msg: '必須項目です。'
+        },
+        authorizer: {
+            required: true,
+            msg: '必須項目です。'
         }
     },
     isCreating: function() {

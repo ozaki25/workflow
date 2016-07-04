@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.csrf = require('./csrf');
-Backbone.csrf()
+Backbone.csrf();
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
@@ -25,6 +25,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
         ""             : "requests",
         "requests"     : "requests",
+        "requests/new" : "newRequest",
         "requests/:id" : "request",
         "users"        : "users",
         "categories"   : "categories",
@@ -53,6 +54,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 }
             };
             requests.fetch(requestsFetchOption);
+        },
+        newRequest: function() {
+            var request = new Request({}, {collection: requests});
+            var formView = new RequestFormView({model: request,
+                                                currentUser: app.currentUser,
+                                                statusList: statusList});
+            app.getRegion('main').show(formView);
         },
         request: function(id) {
             var request = new Request({id: id}, {collection: requests});

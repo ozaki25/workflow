@@ -16,6 +16,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
+        inputAuthorizer: 'input.authorizer',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approvalBtn: '.approval-btn',
@@ -58,6 +59,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                                '<p class="form-control-static">' + this.model.get('status').name + '</p>' +
                              '</div>' +
                            '</div>'
+                }
+            }.bind(this),
+            authorizer: function() {
+                if(!this.isCreate()) {
+                    return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
+                } else if(this.model.get('authorizer')) {
+                    return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
+                        '<input type="hidden" class="authorizer" value="' + this.model.get('authorizer').id + '" />';
+                } else {
+                    return '<input type="text" class="form-control authorizer" name="authorizer" />';
                 }
             }.bind(this),
             save: this.isCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
@@ -110,6 +121,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
+        var authorizerId = this.isCreate() ? this.ui.inputAuthorizer.val() : this.model.get('authorizer').id;
         var userId = this.model.isNew() ? this.currentUser.id : this.model.get('user').id;
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {
@@ -126,7 +138,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             title: title,
             content: content,
             user: {id: userId},
-            status: {id: statusId}
+            status: {id: statusId},
+            authorizer: {id: authorizerId}
         });
         this.model.save({}, options);
     },

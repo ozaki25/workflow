@@ -69,12 +69,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }.bind(this),
             authorizer: function() {
                 if(!this.isCreate()) {
-                    return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
+                    return '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 } else if(this.model.get('authorizer')) {
-                    return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
+                    return '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
                         '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />' +
                         '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>'
-} else {
+                } else {
                     return '<input type="hidden" class="authorizer" name="authorizer" />' +
                         '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
                 }
@@ -94,8 +94,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
+        this.$('.authorizer-name').remove();
         this.ui.inputAuthorizer.val(authorizer.id);
-        this.ui.inputAuthorizer.before('<p class="form-control-static">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
+        this.ui.inputAuthorizer.before('<p class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
         this.getRegion('authorizerModal').currentView.$el.modal('hide');
     },
     selectedFile: function(e) {

@@ -3,6 +3,8 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.csrf = require('./csrf');
 Backbone.csrf();
+window.jQuery = Backbone.$;
+var Bootstrap = require('./assets/js/bootstrap');
 var Request = require('./models/Request');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');

@@ -1,4 +1,3 @@
-var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
@@ -73,8 +72,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 } else if(this.model.get('authorizer')) {
                     return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
-                        '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />';
-                } else {
+                        '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />' +
+                        '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>'
+} else {
                     return '<input type="hidden" class="authorizer" name="authorizer" />' +
                         '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
                 }
@@ -96,6 +96,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var authorizer = view.model;
         this.ui.inputAuthorizer.val(authorizer.id);
         this.ui.inputAuthorizer.before('<p class="form-control-static">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
+        this.getRegion('authorizerModal').currentView.$el.modal('hide');
     },
     selectedFile: function(e) {
         var input = this.$(e.target);

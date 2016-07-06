@@ -18,6 +18,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
         inputAuthorizer: 'input.authorizer',
+        openAuthorizerBtn: 'button.open-authorizer-modal',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approvalBtn: '.approval-btn',
@@ -69,14 +70,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }.bind(this),
             authorizer: function() {
                 if(!this.isCreate()) {
-                    return '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
+                    return '<span class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</span>';
                 } else if(this.model.get('authorizer')) {
-                    return '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
-                        '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />' +
-                        '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>'
+                    return '<span class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</span>' +
+                        '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>' +
+                        '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />'
                 } else {
-                    return '<input type="hidden" class="authorizer" name="authorizer" />' +
-                        '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
+                    return '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>' +
+                        '<input type="hidden" class="authorizer" name="authorizer" />';
                 }
             }.bind(this),
             save: this.isCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
@@ -96,7 +97,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var authorizer = view.model;
         this.$('.authorizer-name').remove();
         this.ui.inputAuthorizer.val(authorizer.id);
-        this.ui.inputAuthorizer.before('<p class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
+        this.ui.openAuthorizerBtn.before('<span class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</span>');
         this.getRegion('authorizerModal').currentView.$el.modal('hide');
     },
     selectedFile: function(e) {
@@ -138,7 +139,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var authorizerId = this.isCreate() ? this.ui.inputAuthorizer.val().trim() : this.model.get('authorizer').id;
-        var authorizer = authorizerId ? {id: authorizerId} : '';
+        var authorizer = authorizerId ? {id: authorizerId} : null;
         var userId = this.model.isNew() ? this.currentUser.id : this.model.get('user').id;
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {

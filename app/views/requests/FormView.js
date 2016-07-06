@@ -7,6 +7,7 @@ Backbone.csrf = require('../../csrf');
 Backbone.csrf();
 var Document = require('../../models/Document');
 var Documents = require('../../collections/Documents');
+var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
 var UsersModalView = require('./UsersModalView');
 
@@ -31,6 +32,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.approvalBtn': 'onClickApproval',
         'click @ui.rejectBtn': 'onClickReject'
     },
+    childEvents: {
+        'select:authorizer': 'selectedAuthorizer'
+    },
     regions: {
         downloadFiles: '#download_file_list',
         authorizerModal: '#select_authorizer_modal'
@@ -38,6 +42,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.currentUser = options.currentUser;
         this.statusList = options.statusList;
+        this.authorizerList = options.authorizerList;
         this.documents = new Documents(this.model.get('documents'));
         if(!this.model.isNew()) this.documents.setUrl(this.model.id);
     },
@@ -68,9 +73,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 } else if(this.model.get('authorizer')) {
                     return '<p class="form-control-static">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>' +
-                        '<input type="hidden" class="authorizer" value="' + this.model.get('authorizer').id + '" />';
+                        '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />';
                 } else {
-                    return '<input type="text" class="form-control authorizer" name="authorizer" />' +
+                    return '<input type="hidden" class="authorizer" name="authorizer" />' +
                         '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
                 }
             }.bind(this),
@@ -85,7 +90,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var downloadFilesView = new DownloadFilesView({collection: this.documents});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
-        if(this.isCreate()) this.getRegion('authorizerModal').show(new UsersModalView());
+        if(this.isCreate()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(this.authorizerList)}));
+    },
+    selectedAuthorizer: function(view) {
+        var authorizer = view.model;
+        this.ui.inputAuthorizer.val(authorizer.id);
+        this.ui.inputAuthorizer.before('<p class="form-control-static">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
     },
     selectedFile: function(e) {
         var input = this.$(e.target);
@@ -140,12 +150,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.model.set({
             title: title,
             content: content,
+            authorizer: authorizer,
             user: {id: userId},
-            status: {id: statusId},
-            authorizer: authorizer
+            status: {id: statusId}
         });
         this.model.save({}, options);
-        console.log(this.model);
     },
     updateStatus: function(nextStatus) {
         var statusId = this.statusList.findWhere({code: nextStatus}).id;

@@ -10,7 +10,7 @@ var Categories = require('./collections/Categories');
 var StatusList = require('./collections/StatusList');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
-var RequestsMainView = require('./views/requests/MainView');
+var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var UsersMainView = require('./views/users/MainView');
 var CategoriesMainView = require('./views/categories/MainView');
@@ -47,20 +47,26 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         requests: function() {
             var requestsFetchOption = {
                 success: function() {
-                    var requestsMainView = new RequestsMainView({collection: requests,
-                                                                 currentUser: app.currentUser,
-                                                                 statusList: statusList});
-                    app.getRegion('main').show(requestsMainView);
+                    var requestsView = new RequestsView({collection: requests,
+                                                         currentUser: app.currentUser,
+                                                         statusList: statusList});
+                    app.getRegion('main').show(requestsView);
                 }
             };
             requests.fetch(requestsFetchOption);
         },
         newRequest: function() {
-            var request = new Request({}, {collection: requests});
-            var formView = new RequestFormView({model: request,
-                                                currentUser: app.currentUser,
-                                                statusList: statusList});
-            app.getRegion('main').show(formView);
+            var usersFetchOption = {
+                success: function() {
+                    var request = new Request({}, {collection: requests});
+                    var formView = new RequestFormView({model: request,
+                                                        currentUser: app.currentUser,
+                                                        statusList: statusList,
+                                                        authorizerList: users.getAuthorizerList()});
+                    app.getRegion('main').show(formView);
+                }
+            };
+            users.fetch(usersFetchOption);
         },
         request: function(id) {
             var request = new Request({id: id}, {collection: requests});
@@ -68,7 +74,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 success: function() {
                     var formView = new RequestFormView({model: request,
                                                         currentUser: app.currentUser,
-                                                        statusList: statusList});
+                                                        statusList: statusList,
+                                                        authorizerList: users.getAuthorizerList()})
                     app.getRegion('main').show(formView);
                 }
             };

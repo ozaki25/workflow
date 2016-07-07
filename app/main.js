@@ -77,7 +77,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                     var formView = new RequestFormView({model: request,
                                                         currentUser: app.currentUser,
                                                         statusList: statusList,
-                                                        authorizerList: users.getAuthorizerList()})
+                                                        teamList: teamList})
                     app.getRegion('main').show(formView);
                 }
             };

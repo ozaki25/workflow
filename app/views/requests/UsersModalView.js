@@ -16,10 +16,13 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
-        this.collection.fetch();
     },
-    changeSelectedTeam: function(e) {
-        var selectedTeam = this.$(e.target).children(':selected').val();
+    onRender: function() {
+        var currentUserTeam = this.ui.selectTeam.children('[value="' + this.currentUser.get('team') + '"]').attr('selected', 'selected');
+        if(currentUserTeam.length) this.changeSelectedTeam();
+    },
+    changeSelectedTeam: function() {
+        var selectedTeam = this.ui.selectTeam.children(':selected').val();
         this.collection.fetch({data: {team: selectedTeam, jobLevel: [0, 1, 2]}});
     }
 });

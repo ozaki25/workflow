@@ -44,6 +44,13 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         users.fetch({success: function() {teamList = users.getTeamList();}});
         app.getRegion('sideMenu').show(new SideMenuView());
     },
+    onRoute: function() {
+        if(!app.currentUser) {
+            Backbone.$.get('/current-user', function(user) {
+                app.currentUser = new User(user);
+            });
+        }
+    },
     controller: {
         requests: function() {
             var requestsFetchOption = {

@@ -156,7 +156,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             content: content,
             authorizer: authorizer,
             applicant: applicant,
-            status: {id: statusId}
+            status: {id: statusId},
+            documents: []
         });
         this.model.save({}, options);
     },

@@ -17,7 +17,7 @@ module.exports = Backbone.Model.extend({
         }
     },
     isRequestUser: function(request) {
-        return this.id === request.get('user').id;
+        return this.get('uid') === request.get('applicant').uid;
     },
     isApproveUser: function() {
         return this.get('jobLevel') < 3;

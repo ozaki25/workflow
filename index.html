@@ -8,7 +8,7 @@
     <meta name="csrf-token" th:content="${_csrf.token}"/>
   </head>
   <body>
-    <input type="hidden" name="current-user" th:value="${user.uid}" />
+    <input type="hidden" name="current-user" th:value="${user}" />
     <div id="header"></div>
     <div class="container">
       <div class="row">
@@ -65,7 +65,7 @@
       <td>{{- id }}</td>
       <td>{{- status.name }}</td>
       <td>{{- title }}</td>
-      <td>{{- user.name }}</td>
+      <td>{{- applicant.name }}</td>
       <td><a href="#" class="btn btn-default btn-xs open-request">Open</a></td>
     </script>
 

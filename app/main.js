@@ -6,6 +6,7 @@ Backbone.csrf();
 window.jQuery = Backbone.$;
 var Bootstrap = require('./assets/js/bootstrap');
 var Request = require('./models/Request');
+var User = require('./models/User');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var Categories = require('./collections/Categories');
@@ -34,15 +35,11 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         "status_list"  : "statusList"
     },
     initialize: function() {
-        var usersFetchOption = {
-            success: function() {
-                var uid = Backbone.$('input[name="current-user"]').val();
-                app.currentUser = users.findWhere({uid: uid});
-                app.getRegion('header').show(new HeaderView({model: app.currentUser}));
-            }
-        };
+        Backbone.$.get('/current-user', function(user) {
+            app.currentUser = new User(user);
+            app.getRegion('header').show(new HeaderView({model: app.currentUser}));
+        });
         statusList.fetch();
-        users.fetch(usersFetchOption);
         app.getRegion('sideMenu').show(new SideMenuView());
     },
     controller: {
@@ -58,17 +55,10 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             requests.fetch(requestsFetchOption);
         },
         newRequest: function() {
-            var usersFetchOption = {
-                success: function() {
-                    var request = new Request({}, {collection: requests});
-                    var formView = new RequestFormView({model: request,
-                                                        currentUser: app.currentUser,
-                                                        statusList: statusList,
-                                                        authorizerList: users.getAuthorizerList()});
-                    app.getRegion('main').show(formView);
-                }
-            };
-            users.fetch(usersFetchOption);
+            var formView = new RequestFormView({model: new Request({}, {collection: requests}),
+                                                currentUser: app.currentUser,
+                                                statusList: statusList});
+            app.getRegion('main').show(formView);
         },
         request: function(id) {
             var request = new Request({id: id}, {collection: requests});

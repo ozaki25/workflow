@@ -69,8 +69,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
             }.bind(this),
             authorizer: function() {
-                if(!this.isCreate()) {
-                    return '<span class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</span>';
+                if(!this.model.isCreating()) {
+                    return '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 } else if(this.model.get('authorizer')) {
                     return '<span class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</span>' +
                         '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>' +
@@ -140,7 +140,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var content = this.ui.inputContent.val().trim();
         var authorizerId = this.isCreate() ? this.ui.inputAuthorizer.val().trim() : this.model.get('authorizer').id;
         var authorizer = authorizerId ? {id: authorizerId} : null;
-        var userId = this.model.isNew() ? this.currentUser.id : this.model.get('user').id;
+        var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
+        if(this.model.isNew()) applicant.set('id', null);
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {
             wait: true,
@@ -154,7 +155,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             title: title,
             content: content,
             authorizer: authorizer,
-            user: {id: userId},
+            applicant: applicant,
             status: {id: statusId}
         });
         this.model.save({}, options);

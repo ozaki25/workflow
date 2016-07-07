@@ -42,6 +42,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.currentUser = options.currentUser;
         this.statusList = options.statusList;
+        this.teamList = options.teamList;
         this.documents = new Documents(this.model.get('documents'));
         if(!this.model.isNew()) this.documents.setUrl(this.model.id);
     },
@@ -90,7 +91,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var downloadFilesView = new DownloadFilesView({collection: this.documents});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
-        if(this.isCreate()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser}));
+        if(this.isCreate()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;

@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UserModalView = require('./UserModalView');
@@ -14,8 +15,18 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     events: {
         'change @ui.selectTeam': 'changeSelectedTeam'
     },
+    templateHelpers: function() {
+        return {
+            teamList: function() {
+                return _(this.teamList).map(function(team) {
+                    return '<option value="' + team + '">' + team + '</option>';
+                }).join('');
+            }.bind(this)
+        }
+    },
     initialize: function(options) {
         this.currentUser = options.currentUser;
+        this.teamList = options.teamList;
     },
     onRender: function() {
         var currentUserTeam = this.ui.selectTeam.children('[value="' + this.currentUser.get('team') + '"]').attr('selected', 'selected');

@@ -9,5 +9,8 @@ module.exports = Backbone.Collection.extend({
         return _(this.models).filter(function(user) {
             return user.get('jobLevel') <= 2;
         });
+    },
+    getTeamList: function() {
+        return _(this.pluck('team')).uniq();
     }
 });

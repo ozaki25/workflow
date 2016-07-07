@@ -23,6 +23,7 @@ var requests = new Requests();
 var users = new Users();
 var statusList = new StatusList();
 var categories = new Categories();
+var teamList;
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -40,6 +41,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             app.getRegion('header').show(new HeaderView({model: app.currentUser}));
         });
         statusList.fetch();
+        users.fetch({success: function() {teamList = users.getTeamList();}});
         app.getRegion('sideMenu').show(new SideMenuView());
     },
     controller: {
@@ -57,7 +59,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         newRequest: function() {
             var formView = new RequestFormView({model: new Request({}, {collection: requests}),
                                                 currentUser: app.currentUser,
-                                                statusList: statusList});
+                                                statusList: statusList,
+                                                teamList: teamList});
             app.getRegion('main').show(formView);
         },
         request: function(id) {

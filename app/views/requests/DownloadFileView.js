@@ -16,6 +16,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     onClickRemoveFile: function(e) {
         e.preventDefault();
-        $(e.target).closest('p').after('<input type="hidden" class="remove-file" value="' + this.model.id + '">');
+        Backbone.$(e.target).closest('p').after('<input type="hidden" class="remove-file" value="' + this.model.id + '">');
     }
 });

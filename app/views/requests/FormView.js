@@ -119,7 +119,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     onClickRemoveFile: function(e) {
         e.preventDefault();
-        var fileNo = $(e.target).closest('p').attr('class');
+        var fileNo = Backbone.$(e.target).closest('p').attr('class');
         this.$('.' + fileNo).remove();
     },
     onClickSave: function() {

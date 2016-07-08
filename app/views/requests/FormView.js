@@ -18,7 +18,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
         inputAuthorizer: 'input.authorizer',
+        removeFile: '.remove-file',
         openAuthorizerBtn: 'button.open-authorizer-modal',
+        authorizerName: '.authorizer-name',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approvalBtn: '.approval-btn',
@@ -26,7 +28,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     events: {
         'change @ui.inputFile': 'selectedFile',
-        'click .remove-file': 'onClickRemoveFile',
+        'click @ui.removeFile': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit',
         'click @ui.approvalBtn': 'onClickApproval',
@@ -100,7 +102,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
-        this.$('.authorizer-name').remove();
+        this.ui.authorizerName.remove();
         this.ui.inputAuthorizer.val(JSON.stringify(authorizer));
         this.ui.openAuthorizerBtn.before('<p class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
         this.getRegion('authorizerModal').currentView.$el.modal('hide');
@@ -124,7 +126,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     onClickRemoveFile: function(e) {
         e.preventDefault();
-        var fileNo = Backbone.$(e.target).closest('p').attr('class');
+        var fileNo = this.$(e.target).closest('p').attr('class');
         this.$('.' + fileNo).remove();
     },
     onClickSave: function() {
@@ -134,10 +136,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.saveRequest(2, true);
     },
     onClickApproval: function() {
-        this.updateStatus(3);
+        this.saveRequest(3, false);
     },
     onClickReject: function() {
-        this.updateStatus(1);
+        this.saveRequest(1, false);
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
@@ -156,14 +158,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
         if(this.model.isNew()) applicant.unset('id');
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
-        var options = {
-            wait: true,
-            success: function(request) {
-                this.saveFile(request);
-                this.deleteFile(request);
-                Backbone.history.navigate('/requests', {trigger: true});
-            }.bind(this)
-        };
         this.model.set({
             title: title,
             content: content,
@@ -172,17 +166,15 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             status: {id: statusId},
             documents: []
         });
-        this.model.save({}, options);
-    },
-    updateStatus: function(nextStatus) {
-        var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {
             wait: true,
-            success: function() {
+            success: function(request) {
+                this.saveFile(request);
+                this.deleteFile(request);
                 Backbone.history.navigate('/requests', {trigger: true});
-            }
+            }.bind(this)
         };
-        this.model.save({status: {id: statusId}}, options);
+        this.model.save({}, options);
     },
     saveFile: function(request) {
         _(this.$('input.file')).each(function(file) {

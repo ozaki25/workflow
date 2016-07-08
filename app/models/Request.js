@@ -21,7 +21,7 @@ module.exports = Backbone.Model.extend({
         }
     },
     isCreating: function() {
-        return !this.get('status') || this.get('status').code == 1;
+        return !this.has('status') || this.get('status').code == 1;
     },
     isWaitingApproval: function() {
         return this.get('status').code == 2;

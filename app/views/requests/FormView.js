@@ -69,16 +69,21 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
             }.bind(this),
             authorizer: function() {
-                if(!this.model.isCreating()) {
-                    return '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
-                } else if(this.model.get('authorizer')) {
-                    return '<span class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</span>' +
-                        '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>' +
-                        '<input type="hidden" class="authorizer" name="authorizer" value="' + this.model.get('authorizer').id + '" />'
-                } else {
-                    return '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>' +
-                        '<input type="hidden" class="authorizer" name="authorizer" />';
+                var html = '';
+                if(this.model.has('authorizer')) {
+                    html += '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 }
+                if(this.model.isCreating()) {
+                    html += '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
+                    var input = '<input type="hidden" class="authorizer" name="authorizer" />';
+                    if(this.model.has('authorizer')) {
+                        var $input = Backbone.$(input);
+                        $input.val(JSON.stringify(this.model.get('authorizer')));
+                        input = $input.prop('outerHTML');;
+                    }
+                    html += input;
+                }
+                return html;
             }.bind(this),
             save: this.isCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
             submit: this.isCreate() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
@@ -96,8 +101,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
         this.$('.authorizer-name').remove();
-        this.ui.inputAuthorizer.val(authorizer.id);
-        this.ui.openAuthorizerBtn.before('<span class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</span>');
+        this.ui.inputAuthorizer.val(JSON.stringify(authorizer));
+        this.ui.openAuthorizerBtn.before('<p class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
         this.getRegion('authorizerModal').currentView.$el.modal('hide');
     },
     selectedFile: function(e) {
@@ -138,10 +143,18 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
-        var authorizerId = this.isCreate() ? this.ui.inputAuthorizer.val().trim() : this.model.get('authorizer').id;
-        var authorizer = authorizerId ? {id: authorizerId} : null;
+        var authorizer = null;
+        if(this.isCreate()) {
+            var inputAuthorizer = this.ui.inputAuthorizer.val();
+            if(inputAuthorizer) {
+                authorizer = JSON.parse(inputAuthorizer);
+                delete authorizer.id;
+            }
+        } else {
+            authorizer = this.model.get('authorizer');
+        }
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
-        if(this.model.isNew()) applicant.set('id', null);
+        if(this.model.isNew()) applicant.unset('id');
         var statusId = this.statusList.findWhere({code: nextStatus}).id;
         var options = {
             wait: true,

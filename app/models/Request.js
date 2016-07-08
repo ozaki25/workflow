@@ -21,21 +21,21 @@ module.exports = Backbone.Model.extend({
         }
     },
     isCreating: function() {
-        return !this.has('status') || this.get('status').code == 1;
+        return !this.isNew() && this.get('status').code == 1;
     },
     isWaitingApprove: function() {
-        return this.get('status').code == 2;
+        return !this.isNew() && this.get('status').code == 2;
     },
     isWaitingRecept: function() {
-        return this.get('status').code == 3;
+        return !this.isNew() && this.get('status').code == 3;
     },
     isWaitingWorkComplete: function() {
-        return this.get('status').code == 4;
+        return !this.isNew() && this.get('status').code == 4;
     },
     isWaitingFinish: function() {
-        return this.get('status').code == 5;
+        return !this.isNew() && this.get('status').code == 5;
     },
     isCompleted: function() {
-        return this.get('status').code == 6;
+        return !this.isNew() && this.get('status').code == 6;
     }
 });

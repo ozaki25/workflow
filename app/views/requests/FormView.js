@@ -17,17 +17,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
-        inputAuthorizer: 'input.authorizer',
         removeFile: '.remove-file',
         openAuthorizerBtn: 'button.open-authorizer-modal',
-        authorizerName: '.authorizer-name',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approveBtn: '.approve-btn',
         receptBtn: '.recept-btn',
         reportBtn: '.report-btn',
         finishBtn: '.finish-btn',
-        rejectBtn: '.reject-btn'
+        rejectBtn: '.reject-btn',
+        destroyBtn: '.destroy-btn'
     },
     events: {
         'change @ui.inputFile': 'selectedFile',
@@ -38,7 +37,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.receptBtn': 'onClickRecept',
         'click @ui.reportBtn': 'onClickReport',
         'click @ui.finishBtn': 'onClickFinish',
-        'click @ui.rejectBtn': 'onClickReject'
+        'click @ui.rejectBtn': 'onClickReject',
+        'click @ui.destroyBtn': 'onClickDestroy'
     },
     childEvents: {
         'select:authorizer': 'selectedAuthorizer'
@@ -81,7 +81,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 if(this.model.has('authorizer')) {
                     html += '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 }
-                if(this.model.isCreating()) {
+                if(this.model.isNew() || this.model.isCreating()) {
                     html += '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
                     var input = '<input type="hidden" class="authorizer" name="authorizer" />';
                     if(this.model.has('authorizer')) {
@@ -93,13 +93,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
                 return html;
             }.bind(this),
-            save    : this.canCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
-            submit  : this.canCreate() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
+            save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
+            submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
             approve : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">Approve</button>' : '',
             recept  : this.canRecept() ? '<button type="button" class="btn btn-default recept-btn">Recept</button>' : '',
             report  : this.canReport() ? '<button type="button" class="btn btn-default report-btn">Report</button>' : '',
             complete: this.canFinish() ? '<button type="button" class="btn btn-default finish-btn">Complete</button>' : '',
             reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
+            destroy : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
         }
     },
     onRender: function() {
@@ -107,12 +108,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var downloadFilesView = new DownloadFilesView({collection: this.documents});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
-        if(this.canCreate()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
+        if(this.canRequest()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
-        this.ui.authorizerName.remove();
-        this.ui.inputAuthorizer.val(JSON.stringify(authorizer));
+        this.$('.authorizer-name').remove();
+        this.$('input.authorizer').val(JSON.stringify(authorizer));
         this.ui.openAuthorizerBtn.before('<p class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
         this.getRegion('authorizerModal').currentView.$el.modal('hide');
     },
@@ -162,41 +163,51 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var next = 1
         this.saveRequest(next, true);
     },
+    onClickDestroy: function() {
+        var options = {
+            wait: true,
+            success: function() {
+                Backbone.history.navigate('/requests', {trigger: true});
+            }
+        };
+        this.model.destroy(options);
+    },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var authorizer = null;
-        if(this.canCreate()) {
-            var inputAuthorizer = this.ui.inputAuthorizer.val();
+        if(this.canRequest()) {
+            var inputAuthorizer = this.$('input.authorizer').val();
             if(inputAuthorizer) {
                 authorizer = JSON.parse(inputAuthorizer);
-                delete authorizer.id;
+                delete authorizer.id;// 暫定のユーザテーブルでは必要。本番ではいらないかも。
             }
         } else {
             authorizer = this.model.get('authorizer');
         }
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
-        if(this.model.isNew()) applicant.unset('id');
-        var statusId = this.statusList.findWhere({code: nextStatus}).id;
+        if(this.model.isNew()) applicant.unset('id');// 暫定のユーザテーブルでは必要。本番ではいらないかも。
         this.model.set({
             title: title,
             content: content,
             authorizer: authorizer,
             applicant: applicant,
-            status: {id: statusId},
             documents: []
 
         });
-        var options = {
-            wait: true,
-            success: function(request) {
-                this.saveFile(request);
-                this.deleteFile(request);
-                Backbone.history.navigate('/requests', {trigger: true});
-            }.bind(this)
-        };
-        this.model.save({}, options);
+        if(this.model.isValid(true)) {
+            var statusId = this.statusList.findWhere({code: nextStatus}).id;
+            var options = {
+                wait: true,
+                success: function(request) {
+                    this.saveFile(request);
+                    this.deleteFile(request);
+                    Backbone.history.navigate('/requests', {trigger: true});
+                }.bind(this)
+            };
+            this.model.save({status: {id: statusId}}, options);
+        }
     },
     saveFile: function(request) {
         _(this.$('input.file')).each(function(file) {
@@ -239,25 +250,37 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     unbindBackboneValidation: function() {
         Backbone.Validation.unbind(this);
     },
-    canCreate: function() {
-        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isApplicant(this.model))
+    canEdit: function() {
+        return this.model.isCreating() &&
+            (this.currentUser.isApplicant(this.model) || this.currentUser.isAdmin());
+    },
+    canRequest: function() {
+        return this.model.isNew() || this.canEdit();
     },
     canApprove: function() {
-        return !this.model.isNew() && this.model.isWaitingApprove() && this.currentUser.isAuthorizer(this.model);
+        return this.model.isWaitingApprove() &&
+            (this.currentUser.isAuthorizer(this.model) || this.currentUser.isAdmin());
     },
     canRecept: function() {
-        return !this.model.isNew() && this.model.isWaitingRecept() && this.currentUser.isReceptionist(this.model);
+        return this.model.isWaitingRecept() &&
+            (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
     },
     canReport: function() {
-        return !this.model.isNew() && this.model.isWaitingWorkComplete() && this.currentUser.isWorker(this.model);
+        return this.model.isWaitingWorkComplete() &&
+            (this.currentUser.isWorker(this.model) || this.currentUser.isAdmin());
     },
     canFinish: function() {
-        return !this.model.isNew() && this.model.isWaitingFinish() && this.currentUser.isReceptionist(this.model);
+        return this.model.isWaitingFinish() &&
+            (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
     },
     canRestore: function() {
-        return !this.model.isNew() && this.model.isCompleted() && this.currentUser.isReceptionist(this.model);
+        return this.model.isCompleted() &&
+            (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
     },
     canReject: function() {
         return this.canApprove() || this.canRecept() || this.canReport() || this.canFinish() || this.canRestore();
+    },
+    canDestroy: function() {
+        return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());
     }
 });

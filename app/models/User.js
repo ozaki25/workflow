@@ -16,10 +16,20 @@ module.exports = Backbone.Model.extend({
             required: true
         }
     },
-    isRequestUser: function(request) {
+    isApplicant: function(request) {
         return this.get('uid') === request.get('applicant').uid;
     },
-    isApproveUser: function() {
-        return this.get('jobLevel') < 3;
+    isAuthorizer: function(request) {
+        return this.get('uid') === request.get('authorizer').uid;
+    },
+    isReceptionist: function(request) {
+        // var receptionistUids = _(request.get('divisions').category.receptionist).pluck('uid');
+        // return _(receptionistUids).contains(this.get('uid'));
+        return true;
+    },
+    isWorker: function(request) {
+        //var workerUids = _(request.get('workers').pluck('uid'));
+        //return _(workerUids).contains(this.get('uid'));
+        return true;
     }
 });

@@ -23,7 +23,19 @@ module.exports = Backbone.Model.extend({
     isCreating: function() {
         return !this.has('status') || this.get('status').code == 1;
     },
-    isWaitingApproval: function() {
+    isWaitingApprove: function() {
         return this.get('status').code == 2;
+    },
+    isWaitingRecept: function() {
+        return this.get('status').code == 3;
+    },
+    isWaitingWorkComplete: function() {
+        return this.get('status').code == 4;
+    },
+    isWaitingFinish: function() {
+        return this.get('status').code == 5;
+    },
+    isCompleted: function() {
+        return this.get('status').code == 6;
     }
 });

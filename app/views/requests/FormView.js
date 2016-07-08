@@ -23,7 +23,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         authorizerName: '.authorizer-name',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
-        approvalBtn: '.approval-btn',
+        approveBtn: '.approve-btn',
+        receptBtn: '.recept-btn',
+        reportBtn: '.report-btn',
+        finishBtn: '.finish-btn',
         rejectBtn: '.reject-btn'
     },
     events: {
@@ -31,7 +34,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.removeFile': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit',
-        'click @ui.approvalBtn': 'onClickApproval',
+        'click @ui.approveBtn': 'onClickApprove',
+        'click @ui.receptBtn': 'onClickRecept',
+        'click @ui.reportBtn': 'onClickReport',
+        'click @ui.finishBtn': 'onClickFinish',
         'click @ui.rejectBtn': 'onClickReject'
     },
     childEvents: {
@@ -87,10 +93,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
                 return html;
             }.bind(this),
-            save: this.isCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
-            submit: this.isCreate() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
-            approval: this.isApproval() ? '<button type="button" class="btn btn-default approval-btn">Approval</button>' : '',
-            reject: this.isApproval() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : ''
+            save    : this.canCreate() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
+            submit  : this.canCreate() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
+            approve : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">Approve</button>' : '',
+            recept  : this.canRecept() ? '<button type="button" class="btn btn-default recept-btn">Recept</button>' : '',
+            report  : this.canReport() ? '<button type="button" class="btn btn-default report-btn">Report</button>' : '',
+            complete: this.canFinish() ? '<button type="button" class="btn btn-default finish-btn">Complete</button>' : '',
+            reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
         }
     },
     onRender: function() {
@@ -98,7 +107,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var downloadFilesView = new DownloadFilesView({collection: this.documents});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
-        if(this.isCreate()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
+        if(this.canCreate()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
@@ -135,18 +144,30 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onClickSubmit: function() {
         this.saveRequest(2, true);
     },
-    onClickApproval: function() {
-        this.saveRequest(3, false);
+    onClickApprove: function() {
+        this.saveRequest(3, true);
+    },
+    onClickRecept: function() {
+        this.saveRequest(4, true);
+    },
+    onClickReport: function() {
+        this.saveRequest(5, true);
+    },
+    onClickFinish: function() {
+        this.saveRequest(6, true);
     },
     onClickReject: function() {
-        this.saveRequest(1, false);
+        // 否認された後のステータスを現在のステータスを元に判断する
+        // var next = request.getStatusAfterReject();
+        var next = 1
+        this.saveRequest(next, true);
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.ui.inputTitle.val().trim();
         var content = this.ui.inputContent.val().trim();
         var authorizer = null;
-        if(this.isCreate()) {
+        if(this.canCreate()) {
             var inputAuthorizer = this.ui.inputAuthorizer.val();
             if(inputAuthorizer) {
                 authorizer = JSON.parse(inputAuthorizer);
@@ -165,6 +186,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             applicant: applicant,
             status: {id: statusId},
             documents: []
+
         });
         var options = {
             wait: true,
@@ -217,10 +239,25 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     unbindBackboneValidation: function() {
         Backbone.Validation.unbind(this);
     },
-    isCreate: function() {
-        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isRequestUser(this.model))
+    canCreate: function() {
+        return this.model.isNew() || (this.model.isCreating() && this.currentUser.isApplicant(this.model))
     },
-    isApproval: function() {
-        return !this.model.isNew() && this.model.isWaitingApproval() && this.currentUser.isApproveUser();
+    canApprove: function() {
+        return !this.model.isNew() && this.model.isWaitingApprove() && this.currentUser.isAuthorizer(this.model);
+    },
+    canRecept: function() {
+        return !this.model.isNew() && this.model.isWaitingRecept() && this.currentUser.isReceptionist(this.model);
+    },
+    canReport: function() {
+        return !this.model.isNew() && this.model.isWaitingWorkComplete() && this.currentUser.isWorker(this.model);
+    },
+    canFinish: function() {
+        return !this.model.isNew() && this.model.isWaitingFinish() && this.currentUser.isReceptionist(this.model);
+    },
+    canRestore: function() {
+        return !this.model.isNew() && this.model.isCompleted() && this.currentUser.isReceptionist(this.model);
+    },
+    canReject: function() {
+        return this.canApprove() || this.canRecept() || this.canReport() || this.canFinish() || this.canRestore();
     }
 });

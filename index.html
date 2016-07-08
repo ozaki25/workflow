@@ -30,7 +30,7 @@
           </div>
           <div class="collapse navbar-collapse" id="navbar_links">
             <ul class="nav navbar-nav pull-right">
-              <li><a href="#">{{= username() }}</a></li>
+              <li><a href="/login">{{= username() }}</a></li>
             </ul>
           </div>
         </div>
@@ -55,7 +55,7 @@
             <th>Title</th>
             <th>User</th>
             <th></th>
-            </tr>
+          </tr>
         </thead>
         <tbody id="request_list"></tbody>
       </table>
@@ -104,7 +104,10 @@
             <div class="col-sm-offset-2 col-sm-10">
               {{= save }}
               {{= submit }}
-              {{= approval }}
+              {{= approve }}
+              {{= recept }}
+              {{= report }}
+              {{= complete }}
               {{= reject }}
             </div>
           </div>

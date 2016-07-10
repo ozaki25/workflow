@@ -87,7 +87,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     if(this.model.has('authorizer')) {
                         var $input = Backbone.$(input);
                         $input.val(JSON.stringify(this.model.get('authorizer')));
-                        input = $input.prop('outerHTML');;
+                        input = $input.prop('outerHTML');
                     }
                     html += input;
                 }
@@ -181,13 +181,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var inputAuthorizer = this.$('input.authorizer').val();
             if(inputAuthorizer) {
                 authorizer = JSON.parse(inputAuthorizer);
-                delete authorizer.id;// 暫定のユーザテーブルでは必要。本番ではいらないかも。
             }
         } else {
             authorizer = this.model.get('authorizer');
         }
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
-        if(this.model.isNew()) applicant.unset('id');// 暫定のユーザテーブルでは必要。本番ではいらないかも。
         this.model.set({
             title: title,
             content: content,

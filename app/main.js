@@ -64,21 +64,33 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             requests.fetch(requestsFetchOption);
         },
         newRequest: function() {
-            var formView = new RequestFormView({model: new Request({}, {collection: requests}),
-                                                currentUser: app.currentUser,
-                                                statusList: statusList,
-                                                teamList: teamList});
-            app.getRegion('main').show(formView);
+            var categoryFetchOptions = {
+                success: function() {
+                    var formView = new RequestFormView({model: new Request({}, {collection: requests}),
+                                                        currentUser: app.currentUser,
+                                                        statusList: statusList,
+                                                        categoryList: categories,
+                                                        teamList: teamList});
+                    app.getRegion('main').show(formView);
+                }
+            }
+            categories.fetch(categoryFetchOptions);
         },
         request: function(id) {
             var request = new Request({id: id}, {collection: requests});
             var requestFetchOption = {
                 success: function() {
-                    var formView = new RequestFormView({model: request,
-                                                        currentUser: app.currentUser,
-                                                        statusList: statusList,
-                                                        teamList: teamList})
-                    app.getRegion('main').show(formView);
+                    var categoryFetchOptions = {
+                        success: function() {
+                            var formView = new RequestFormView({model: request,
+                                                                currentUser: app.currentUser,
+                                                                statusList: statusList,
+                                                                teamList: teamList,
+                                                                categoryList: categories});
+                            app.getRegion('main').show(formView);
+                        }
+                    }
+                    categories.fetch(categoryFetchOptions);
                 }
             };
             request.fetch(requestFetchOption);

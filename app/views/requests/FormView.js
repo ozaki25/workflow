@@ -14,6 +14,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
+        inputCategory: 'select.category',
         inputTitle: 'input.title',
         inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
@@ -51,6 +52,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.currentUser = options.currentUser;
         this.statusList = options.statusList;
         this.teamList = options.teamList;
+        this.categoryList = options.categoryList;
         this.documents = new Documents(this.model.get('documents'));
         if(!this.model.isNew()) this.documents.setUrl(this.model.id);
     },
@@ -58,6 +60,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         return {
             id     : this.model.isNew() ? '' : this.staticFormItemHtml('ID', this.model.id),
             status : this.model.isNew() ? '' : this.staticFormItemHtml('Status', this.model.get('status').name),
+            inputCategory: this.canRequest() ?
+                '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>' :
+                this.staticItemNameHtml(this.model.get('category').name),
             inputTitle: this.canRequest() ?
                 '<input type="text" class="title form-control" name="title" value="' + this.model.get('title') + '" />' :
                 this.staticItemNameHtml(this.model.get('title')),
@@ -161,21 +166,28 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
+        var category = '';
         var title = '';
         var content = '';
         var authorizer = null;
         if(this.canRequest()) {
+            var inputCategory = this.ui.inputCategory.children(':checked').val();
+            if(inputCategory) category = {id: inputCategory};
+            console.log(inputCategory);
+            console.log(category);
             title = this.ui.inputTitle.val().trim();
             content = this.ui.inputContent.val().trim();
             var inputAuthorizer = this.$('input.authorizer').val();
             if(inputAuthorizer) authorizer = JSON.parse(inputAuthorizer);
         } else {
+            category = this.model.get('category');
             title = this.model.get('title');
             content = this.model.get('content');
             authorizer = this.model.get('authorizer');
         }
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
         this.model.set({
+            category: category,
             title: title,
             content: content,
             authorizer: authorizer,
@@ -192,6 +204,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     Backbone.history.navigate('/requests', {trigger: true});
                 }.bind(this)
             };
+            console.log(this.model);
             this.model.save({status: {id: statusId}}, options);
         }
     },
@@ -281,6 +294,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(!className) className = '';
         if(!attr) attr = '';
         return '<p class="form-control-static ' + className + '" ' + attr + '>' + value + '</p>';
+    },
+    categoryListHtml: function() {
+        return _(this.categoryList.models).map(function(category) {
+            return '<option value="' + category.id + '">' + category.get('name') + '</option>';
+        }).join('');
     },
     replaceLine: function(text) {
         return text.replace(/\r\n/g, '<br />').replace(/(\n|\r)/g, '<br />');

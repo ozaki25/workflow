@@ -97,7 +97,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var downloadFilesView = new DownloadFilesView({collection: this.documents, canRequest: this.canRequest()});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
-        if(this.canRequest()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
+        if(this.canRequest()) {
+            var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList})
+            this.getRegion('authorizerModal').show(usersModalView);
+        }
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
@@ -178,7 +181,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             authorizer: authorizer,
             applicant: applicant,
             documents: []
-
         });
         if(this.model.isValid(true)) {
             var statusId = this.statusList.findWhere({code: nextStatus}).id;

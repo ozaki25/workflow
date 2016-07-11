@@ -34,6 +34,6 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     changeSelectedTeam: function() {
         var selectedTeam = this.ui.selectTeam.children(':selected').val();
-        this.collection.fetch({data: {team: selectedTeam, jobLevel: [0, 1, 2]}});
+        this.collection.fetch({data: {team: selectedTeam, jobLevel: {lte: 2}}});
     }
 });

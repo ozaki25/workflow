@@ -11,8 +11,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
     template: '#download_file_view',
     templateHelpers: function() {
         return {
-            url: this.model.url()
+            url: this.model.url(),
+            removeLink: this.canRequest ? '<a href="#" class="btn btn-link btn-xs remove-file">&times;</a>' : ''
         }
+    },
+    initialize: function(options) {
+        this.canRequest = options.canRequest;
     },
     onClickRemoveFile: function(e) {
         e.preventDefault();

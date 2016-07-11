@@ -95,7 +95,6 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         categories: function() {
             var categoriesFetchOption = {
                 success: function() {
-                    if(categories.length === 0) categories.addDefaultCategories();
                     var categoriesMainView = new CategoriesMainView({collection: categories});
                     app.getRegion('main').show(categoriesMainView);
                 }

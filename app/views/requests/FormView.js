@@ -56,32 +56,21 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     templateHelpers: function() {
         return {
-            id: function() {
-                if(!this.model.isNew()) {
-                    return '<div class="form-group">' +
-                             '<label class="col-sm-2 control-label">ID</label>' +
-                             '<div class="col-sm-10">' +
-                               '<p class="form-control-static">' + this.model.id + '</p>' +
-                             '</div>' +
-                           '</div>'
-                }
-            }.bind(this),
-            status: function() {
-                if(!this.model.isNew()) {
-                    return '<div class="form-group">' +
-                             '<label class="col-sm-2 control-label">Status</label>' +
-                             '<div class="col-sm-10">' +
-                               '<p class="form-control-static">' + this.model.get('status').name + '</p>' +
-                             '</div>' +
-                           '</div>'
-                }
-            }.bind(this),
+            id     : this.model.isNew() ? '' : this.staticFormItemHtml('ID', this.model.id),
+            status : this.model.isNew() ? '' : this.staticFormItemHtml('Status', this.model.get('status').name),
+            inputTitle: this.canRequest() ?
+                '<input type="text" class="title form-control" name="title" value="' + this.model.get('title') + '" />' :
+                this.staticItemNameHtml(this.model.get('title')),
+            inputContent: this.canRequest() ?
+                '<textarea type="text" class="content form-control" name="content">' + this.model.get('content') + '</textarea>' :
+                this.staticItemNameHtml(this.replaceLine(this.model.get('content'))),
+            inputFile: this.canRequest() ? '<input type="file" class="form-control file-tmp" />' : '',
             authorizer: function() {
                 var html = '';
                 if(this.model.has('authorizer')) {
-                    html += '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
+                    html += this.staticItemNameHtml(this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')', 'authorizer-name');
                 }
-                if(this.model.isNew() || this.model.isCreating()) {
+                if(this.canRequest()) {
                     html += '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
                     var input = '<input type="hidden" class="authorizer" name="authorizer" />';
                     if(this.model.has('authorizer')) {
@@ -105,7 +94,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     onRender: function() {
         if(!this.model.isNew()) {
-            var downloadFilesView = new DownloadFilesView({collection: this.documents});
+            var downloadFilesView = new DownloadFilesView({collection: this.documents, canRequest: this.canRequest()});
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
         if(this.canRequest()) this.getRegion('authorizerModal').show(new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList}));
@@ -114,7 +103,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var authorizer = view.model;
         this.$('.authorizer-name').remove();
         this.$('input.authorizer').val(JSON.stringify(authorizer));
-        this.ui.openAuthorizerBtn.before('<p class="form-control-static authorizer-name">' + authorizer.get('name') + '(' + authorizer.get('uid') + ')' + '</p>');
+        this.ui.openAuthorizerBtn.before(this.staticItemNameHtml(authorizer.get('name') + '(' + authorizer.get('uid') + ')', 'authorizer-name'));
         this.getRegion('authorizerModal').currentView.$el.modal('hide');
     },
     selectedFile: function(e) {
@@ -125,18 +114,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var fileNo = latestFileNo ? parseInt(latestFileNo) + 1 : 1
             var newInput = input.clone();
             input.after(newInput);
-            input.after(
-                '<p class="' + fileNo + '">' +
-                    '<span>' + file[0].name + '</span>' +
-                    '<a href="#" class="btn btn-link btn-xs remove-file">&times;</a>' +
-                '</p>'
-            );
+            input.after(this.staticItemNameHtml('<span>' + file[0].name + '</span><a href="#" class="btn btn-link btn-xs remove-file">&times;</a>', fileNo, 'data-file-no="' + fileNo + '"'));
             input.attr('id', fileNo).addClass('file hide ' + fileNo).removeClass('file-tmp');
         }
     },
     onClickRemoveFile: function(e) {
         e.preventDefault();
-        var fileNo = this.$(e.target).closest('p').attr('class');
+        var fileNo = this.$(e.target).closest('p').attr('data-file-no');
         this.$('.' + fileNo).remove();
     },
     onClickSave: function() {
@@ -174,15 +158,17 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     saveRequest: function(nextStatus, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
-        var title = this.ui.inputTitle.val().trim();
-        var content = this.ui.inputContent.val().trim();
+        var title = '';
+        var content = '';
         var authorizer = null;
         if(this.canRequest()) {
+            title = this.ui.inputTitle.val().trim();
+            content = this.ui.inputContent.val().trim();
             var inputAuthorizer = this.$('input.authorizer').val();
-            if(inputAuthorizer) {
-                authorizer = JSON.parse(inputAuthorizer);
-            }
+            if(inputAuthorizer) authorizer = JSON.parse(inputAuthorizer);
         } else {
+            title = this.model.get('title');
+            content = this.model.get('content');
             authorizer = this.model.get('authorizer');
         }
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
@@ -280,5 +266,21 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canDestroy: function() {
         return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());
+    },
+    staticFormItemHtml: function(name, value) {
+        return '<div class="form-group">' +
+                 '<label class="col-sm-2 control-label">' + name + '</label>' +
+                 '<div class="col-sm-10">' +
+                   '<p class="form-control-static">' + value + '</p>' +
+                 '</div>' +
+               '</div>'
+    },
+    staticItemNameHtml: function(value, className, attr) {
+        if(!className) className = '';
+        if(!attr) attr = '';
+        return '<p class="form-control-static ' + className + '" ' + attr + '>' + value + '</p>';
+    },
+    replaceLine: function(text) {
+        return text.replace(/\r\n/g, '<br />').replace(/(\n|\r)/g, '<br />');
     }
 });

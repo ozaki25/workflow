@@ -26,7 +26,7 @@ module.exports = Backbone.Model.extend({
     isWaitingApprove: function() {
         return !this.isNew() && this.get('status').code == 2;
     },
-    isWaitingRecept: function() {
+    isWaitingAccept: function() {
         return !this.isNew() && this.get('status').code == 3;
     },
     isWaitingWorkComplete: function() {

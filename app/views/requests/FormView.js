@@ -22,7 +22,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
         approveBtn: '.approve-btn',
-        receptBtn: '.recept-btn',
+        acceptBtn: '.accept-btn',
         reportBtn: '.report-btn',
         finishBtn: '.finish-btn',
         rejectBtn: '.reject-btn',
@@ -34,7 +34,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit',
         'click @ui.approveBtn': 'onClickApprove',
-        'click @ui.receptBtn': 'onClickRecept',
+        'click @ui.acceptBtn': 'onClickAccept',
         'click @ui.reportBtn': 'onClickReport',
         'click @ui.finishBtn': 'onClickFinish',
         'click @ui.rejectBtn': 'onClickReject',
@@ -85,7 +85,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
             submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
             approve : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">Approve</button>' : '',
-            recept  : this.canRecept() ? '<button type="button" class="btn btn-default recept-btn">Recept</button>' : '',
+            accept  : this.canAccept() ? '<button type="button" class="btn btn-default accept-btn">Accept</button>' : '',
             report  : this.canReport() ? '<button type="button" class="btn btn-default report-btn">Report</button>' : '',
             complete: this.canFinish() ? '<button type="button" class="btn btn-default finish-btn">Complete</button>' : '',
             reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
@@ -135,7 +135,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onClickApprove: function() {
         this.saveRequest(3, true);
     },
-    onClickRecept: function() {
+    onClickAccept: function() {
         this.saveRequest(4, true);
     },
     onClickReport: function() {
@@ -247,8 +247,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         return this.model.isWaitingApprove() &&
             (this.currentUser.isAuthorizer(this.model) || this.currentUser.isAdmin());
     },
-    canRecept: function() {
-        return this.model.isWaitingRecept() &&
+    canAccept: function() {
+        return this.model.isWaitingAccept() &&
             (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
     },
     canReport: function() {
@@ -264,7 +264,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
     },
     canReject: function() {
-        return this.canApprove() || this.canRecept() || this.canReport() || this.canFinish() || this.canRestore();
+        return this.canApprove() || this.canAccept() || this.canReport() || this.canFinish() || this.canRestore();
     },
     canDestroy: function() {
         return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());

@@ -173,8 +173,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.canRequest()) {
             var inputCategory = this.ui.inputCategory.children(':checked').val();
             if(inputCategory) category = {id: inputCategory};
-            console.log(inputCategory);
-            console.log(category);
             title = this.ui.inputTitle.val().trim();
             content = this.ui.inputContent.val().trim();
             var inputAuthorizer = this.$('input.authorizer').val();
@@ -204,7 +202,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     Backbone.history.navigate('/requests', {trigger: true});
                 }.bind(this)
             };
-            console.log(this.model);
             this.model.save({status: {id: statusId}}, options);
         }
     },

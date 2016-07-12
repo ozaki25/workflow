@@ -7,17 +7,20 @@ window.jQuery = Backbone.$;
 var Bootstrap = require('./assets/js/bootstrap');
 var Request = require('./models/Request');
 var User = require('./models/User');
+var Category = require('./models/Category');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
-var Categories = require('./collections/Categories');
 var StatusList = require('./collections/StatusList');
+var Categories = require('./collections/Categories');
+var Divisions = require('./collections/Divisions');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
 var RequestFormView = require('./views/requests/FormView');
 var UsersMainView = require('./views/users/MainView');
-var CategoriesMainView = require('./views/categories/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
+var CategoriesMainView = require('./views/categories/MainView');
+var DivisionsMainView = require('./views/divisions/MainView');
 
 var requests = new Requests();
 var users = new Users();
@@ -27,13 +30,14 @@ var teamList;
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        ""             : "requests",
-        "requests"     : "requests",
-        "requests/new" : "newRequest",
-        "requests/:id" : "request",
-        "users"        : "users",
-        "categories"   : "categories",
-        "status_list"  : "statusList"
+        ""                        : "requests",
+        "requests"                : "requests",
+        "requests/new"            : "newRequest",
+        "requests/:id"            : "request",
+        "users"                   : "users",
+        "status_list"             : "statusList",
+        "categories"              : "categories",
+        "categories/:id/divisions": "divisions"
     },
     initialize: function() {
         Backbone.$.get('/current-user', function(user) {
@@ -104,6 +108,10 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             };
             users.fetch(usersFetchOption);
         },
+        statusList: function() {
+            var statusListView = new StatusListView({collection: statusList});
+            app.getRegion('main').show(statusListView);
+        },
         categories: function() {
             var categoriesFetchOption = {
                 success: function() {
@@ -113,9 +121,17 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             };
             categories.fetch(categoriesFetchOption);
         },
-        statusList: function() {
-            var statusListView = new StatusListView({collection: statusList});
-            app.getRegion('main').show(statusListView);
+        divisions: function(id) {
+            var category = new Category({id: id}, {collection: new Categories()});
+            var options = {
+                success: function() {
+                    var divisionsMainView = new DivisionsMainView({collection: new Divisions(), category: category});
+                    divisionsMainView.collection.setUrl(id);
+                    divisionsMainView.collection.fetch();
+                    app.getRegion('main').show(divisionsMainView);
+                }
+            }
+            category.fetch(options);
         }
     }
 });

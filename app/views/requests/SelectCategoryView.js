@@ -6,13 +6,27 @@ var SelectDivisionView = require('./SelectDivisionView');
 module.exports = Backbone.Marionette.CompositeView.extend({
     childView: SelectDivisionView,
     childViewContainer: '#division_list',
+    childViewOptions: function() {
+        return {
+            selectedDivision: this.model.id
+        }
+    },
     template: '#select_category_view',
+    ui: {
+        selectCategory: 'select.category'
+    },
+    events: {
+        'change @ui.selectCategory': 'changeSelectedCategory'
+    },
     initialize: function(options) {
         this.categoryList = options.categoryList;
     },
     onRender: function() {
-        this.collection.setUrl(this.categoryList.models[0].id);
-        this.collection.fetch();
+        if(this.categoryList.models.length !== 0) {
+            var selectedCategory = this.model.has('category') ? this.model.get('category') : this.categoryList.models[0].id;
+            this.ui.selectCategory.val(selectedCategory);
+            this.changeSelectedCategory();
+        }
     },
     templateHelpers: function() {
         return {
@@ -22,6 +36,11 @@ module.exports = Backbone.Marionette.CompositeView.extend({
             */
             inputCategory: '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>'
         }
+    },
+    changeSelectedCategory: function() {
+        var selectedCategory = this.ui.selectCategory.val();
+        this.collection.setUrl(selectedCategory);
+        this.collection.fetch();
     },
     categoryListHtml: function() {
         return _(this.categoryList.models).map(function(category) {

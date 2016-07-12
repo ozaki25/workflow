@@ -125,7 +125,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             var category = new Category({id: id}, {collection: new Categories()});
             var options = {
                 success: function() {
-                    var divisionsMainView = new DivisionsMainView({collection: new Divisions(), category: category});
+                    var divisionsMainView = new DivisionsMainView({collection: new Divisions(), model: category});
                     divisionsMainView.collection.setUrl(id);
                     divisionsMainView.collection.fetch();
                     app.getRegion('main').show(divisionsMainView);

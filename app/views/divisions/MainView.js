@@ -16,11 +16,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click:edit': 'showEdit'
     },
     onRender: function() {
-        var divisionsView = new DivisionsView({collection: this.collection});
+        var divisionsView = new DivisionsView({collection: this.collection, model: this.model});
         this.getRegion('divisionsMain').show(divisionsView);
     },
     showNew: function() {
-        var formView = new FormView({collection: this.collection, category: this.options.category});
+        var formView = new FormView({collection: this.collection, category: this.model});
         this.getRegion('divisionsMain').show(formView);
     },
     showEdit: function(view) {
@@ -28,7 +28,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('divisionsMain').show(formView);
     },
     showIndex: function() {
-        var divisionsView = new DivisionsView({collection: this.collection});
+        var divisionsView = new DivisionsView({collection: this.collection, model: this.model});
         this.getRegion('divisionsMain').show(divisionsView);
     }
 });

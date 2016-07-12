@@ -14,6 +14,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
         'click @ui.editBtn': 'onClickEditBtn',
         'click @ui.deleteBtn': 'onClickDeleteBtn'
     },
+    initialize: function(options) {
+        this.categoryName = options.categoryName;
+    },
+    templateHelpers: function() {
+        return {
+            categoryName: this.categoryName
+        }
+    },
     onClickEditBtn: function(e) {
         e.preventDefault();
         this.triggerMethod('click:edit');

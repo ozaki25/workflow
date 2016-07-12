@@ -5,9 +5,12 @@ Backbone.Validation = require('backbone.validation');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
 var Document = require('../../models/Document');
+var Category = require('../../models/category');
 var Documents = require('../../collections/Documents');
+var Divisions = require('../../collections/Divisions');
 var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
+var SelectCategoryView = require('./SelectCategoryView');
 var UsersModalView = require('./UsersModalView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
@@ -45,6 +48,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'select:authorizer': 'selectedAuthorizer'
     },
     regions: {
+        selectCategoryField: '#select_category_field',
         downloadFiles: '#download_file_list',
         authorizerModal: '#select_authorizer_modal'
     },
@@ -60,9 +64,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         return {
             id     : this.model.isNew() ? '' : this.staticFormItemHtml('ID', this.model.id),
             status : this.model.isNew() ? '' : this.staticFormItemHtml('Status', this.model.get('status').name),
+            /*
             inputCategory: this.canRequest() ?
                 '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>' :
                 this.staticItemNameHtml(this.model.get('category').name),
+            inputDivision: this.canRequest() ?
+                '<select class="division form-control" name="division">' + this.divisionListHtml() + '</select>' :
+                this.staticItemNameHtml(this.model.get('division').name),
+            */
             inputTitle: this.canRequest() ?
                 '<input type="text" class="title form-control" name="title" value="' + this.model.get('title') + '" />' :
                 this.staticItemNameHtml(this.model.get('title')),
@@ -105,6 +114,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.canRequest()) {
             var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList})
             this.getRegion('authorizerModal').show(usersModalView);
+            var selectCategoryView = new SelectCategoryView({collection: new Divisions(), categoryList:  this.categoryList});
+            this.getRegion('selectCategoryField').show(selectCategoryView);
         }
     },
     selectedAuthorizer: function(view) {
@@ -295,6 +306,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     categoryListHtml: function() {
         return _(this.categoryList.models).map(function(category) {
             return '<option value="' + category.id + '">' + category.get('name') + '</option>';
+        }).join('');
+    },
+    divisionListHtml: function() {
+        return _(this.divisionList.models).map(function(division) {
+            return '<option value="' + division.id + '">' + division.get('name') + '</option>';
         }).join('');
     },
     replaceLine: function(text) {

@@ -106,10 +106,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.canRequest()) {
             var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList})
             this.getRegion('authorizerModal').show(usersModalView);
-            var selectedDivision = this.model.isNew() ? new Division() : new Division(this.model.get('division'));
-            var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList});
-            this.getRegion('selectCategoryField').show(selectCategoryView);
         }
+        var selectedDivision = this.model.isNew() ? new Division() : new Division(this.model.get('division'));
+        var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList, canRequest: this.canRequest()});
+        this.getRegion('selectCategoryField').show(selectCategoryView);
     },
     selectedAuthorizer: function(view) {
         var authorizer = view.model;
@@ -182,7 +182,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var inputAuthorizer = this.$('input.authorizer').val();
             if(inputAuthorizer) authorizer = JSON.parse(inputAuthorizer);
         } else {
-            category = this.model.get('category');
+            division = this.model.get('division');
+            division.category = {id : division.category} // 暫定対応(springからcategory: 1で渡ってくるけどcategory: {id: 1}で送りたい)
             title = this.model.get('title');
             content = this.model.get('content');
             authorizer = this.model.get('authorizer');

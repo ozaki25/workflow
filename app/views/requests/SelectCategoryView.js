@@ -20,9 +20,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     initialize: function(options) {
         this.categoryList = options.categoryList;
+        this.canRequest = options.canRequest;
     },
     onRender: function() {
-        if(this.categoryList.models.length !== 0) {
+        if(this.canRequest && this.categoryList.models.length !== 0) {
             var selectedCategory = this.model.has('category') ? this.model.get('category') : this.categoryList.models[0].id;
             this.ui.selectCategory.val(selectedCategory);
             this.changeSelectedCategory();
@@ -30,11 +31,12 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     templateHelpers: function() {
         return {
-            /*inputCategory: this.canRequest() ?
-              '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>' :
-              this.staticItemNameHtml(this.model.get('category').name)
-            */
-            inputCategory: '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>'
+            inputCategory: this.canRequest ?
+                '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>' :
+                '<p class="form-control-static">' + this.categoryList.findWhere({id: this.model.get('category')}).get('name') + '</p>',
+            inputDivision: this.canRequest ?
+                '<select id="division_list" class="division form-control" name="division"></select>' :
+                '<p class="form-control-static">' + this.model.get('name') + '</p>'
         }
     },
     changeSelectedCategory: function() {

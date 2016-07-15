@@ -24,8 +24,8 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     onRender: function() {
         if(this.canRequest && this.categoryList.models.length !== 0) {
-            var selectedCategory = this.model.has('category') ? this.model.get('category') : this.categoryList.models[0].id;
-            this.ui.selectCategory.val(selectedCategory);
+            var defaultCategory = this.model.has('category') ? this.model.get('category') : this.categoryList.models[0].id;
+            this.ui.selectCategory.val(defaultCategory);
             this.changeSelectedCategory();
         }
     },
@@ -40,8 +40,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         }
     },
     changeSelectedCategory: function() {
-        var selectedCategory = this.ui.selectCategory.val();
-        this.collection.setUrl(selectedCategory);
+        this.collection.setUrl(this.ui.selectCategory.val());
         this.collection.fetch();
     },
     categoryListHtml: function() {

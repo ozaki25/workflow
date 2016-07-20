@@ -39,7 +39,27 @@ module.exports = Backbone.Model.extend({
     isCompleted: function() {
         return !this.isNew() && this.get('status').code == StatusCodes.Completed;
     },
-    getStatusAfterReject: function() {
+    getProgressBtnLabel: function() {
+        if(this.isNew())                 return 'Submit';
+        if(this.isCreating())            return 'Submit';
+        if(this.isWaitingApprove())      return 'Approve';
+        if(this.isWaitingAccept())       return 'Accept';
+        if(this.isWaitingWorkComplete()) return 'Report';
+        if(this.isWaitingFinish())       return 'Complete';
+        console.warn('this request status can not progress.');
+        return '';
+    },
+    getStatusAfterProgressing: function() {
+        if(this.isNew())                 return StatusCodes.WaitingApprove;
+        if(this.isCreating())            return StatusCodes.WaitingApprove;
+        if(this.isWaitingApprove())      return StatusCodes.WaitingAccept;
+        if(this.isWaitingAccept())       return StatusCodes.WaitingWorkComplete;
+        if(this.isWaitingWorkComplete()) return StatusCodes.WaitingFinish;
+        if(this.isWaitingFinish())       return StatusCodes.Completed;
+        console.warn('this request status can not progress.');
+        return null;
+    },
+    getStatusAfterRejection: function() {
         if(this.isWaitingApprove())      return StatusCodes.Creating;
         if(this.isWaitingAccept())       return StatusCodes.Creating;
         if(this.isWaitingWorkComplete()) return StatusCodes.WaitingAccept;

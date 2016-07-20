@@ -24,11 +24,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         removeFile: '.remove-file',
         openAuthorizerBtn: 'button.open-authorizer-modal',
         saveBtn: '.save-btn',
-        submitBtn: '.submit-btn',
-        approveBtn: '.approve-btn',
-        acceptBtn: '.accept-btn',
-        reportBtn: '.report-btn',
-        finishBtn: '.finish-btn',
+        progressBtn: '.progress-btn',
         rejectBtn: '.reject-btn',
         destroyBtn: '.destroy-btn'
     },
@@ -36,11 +32,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'change @ui.inputFile': 'selectedFile',
         'click @ui.removeFile': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
-        'click @ui.submitBtn': 'onClickSubmit',
-        'click @ui.approveBtn': 'onClickApprove',
-        'click @ui.acceptBtn': 'onClickAccept',
-        'click @ui.reportBtn': 'onClickReport',
-        'click @ui.finishBtn': 'onClickFinish',
+        'click @ui.progressBtn': 'onClickProgress',
         'click @ui.rejectBtn': 'onClickReject',
         'click @ui.destroyBtn': 'onClickDestroy'
     },
@@ -89,11 +81,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 return html;
             }.bind(this),
             save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
-            submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
-            approve : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">Approve</button>' : '',
-            accept  : this.canAccept() ? '<button type="button" class="btn btn-default accept-btn">Accept</button>' : '',
-            report  : this.canReport() ? '<button type="button" class="btn btn-default report-btn">Report</button>' : '',
-            complete: this.canFinish() ? '<button type="button" class="btn btn-default finish-btn">Complete</button>' : '',
+            progress: this.canProgress() ? '<button type="button" class="btn btn-default progress-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
             reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
             destroy : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
         }
@@ -138,24 +126,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onClickSave: function() {
         this.saveRequest(1, false);
     },
-    onClickSubmit: function() {
-        this.saveRequest(2, true);
-    },
-    onClickApprove: function() {
-        this.saveRequest(3, true);
-    },
-    onClickAccept: function() {
-        this.saveRequest(4, true);
-    },
-    onClickReport: function() {
-        this.saveRequest(5, true);
-    },
-    onClickFinish: function() {
-        this.saveRequest(6, true);
+    onClickProgress: function() {
+        this.saveRequest(this.model.getStatusAfterProgressing(), true);
     },
     onClickReject: function() {
-        var next = this.model.getStatusAfterReject();
-        this.saveRequest(next, true);
+        this.saveRequest(this.model.getStatusAfterRejection(), false);
     },
     onClickDestroy: function() {
         var options = {
@@ -275,6 +250,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     canRestore: function() {
         return this.model.isCompleted() &&
             (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
+    },
+    canProgress: function() {
+        return this.canRequest() || this.canApprove() || this.canAccept() || this.canReport() || this.canFinish();
     },
     canReject: function() {
         return this.canApprove() || this.canAccept() || this.canReport() || this.canFinish() || this.canRestore();

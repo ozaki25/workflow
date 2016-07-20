@@ -154,9 +154,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.saveRequest(6, true);
     },
     onClickReject: function() {
-        // 否認された後のステータスを現在のステータスを元に判断する
-        // var next = request.getStatusAfterReject();
-        var next = 1
+        var next = this.model.getStatusAfterReject();
         this.saveRequest(next, true);
     },
     onClickDestroy: function() {

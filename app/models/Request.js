@@ -37,5 +37,14 @@ module.exports = Backbone.Model.extend({
     },
     isCompleted: function() {
         return !this.isNew() && this.get('status').code == 6;
+    },
+    getStatusAfterReject: function() {
+        if(this.isWaitingApprove())      return 1;
+        if(this.isWaitingAccept())       return 1;
+        if(this.isWaitingWorkComplete()) return 3;
+        if(this.isWaitingFinish())       return 4;
+        if(this.isCompleted())           return 5;
+        console.warn('this request status can not reject.');
+        return null;
     }
 });

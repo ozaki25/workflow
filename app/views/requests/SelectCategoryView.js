@@ -24,7 +24,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     onRender: function() {
         if(this.canRequest && this.categoryList.models.length !== 0) {
-            var defaultCategory = this.model.has('category') ? this.model.get('category') : this.categoryList.models[0].id;
+            var defaultCategory = this.model.has('category') ? this.model.get('category').id : this.categoryList.models[0].id;
             this.ui.selectCategory.val(defaultCategory);
             this.changeSelectedCategory();
         }
@@ -33,7 +33,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         return {
             inputCategory: this.canRequest ?
                 '<select class="category form-control" name="category">' + this.categoryListHtml() + '</select>' :
-                '<p class="form-control-static">' + this.categoryList.findWhere({id: this.model.get('category')}).get('name') + '</p>',
+                '<p class="form-control-static">' + this.categoryList.findWhere({id: this.model.get('category').id}).get('name') + '</p>',
             inputDivision: this.canRequest ?
                 '<select id="division_list" class="division form-control" name="division"></select>' :
                 '<p class="form-control-static">' + this.model.get('name') + '</p>'

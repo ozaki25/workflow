@@ -121,12 +121,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             };
             categories.fetch(categoriesFetchOption);
         },
-        divisions: function(id) {
-            var category = new Category({id: id}, {collection: new Categories()});
+        divisions: function(categoryId) {
+            var category = new Category({id: categoryId}, {collection: new Categories()});
             var options = {
                 success: function() {
                     var divisionsMainView = new DivisionsMainView({collection: new Divisions(), model: category});
-                    divisionsMainView.collection.setUrl(id);
+                    divisionsMainView.collection.setUrl(categoryId);
                     divisionsMainView.collection.fetch();
                     app.getRegion('main').show(divisionsMainView);
                 }

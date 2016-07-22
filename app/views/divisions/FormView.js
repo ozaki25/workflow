@@ -33,7 +33,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
         var code = this.ui.inputCode.val().trim();
         var name = this.ui.inputName.val().trim();
         var category = this.model.isNew() ? this.options.category : this.model.get('category');
-        this.model.set({code: code, name: name, category: {id: category}});
+        this.model.set({code: code, name: name, category: category});
         if(this.model.isValid(true)) {
             this.collection.create(this.model, {wait: true});
         }

@@ -156,7 +156,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             if(inputAuthorizer) authorizer = JSON.parse(inputAuthorizer);
         } else {
             division = this.model.get('division');
-            division.category = {id : division.category} // 暫定対応(springからcategory: 1で渡ってくるけどcategory: {id: 1}で送りたい)
+            //division.category = {id : division.category} // 暫定対応(springからcategory: 1で渡ってくるけどcategory: {id: 1}で送りたい)
             title = this.model.get('title');
             content = this.model.get('content');
             authorizer = this.model.get('authorizer');

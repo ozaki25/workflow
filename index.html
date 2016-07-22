@@ -282,6 +282,7 @@
           <th></th>
           <th></th>
           <th></th>
+          <th></th>
         </tr>
         <tbody id="category_list"></tbody>
       </table>
@@ -292,6 +293,7 @@
       <td>{{- name }}</td>
       <td id="division_col_list"></td>
       <td><a class="btn btn-default btn-xs to-divisions">Divisions</a></td>
+      <td><a class="btn btn-default btn-xs to-receptnists">Receptnists</a></td>
       <td><a class="btn btn-default btn-xs edit">Edit</a></td>
       <td><a class="btn btn-link btn-xs delete">Delete</a></td>
     </script>
@@ -375,6 +377,52 @@
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
               <button type="button" class="btn btn-default new-division">{{= submit }}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </script>
+
+    <script id="receptnists_main_view" type="text/template">
+      <div id="receptnists_main"></div>
+    </script>
+
+    <script id="receptnists_view" type="text/template">
+      <div class="panel-heading">
+        Receptnist List
+        <div class="pull-right">
+          <a class="btn btn-default btn-xs new-receptnist" href="#">New</a>
+        </div>
+      </div>
+      <table class="table">
+        <tr>
+          <th>CategoryName</th>
+          <td>Uid</td>
+          <td>Name</td>
+          <td>Team</td>
+          <th></th>
+          <th></th>
+        </tr>
+        <tbody id="receptnist_list"></tbody>
+      </table>
+    </script>
+
+    <script id="receptnist_view" type="text/template">
+      <td>{{= categoryName }}</td>
+      <td>{{- uid }}</td>
+      <td>{{- name }}</td>
+      <td>{{- team }}</td>
+      <td><a class="btn btn-default btn-xs edit">Edit</a></td>
+      <td><a class="btn btn-link btn-xs delete">Delete</a></td>
+    </script>
+
+    <script id="receptnist_form_view" type="text/template">
+      <div class="panel-heading">New Receptnist</div>
+      <div class="panel-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" class="btn btn-default new-receptnist">{{= submit }}</button>
             </div>
           </div>
         </form>

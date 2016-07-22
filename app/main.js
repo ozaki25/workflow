@@ -13,6 +13,7 @@ var Users = require('./collections/Users');
 var StatusList = require('./collections/StatusList');
 var Categories = require('./collections/Categories');
 var Divisions = require('./collections/Divisions');
+var Receptnists = require('./collections/Receptnists');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
@@ -21,6 +22,7 @@ var UsersMainView = require('./views/users/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
 var CategoriesMainView = require('./views/categories/MainView');
 var DivisionsMainView = require('./views/divisions/MainView');
+var ReceptnistsMainView = require('./views/receptnists/MainView');
 
 var requests = new Requests();
 var users = new Users();
@@ -30,14 +32,15 @@ var teamList;
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        ""                        : "requests",
-        "requests"                : "requests",
-        "requests/new"            : "newRequest",
-        "requests/:id"            : "request",
-        "users"                   : "users",
-        "status_list"             : "statusList",
-        "categories"              : "categories",
-        "categories/:id/divisions": "divisions"
+        ""                         : "requests",
+        "requests"                 : "requests",
+        "requests/new"             : "newRequest",
+        "requests/:id"             : "request",
+        "users"                    : "users",
+        "status_list"              : "statusList",
+        "categories"               : "categories",
+        "categories/:id/divisions" : "divisions",
+        "categories/:id/receptnists": "receptnists"
     },
     initialize: function() {
         Backbone.$.get('/current-user', function(user) {
@@ -129,6 +132,18 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                     divisionsMainView.collection.setUrl(categoryId);
                     divisionsMainView.collection.fetch();
                     app.getRegion('main').show(divisionsMainView);
+                }
+            }
+            category.fetch(options);
+        },
+        receptnists: function(categoryId) {
+            var category = new Category({id: categoryId}, {collection: new Categories()});
+            var options = {
+                success: function() {
+                    var receptnistsMainView = new ReceptnistsMainView({collection: new Receptnists(), model: category});
+                    receptnistsMainView.collection.setUrl(categoryId);
+                    receptnistsMainView.collection.fetch();
+                    app.getRegion('main').show(receptnistsMainView);
                 }
             }
             category.fetch(options);

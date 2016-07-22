@@ -14,7 +14,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     childEvents: {
         'click:new': 'showNew',
         'click:edit': 'showEdit',
-        'click:divisions': 'showDivisions'
+        'click:divisions': 'showDivisions',
+        'click:receptnists': 'showReceptnists'
     },
     onRender: function() {
         var categoriesView = new CategoriesView({collection: this.collection});
@@ -35,5 +36,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     showDivisions: function(view) {
         Backbone.history.navigate('#/categories/' + view.model.id + '/divisions', {trigger: true});
     },
+    showReceptnists: function(view) {
+        Backbone.history.navigate('#/categories/' + view.model.id + '/receptnists', {trigger: true});
+    }
 });
 

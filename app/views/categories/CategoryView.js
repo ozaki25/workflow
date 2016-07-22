@@ -12,11 +12,13 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     childViewContainer: '#division_col_list',
     ui: {
         toDivisionsBtn: '.to-divisions',
+        toReceptnistsBtn: '.to-receptnists',
         editBtn: '.edit',
         deleteBtn: '.delete'
     },
     events: {
         'click @ui.toDivisionsBtn': 'onClickToDivisionsBtn',
+        'click @ui.toReceptnistsBtn': 'onClickToReceptnistsBtn',
         'click @ui.editBtn': 'onClickEditBtn',
         'click @ui.deleteBtn': 'onClickDeleteBtn'
     },
@@ -28,6 +30,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     onClickToDivisionsBtn: function(e) {
         e.preventDefault();
         this.triggerMethod('click:divisions');
+    },
+    onClickToReceptnistsBtn: function(e) {
+        e.preventDefault();
+        this.triggerMethod('click:receptnists');
     },
     onClickEditBtn: function(e) {
         e.preventDefault();

@@ -1,9 +1,9 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
-var Receptnist = require('../models/Receptnist');
+var User = require('../models/User');
 
 module.exports = Backbone.Collection.extend({
-    model: Receptnist,
+    model: User,
     setUrl: function(categoryId) {
         this.url = '/categories/' + categoryId + '/receptnists';
     }

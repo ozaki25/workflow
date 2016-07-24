@@ -1,27 +1,33 @@
+var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var User = require('../../models/User');
+var Users = require('../../collections/Users');
 var ReceptnistsView = require('./ReceptnistsView');
-var FormView = require('./FormView');
+var UsersModalView = require('./UsersModalView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#receptnists_main_view',
     regions: {
-        receptnistsMain: '#receptnists_main'
+        receptnistsMain: '#receptnists_main',
+        receptnistsModal: '#select_receptnists_modal'
     },
     collectionEvents: {
         'add change': 'showIndex'
     },
     childEvents: {
-        'click:new': 'showNew',
-        'click:edit': 'showEdit'
+        'click:edit': 'showEdit',
+        'selected:users': 'onSelectedUsers'
+    },
+    initialize: function(options) {
+        this.currentUser = options.currentUser;
+        this.teamList = options.teamList;
     },
     onRender: function() {
         var receptnistsView = new ReceptnistsView({collection: this.collection, model: this.model});
         this.getRegion('receptnistsMain').show(receptnistsView);
-    },
-    showNew: function() {
-        var formView = new FormView({collection: this.collection, category: this.model});
-        this.getRegion('receptnistsMain').show(formView);
+        var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList});
+        this.getRegion('receptnistsModal').show(usersModalView);
     },
     showEdit: function(view) {
         var formView = new FormView({collection: this.collection, model: view.model});
@@ -30,6 +36,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     showIndex: function() {
         var receptnistsView = new ReceptnistsView({collection: this.collection, model: this.model});
         this.getRegion('receptnistsMain').show(receptnistsView);
+    },
+    onSelectedUsers: function(view, users) {
+        _(users).each(function(user) {
+            if(!this.collection.findWhere({uid: user.get('uid')})) {
+                var clone = user.clone().set({category: {id: this.model.id}});
+                this.collection.create(clone);
+            }
+        }.bind(this));
     }
 });
 

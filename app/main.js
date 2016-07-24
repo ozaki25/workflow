@@ -141,7 +141,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             var category = new Category({id: categoryId}, {collection: new Categories()});
             var options = {
                 success: function() {
-                    var receptnistsMainView = new ReceptnistsMainView({collection: new Receptnists(), model: category});
+                    var receptnistsMainView = new ReceptnistsMainView({
+                        collection: new Receptnists(),
+                        model: category,
+                        currentUser: currentUser,
+                        teamList: teamList
+                    });
                     receptnistsMainView.collection.setUrl(categoryId);
                     receptnistsMainView.collection.fetch();
                     app.getRegion('main').show(receptnistsMainView);

@@ -1,5 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var csrf = require('../../csrf');
+csrf();
 var ReceptnistView = require('./ReceptnistView');
 
 module.exports = Backbone.Marionette.CompositeView.extend({
@@ -11,16 +13,5 @@ module.exports = Backbone.Marionette.CompositeView.extend({
             categoryName: this.model.get('name')
         }
     },
-    template: '#receptnists_view',
-    ui: {
-        newReceptnistBtn: '.new-receptnist'
-    },
-    events: {
-        'click @ui.newReceptnistBtn': 'onClickNewBtn'
-    },
-    onClickNewBtn: function(e) {
-        e.preventDefault();
-        this.triggerMethod('click:new');
-    }
-
+    template: '#receptnists_view'
 });

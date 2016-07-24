@@ -61,6 +61,44 @@
       </table>
     </script>
 
+    <script id="users_modal_view" type="text/template">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title">User List</h4>
+          </div>
+          <div class="modal-body">
+            <select class="form-control team-select">{{= teamList() }}</select>
+            <table class="table">
+              <thead>
+                <tr>
+                  <td></td>
+                  <td>Uid</td>
+                  <td>Name</td>
+                  <td>Team</td>
+                  <td>JobLevel</td>
+                </tr>
+              </thead>
+              <tbody id="select_user_list"></tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary submit">Add</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script id="user_modal_view" type="text/template">
+      <td><input type="{{= type }}" value="{{- uid }}" /></td>
+      <td>{{- uid }}</td>
+      <td>{{- name }}</td>
+      <td>{{- team }}</td>
+      <td>{{- jobLevel }}</td>
+    </script>
+
     <script id="request_view" type="text/template">
       <td>{{- id }}</td>
       <td>{{- status.name }}</td>
@@ -138,41 +176,6 @@
         <a href="{{= url }}">{{- filename }}</a>
         {{= removeLink }}
       </p>
-    </script>
-
-    <script id="users_modal_view" type="text/template">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            <h4 class="modal-title">Candidate of Authorizer List</h4>
-          </div>
-          <div class="modal-body">
-            <select class="form-control team-select">{{= teamList() }}</select>
-            <table class="table">
-              <thead>
-                <tr>
-                  <td>Uid</td>
-                  <td>Name</td>
-                  <td>Team</td>
-                  <td>JobLevel</td>
-                </tr>
-              </thead>
-              <tbody id="authorizer_list"></tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </script>
-
-    <script id="user_modal_view" type="text/template">
-      <td><a href="#" class="authorizer">{{- uid }}</a></td>
-      <td><a href="#" class="authorizer">{{- name }}</a></td>
-      <td><a href="#" class="authorizer">{{- team }}</a></td>
-      <td><a href="#" class="authorizer">{{- jobLevel }}</a></td>
     </script>
 
     <script id="users_main_view" type="text/template">
@@ -392,7 +395,7 @@
       <div class="panel-heading">
         Receptnist List
         <div class="pull-right">
-          <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#receptnist_list_modal" href="#">Add</a>
+          <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#select_users_modal" href="#">Add</a>
         </div>
       </div>
       <table class="table">
@@ -413,45 +416,6 @@
       <td>{{- name }}</td>
       <td>{{- team }}</td>
       <td><a class="btn btn-link btn-xs delete">Delete</a></td>
-    </script>
-
-    <script id="receptnists_modal_view" type="text/template">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            <h4 class="modal-title">Candidate of Receptnist List</h4>
-          </div>
-          <div class="modal-body">
-            <select class="form-control team-select">{{= teamList() }}</select>
-            <table class="table">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td>Uid</td>
-                  <td>Name</td>
-                  <td>Team</td>
-                  <td>JobLevel</td>
-                </tr>
-              </thead>
-              <tbody id="receptnist_list"></tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-
-            <button type="button" class="btn btn-primary submit">Add</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </script>
-
-    <script id="receptnist_modal_view" type="text/template">
-      <td><input type="checkbox" value="{{- uid }}" /></td>
-      <td>{{- uid }}</td>
-      <td>{{- name }}</td>
-      <td>{{- team }}</td>
-      <td>{{- jobLevel }}</td>
     </script>
 
     <script id="status_list_view" type="text/template">

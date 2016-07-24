@@ -12,7 +12,7 @@ var Divisions = require('../../collections/Divisions');
 var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
 var SelectCategoryView = require('./SelectCategoryView');
-var UsersModalView = require('./UsersModalView');
+var UsersModalView = require('../UsersModalView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -37,7 +37,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.destroyBtn': 'onClickDestroy'
     },
     childEvents: {
-        'select:authorizer': 'selectedAuthorizer'
+        'select:user': 'selectedAuthorizer'
     },
     regions: {
         selectCategoryField: '#select_category_field',
@@ -69,7 +69,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                     html += this.staticItemNameHtml(this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')', 'authorizer-name');
                 }
                 if(this.canRequest()) {
-                    html += '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#authorizer_list_modal">Selected Authorizer</button>';
+                    html += '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#select_users_modal">Selected Authorizer</button>';
                     var input = '<input type="hidden" class="authorizer" name="authorizer" />';
                     if(this.model.has('authorizer')) {
                         var $input = Backbone.$(input);
@@ -92,19 +92,17 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
         if(this.canRequest()) {
-            var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList})
+            var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'radio', findOptions: {data: {jobLevel: {lte: 2}}}});
             this.getRegion('authorizerModal').show(usersModalView);
         }
         var selectedDivision = this.model.isNew() ? new Division() : new Division(this.model.get('division'));
         var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList, canRequest: this.canRequest()});
         this.getRegion('selectCategoryField').show(selectCategoryView);
     },
-    selectedAuthorizer: function(view) {
-        var authorizer = view.model;
+    selectedAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();
-        this.$('input.authorizer').val(JSON.stringify(authorizer));
-        this.ui.openAuthorizerBtn.before(this.staticItemNameHtml(authorizer.get('name') + '(' + authorizer.get('uid') + ')', 'authorizer-name'));
-        this.getRegion('authorizerModal').currentView.$el.modal('hide');
+        this.$('input.authorizer').val(JSON.stringify(user));
+        this.ui.openAuthorizerBtn.before(this.staticItemNameHtml(user.get('name') + '(' + user.get('uid') + ')', 'authorizer-name'));
     },
     selectedFile: function(e) {
         var input = this.$(e.target);
@@ -156,7 +154,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             if(inputAuthorizer) authorizer = JSON.parse(inputAuthorizer);
         } else {
             division = this.model.get('division');
-            //division.category = {id : division.category} // 暫定対応(springからcategory: 1で渡ってくるけどcategory: {id: 1}で送りたい)
             title = this.model.get('title');
             content = this.model.get('content');
             authorizer = this.model.get('authorizer');

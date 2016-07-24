@@ -1,14 +1,20 @@
+var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UserModalView = require('./UserModalView');
 
 module.exports = Backbone.Marionette.CompositeView.extend({
-    id: 'receptnist_list_modal',
+    id: 'select_users_modal',
     className: 'modal fade',
     childView: UserModalView,
-    childViewContainer: '#receptnist_list',
-    template: '#receptnists_modal_view',
+    childViewContainer: '#select_user_list',
+    childViewOptions: function() {
+        return {
+            type: this.type
+        }
+    },
+    template: '#users_modal_view',
     ui: {
         selectTeam: 'select.team-select',
         submitBtn: 'button.submit'
@@ -18,8 +24,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         'click @ui.submitBtn': 'onClickSubmitBtn'
     },
     initialize: function(options) {
+        this.type = options.type || 'radio';
         this.currentUser = options.currentUser;
         this.teamList = options.teamList;
+        this.findOptions = options.findOptions;
     },
     templateHelpers: function() {
         return {
@@ -36,17 +44,20 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     changeSelectedTeam: function() {
         var selectedTeam = this.ui.selectTeam.val();
-        this.collection.fetch({data: {team: selectedTeam}});
+        var fetchOptions = {data: {team: selectedTeam}};
+        $.extend(true, fetchOptions, this.findOptions);
+        this.collection.fetch(fetchOptions);
     },
     onClickSubmitBtn: function(e) {
         e.preventDefault();
-        var selectedInputs = this.$('input[type="checkbox"]:checked');
+        var selectedInputs = this.$('input[type="' + this.type + '"]:checked');
         var selectedUsers = _(selectedInputs).map(function(input) {
             return this.collection.findWhere({uid: this.$(input).val()});
         }.bind(this));
         this.$(selectedInputs).removeAttr('checked');
         this.$el.modal('hide');
-        this.triggerMethod('selected:users', selectedUsers);
+        if(this.type === 'checkbox') this.triggerMethod('select:users', selectedUsers);
+        if(this.type === 'radio') this.triggerMethod('select:user', selectedUsers[0]);
     }
 });
 

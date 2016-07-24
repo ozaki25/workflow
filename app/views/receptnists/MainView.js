@@ -4,7 +4,7 @@ Backbone.Marionette = require('backbone.marionette');
 var User = require('../../models/User');
 var Users = require('../../collections/Users');
 var ReceptnistsView = require('./ReceptnistsView');
-var UsersModalView = require('./UsersModalView');
+var UsersModalView = require('../UsersModalView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#receptnists_main_view',
@@ -17,7 +17,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     childEvents: {
         'click:edit': 'showEdit',
-        'selected:users': 'onSelectedUsers'
+        'select:users': 'onSelectedUsers'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -26,7 +26,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onRender: function() {
         var receptnistsView = new ReceptnistsView({collection: this.collection, model: this.model});
         this.getRegion('receptnistsMain').show(receptnistsView);
-        var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList});
+        var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'checkbox'});
         this.getRegion('receptnistsModal').show(usersModalView);
     },
     showEdit: function(view) {

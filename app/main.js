@@ -24,6 +24,7 @@ var CategoriesMainView = require('./views/categories/MainView');
 var DivisionsMainView = require('./views/divisions/MainView');
 var ReceptnistsMainView = require('./views/receptnists/MainView');
 
+var currentUser;
 var requests = new Requests();
 var users = new Users();
 var statusList = new StatusList();
@@ -44,17 +45,17 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     initialize: function() {
         Backbone.$.get('/current-user', function(user) {
-            app.currentUser = new User(user);
-            app.getRegion('header').show(new HeaderView({model: app.currentUser}));
+            currentUser = new User(user);
+            app.getRegion('header').show(new HeaderView({model: currentUser}));
         });
         statusList.fetch();
         users.fetch({success: function() {teamList = users.getTeamList();}});
         app.getRegion('sideMenu').show(new SideMenuView());
     },
     onRoute: function() {
-        if(!app.currentUser) {
+        if(!currentUser) {
             Backbone.$.get('/current-user', function(user) {
-                app.currentUser = new User(user);
+                currentUser = new User(user);
             });
         }
     },
@@ -63,7 +64,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             var requestsFetchOption = {
                 success: function() {
                     var requestsView = new RequestsView({collection: requests,
-                                                         currentUser: app.currentUser,
+                                                         currentUser: currentUser,
                                                          statusList: statusList});
                     app.getRegion('main').show(requestsView);
                 }
@@ -74,7 +75,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             var categoryFetchOptions = {
                 success: function() {
                     var formView = new RequestFormView({model: new Request({}, {collection: requests}),
-                                                        currentUser: app.currentUser,
+                                                        currentUser: currentUser,
                                                         statusList: statusList,
                                                         categoryList: categories,
                                                         teamList: teamList});
@@ -90,7 +91,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                     var categoryFetchOptions = {
                         success: function() {
                             var formView = new RequestFormView({model: request,
-                                                                currentUser: app.currentUser,
+                                                                currentUser: currentUser,
                                                                 statusList: statusList,
                                                                 teamList: teamList,
                                                                 categoryList: categories});

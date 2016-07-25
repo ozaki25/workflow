@@ -17,7 +17,7 @@ var Receptnists = require('./collections/Receptnists');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestsView = require('./views/requests/RequestsView');
-var RequestFormView = require('./views/requests/FormView');
+var ShowRequestView = require('./views/requests/ShowView');
 var UsersMainView = require('./views/users/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
 var CategoriesMainView = require('./views/categories/MainView');
@@ -74,12 +74,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         newRequest: function() {
             var categoryFetchOptions = {
                 success: function() {
-                    var formView = new RequestFormView({model: new Request({}, {collection: requests}),
-                                                        currentUser: currentUser,
-                                                        statusList: statusList,
-                                                        categoryList: categories,
-                                                        teamList: teamList});
-                    app.getRegion('main').show(formView);
+                    var requestView = new ShowRequestView({model: new Request({}, {collection: requests}),
+                                                           currentUser: currentUser,
+                                                           statusList: statusList,
+                                                           categoryList: categories,
+                                                           teamList: teamList});
+                    app.getRegion('main').show(requestView);
                 }
             }
             categories.fetch(categoryFetchOptions);
@@ -90,12 +90,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 success: function() {
                     var categoryFetchOptions = {
                         success: function() {
-                            var formView = new RequestFormView({model: request,
-                                                                currentUser: currentUser,
-                                                                statusList: statusList,
-                                                                teamList: teamList,
-                                                                categoryList: categories});
-                            app.getRegion('main').show(formView);
+                            var requestView = new ShowRequestView({model: request,
+                                                                   currentUser: currentUser,
+                                                                   statusList: statusList,
+                                                                   teamList: teamList,
+                                                                   categoryList: categories});
+                            app.getRegion('main').show(requestView);
                         }
                     }
                     categories.fetch(categoryFetchOptions);

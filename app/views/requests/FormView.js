@@ -25,7 +25,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         openAuthorizerBtn: 'button.open-authorizer-modal',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
-        progressBtn: '.progress-btn',
+        workBtn: '.work-btn',
+        approveBtn: '.approve-btn',
         rejectBtn: '.reject-btn',
         destroyBtn: '.destroy-btn'
     },
@@ -34,7 +35,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.removeFile': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit',
-        'click @ui.progressBtn': 'onClickProgress',
+        'click @ui.workBtn': 'onClickWork',
+        'click @ui.approveBtn': 'onClickApprove',
         'click @ui.rejectBtn': 'onClickReject',
         'click @ui.destroyBtn': 'onClickDestroy'
     },
@@ -84,7 +86,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }.bind(this),
             save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
             submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
-            progress: this.canProgress() ? '<button type="button" class="btn btn-default progress-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
+            work    : this.canWork() ? '<button type="button" class="btn btn-default work-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
+            approve : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
             reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
             destroy : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
         }
@@ -130,7 +133,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onClickSubmit: function() {
         this.setRequest(this.model.getStatusAfterProgressing(), true);
     },
-    onClickProgress: function() {
+    onClickWork: function() {
+        this.setWork(this.model.getStatusAfterProgressing());
+    },
+    onClickApprove: function() {
         this.saveRequest(this.model.getStatusAfterProgressing());
     },
     onClickReject: function() {
@@ -163,6 +169,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             documents: []
         });
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode, true);
+    },
+    setWork: function(nextStatusCode) {
+        //var content = this.ui.inputContent.val().trim();
+        var content = '内容'
+        this.model.set({
+            work: {content: content}
+        });
+        this.saveRequest(nextStatusCode);
     },
     saveRequest: function(nextStatusCode, canEditFile = false) {
         var statusId = this.statusList.findWhere({code: nextStatusCode}).id;
@@ -223,10 +237,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         return this.model.isCreating() &&
             (this.currentUser.isApplicant(this.model) || this.currentUser.isAdmin());
     },
-    canRequest: function() {
-        return this.model.isNew() || this.canEdit();
-    },
-    canApprove: function() {
+    canApproveRequest: function() {
         return this.model.isWaitingApprove() &&
             (this.currentUser.isAuthorizer(this.model) || this.currentUser.isAdmin());
     },
@@ -246,18 +257,22 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         return this.model.isCompleted() &&
             (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
     },
-    canProgress: function() {
-        return this.canApprove() || this.canAccept() || this.canReport() || this.canFinish();
+    canRequest: function() {
+        return this.model.isNew() || this.canEdit();
+    },
+    canWork: function() {
+        return this.canAccept() || this.canReport();
+    },
+    canApprove: function() {
+        return this.canApproveRequest() || this.canFinish();
     },
     canReject: function() {
-        return this.canApprove() || this.canAccept() || this.canReport() || this.canFinish() || this.canRestore();
+        return this.canApprove() || this.canWork() || this.canRestore();
     },
     canDestroy: function() {
         return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());
     },
-    staticItemNameHtml: function(value, className, attr) {
-        if(!className) className = '';
-        if(!attr) attr = '';
+    staticItemNameHtml: function(value, className = '', attr = '') {
         return '<p class="form-control-static ' + className + '" ' + attr + '>' + value + '</p>';
     },
     staticFormItemHtml: function(name, value) {

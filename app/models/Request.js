@@ -49,6 +49,9 @@ module.exports = Backbone.Model.extend({
         console.warn('this request status can not progress.');
         return '';
     },
+    getStatusAfterSave: function() {
+        return StatusCodes.Creating;
+    },
     getStatusAfterProgressing: function() {
         if(this.isNew())                 return StatusCodes.WaitingApprove;
         if(this.isCreating())            return StatusCodes.WaitingApprove;

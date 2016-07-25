@@ -24,6 +24,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         removeFile: '.remove-file',
         openAuthorizerBtn: 'button.open-authorizer-modal',
         saveBtn: '.save-btn',
+        submitBtn: '.submit-btn',
         progressBtn: '.progress-btn',
         rejectBtn: '.reject-btn',
         destroyBtn: '.destroy-btn'
@@ -32,6 +33,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'change @ui.inputFile': 'selectedFile',
         'click @ui.removeFile': 'onClickRemoveFile',
         'click @ui.saveBtn': 'onClickSave',
+        'click @ui.submitBtn': 'onClickSubmit',
         'click @ui.progressBtn': 'onClickProgress',
         'click @ui.rejectBtn': 'onClickReject',
         'click @ui.destroyBtn': 'onClickDestroy'
@@ -81,6 +83,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 return html;
             }.bind(this),
             save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
+            submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
             progress: this.canProgress() ? '<button type="button" class="btn btn-default progress-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
             reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
             destroy : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
@@ -122,13 +125,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.$('.' + fileNo).remove();
     },
     onClickSave: function() {
-        this.saveRequest(1, false);
+        this.setRequest(this.model.getStatusAfterSave(), false);
+    },
+    onClickSubmit: function() {
+        this.setRequest(this.model.getStatusAfterProgressing(), true);
     },
     onClickProgress: function() {
-        this.saveRequest(this.model.getStatusAfterProgressing(), true);
+        this.saveRequest(this.model.getStatusAfterProgressing());
     },
     onClickReject: function() {
-        this.saveRequest(this.model.getStatusAfterRejection(), false);
+        this.saveRequest(this.model.getStatusAfterRejection());
     },
     onClickDestroy: function() {
         var options = {
@@ -139,46 +145,38 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         };
         this.model.destroy(options);
     },
-    saveRequest: function(nextStatus, validate) {
+    setRequest: function(nextStatusCode, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
-        var division = null;
-        var title = '';
-        var content = '';
-        var authorizer = null;
-        if(this.canRequest()) {
-            var inputDivision = this.$('select.division').val();
-            if(inputDivision) division = {id: inputDivision};
-            title = this.ui.inputTitle.val().trim();
-            content = this.ui.inputContent.val().trim();
-            var inputAuthorizer = this.$('input.authorizer').val();
-            if(inputAuthorizer) authorizer = JSON.parse(inputAuthorizer);
-        } else {
-            division = this.model.get('division');
-            title = this.model.get('title');
-            content = this.model.get('content');
-            authorizer = this.model.get('authorizer');
-        }
+        var title = this.ui.inputTitle.val().trim();
+        var content = this.ui.inputContent.val().trim();
+        var inputDivision = this.$('select.division').val();
+        var division = !!inputDivision ? {id: inputDivision} : null;
+        var inputAuthorizer = this.$('input.authorizer').val();
+        var authorizer = !!inputAuthorizer ? JSON.parse(inputAuthorizer) : null;
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
         this.model.set({
-            division: division,
             title: title,
             content: content,
+            division: division,
             authorizer: authorizer,
             applicant: applicant,
             documents: []
         });
-        if(this.model.isValid(true)) {
-            var statusId = this.statusList.findWhere({code: nextStatus}).id;
-            var options = {
-                wait: true,
-                success: function(request) {
+        if(this.model.isValid(true)) this.saveRequest(nextStatusCode, true);
+    },
+    saveRequest: function(nextStatusCode, canEditFile = false) {
+        var statusId = this.statusList.findWhere({code: nextStatusCode}).id;
+        var options = {
+            wait: true,
+            success: function(request) {
+                if(canEditFile) {
                     this.saveFile(request);
                     this.deleteFile(request);
-                    Backbone.history.navigate('/requests', {trigger: true});
-                }.bind(this)
-            };
-            this.model.save({status: {id: statusId}}, options);
-        }
+                }
+                Backbone.history.navigate('/requests', {trigger: true});
+            }.bind(this)
+        };
+        this.model.save({status: {id: statusId}}, options);
     },
     saveFile: function(request) {
         _(this.$('input.file')).each(function(file) {
@@ -249,7 +247,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
     },
     canProgress: function() {
-        return this.canRequest() || this.canApprove() || this.canAccept() || this.canReport() || this.canFinish();
+        return this.canApprove() || this.canAccept() || this.canReport() || this.canFinish();
     },
     canReject: function() {
         return this.canApprove() || this.canAccept() || this.canReport() || this.canFinish() || this.canRestore();

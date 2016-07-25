@@ -234,7 +234,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canAccept: function() {
         return this.model.isWaitingAccept() &&
-            (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
     },
     canReport: function() {
         return this.model.isWaitingWorkComplete() &&
@@ -242,11 +242,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canFinish: function() {
         return this.model.isWaitingFinish() &&
-            (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
     },
     canRestore: function() {
         return this.model.isCompleted() &&
-            (this.currentUser.isReceptionist(this.model) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
     },
     canProgress: function() {
         return this.canRequest() || this.canApprove() || this.canAccept() || this.canReport() || this.canFinish();

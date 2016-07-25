@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -20,19 +21,17 @@ module.exports = Backbone.Model.extend({
         return this.get('admin');
     },
     isApplicant: function(request) {
-        return this.get('uid') === request.get('applicant').uid || this.isAdmin();
+        return this.get('uid') === request.get('applicant').uid;
     },
     isAuthorizer: function(request) {
-        return this.get('uid') === request.get('authorizer').uid || this.isAdmin();
+        return this.get('uid') === request.get('authorizer').uid;
     },
-    isReceptionist: function(request) {
-        // var receptionistUids = _(request.get('divisions').category.receptionist).pluck('uid');
-        // return _(receptionistUids).contains(this.get('uid'));
-        return true || this.isAdmin();
+    isReceptionist: function(receptnists) {
+        return _.chain(receptnists).pluck('uid').contains(this.get('uid')).value();
     },
     isWorker: function(request) {
         //var workerUids = _(request.get('workers').pluck('uid'));
         //return _(workerUids).contains(this.get('uid'));
-        return true || this.isAdmin();
+        return true;
     }
 });

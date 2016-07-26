@@ -4,6 +4,7 @@ Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
+var Documents = require('../../collections/Documents');
 var RequestFormView = require('./RequestFormView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
@@ -33,6 +34,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.statusList = options.statusList;
         this.teamList = options.teamList;
         this.categoryList = options.categoryList;
+        this.documents = new Documents(this.model.get('documents'));
+        if(!this.model.isNew()) this.documents.setUrl(this.model.id);
     },
     templateHelpers: function() {
         return {
@@ -45,24 +48,18 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         }
     },
     onRender: function() {
-        var requestFormView = new RequestFormView({model: this.model, currentUser: this.currentUser, teamList: this.teamList, categoryList: this.categoryList, canRequest: this.canRequest()});
+        var requestFormView = new RequestFormView({model: this.model,
+                                                   currentUser: this.currentUser,
+                                                   teamList: this.teamList,
+                                                   categoryList: this.categoryList,
+                                                   canRequest: this.canRequest()});
         this.getRegion('requestForm').show(requestFormView);
     },
-    onClickSave: function() {
-        this.setRequest(this.model.getStatusAfterSave(), false);
-    },
-    onClickSubmit: function() {
-        this.setRequest(this.model.getStatusAfterProgressing(), true);
-    },
-    onClickWork: function() {
-        this.setWork(this.model.getStatusAfterProgressing());
-    },
-    onClickApprove: function() {
-        this.saveRequest(this.model.getStatusAfterProgressing());
-    },
-    onClickReject: function() {
-        this.saveRequest(this.model.getStatusAfterRejection());
-    },
+    onClickSave   : function() { this.setRequest(this.model.getStatusAfterSave(), false); },
+    onClickSubmit : function() { this.setRequest(this.model.getStatusAfterProgressing(), true); },
+    onClickWork   : function() { this.setWork(this.model.getStatusAfterProgressing()); },
+    onClickApprove: function() { this.saveRequest(this.model.getStatusAfterProgressing()); },
+    onClickReject : function() { this.saveRequest(this.model.getStatusAfterRejection()); },
     onClickDestroy: function() {
         var options = {
             wait: true,

@@ -1,9 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-var Document = require('../../models/Document');
 var Category = require('../../models/category');
 var Division = require('../../models/Division');
-var Documents = require('../../collections/Documents');
 var Divisions = require('../../collections/Divisions');
 var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
@@ -18,11 +16,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         openAuthorizerBtn: 'button.open-authorizer-modal'
     },
     events: {
-        'change @ui.inputFile': 'selectedFile',
+        'change @ui.inputFile': 'onSelectFile',
         'click @ui.removeFile': 'onClickRemoveFile'
     },
     childEvents: {
-        'select:user': 'selectedAuthorizer'
+        'select:user': 'onSelectAuthorizer'
     },
     regions: {
         selectCategoryField: '#select_category_field',
@@ -31,12 +29,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
-        this.statusList = options.statusList;
         this.teamList = options.teamList;
         this.categoryList = options.categoryList;
         this.canRequest = options.canRequest;
-        this.documents = new Documents(this.model.get('documents'));
-        if(!this.model.isNew()) this.documents.setUrl(this.model.id);
+        this.documents = options.documents;
     },
     templateHelpers: function() {
         return {
@@ -74,19 +70,26 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             this.getRegion('downloadFiles').show(downloadFilesView);
         }
         if(this.canRequest) {
-            var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'radio', findOptions: {data: {jobLevel: {lte: 2}}}});
+            var usersModalView = new UsersModalView({collection: new Users(),
+                                                     currentUser: this.currentUser,
+                                                     teamList: this.teamList,
+                                                     findOptions: {data: {jobLevel: {lte: 2}}},
+                                                     type: 'radio'});
             this.getRegion('authorizerModal').show(usersModalView);
         }
         var selectedDivision = this.model.isNew() ? new Division() : new Division(this.model.get('division'));
-        var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList, canRequest: this.canRequest});
+        var selectCategoryView = new SelectCategoryView({collection: new Divisions(),
+                                                         model: selectedDivision,
+                                                         categoryList: this.categoryList,
+                                                         canRequest: this.canRequest});
         this.getRegion('selectCategoryField').show(selectCategoryView);
     },
-    selectedAuthorizer: function(view, user) {
+    onSelectAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();
         this.$('input.authorizer').val(JSON.stringify(user));
         this.ui.openAuthorizerBtn.before(this.staticItemNameHtml(user.get('name') + '(' + user.get('uid') + ')', 'authorizer-name'));
     },
-    selectedFile: function(e) {
+    onSelectFile: function(e) {
         var input = this.$(e.target);
         var file = input.prop('files');
         if(file.length !== 0) {

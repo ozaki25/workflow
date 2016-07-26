@@ -5,7 +5,9 @@ Backbone.Validation = require('backbone.validation');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
 var Documents = require('../../collections/Documents');
+var Work = require('../../models/Work');
 var RequestFormView = require('./RequestFormView');
+var WorkFormView = require('./WorkFormView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -27,7 +29,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.destroyBtn': 'onClickDestroy'
     },
     regions: {
-        requestForm: '#request_form'
+        requestForm: '#request_form',
+        workForm: '#work_form'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -54,6 +57,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                                                    categoryList: this.categoryList,
                                                    canRequest: this.canRequest()});
         this.getRegion('requestForm').show(requestFormView);
+        if(this.model.isRequested()) {
+            var work = new Work(this.model.get('work'));
+            var workFormView = new WorkFormView({model: work, canWork: this.canWork()});
+            this.getRegion('workForm').show(workFormView);
+        }
     },
     onClickSave   : function() { this.setRequest(this.model.getStatusAfterSave(), false); },
     onClickSubmit : function() { this.setRequest(this.model.getStatusAfterProgressing(), true); },
@@ -89,8 +97,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode, true);
     },
     setWork: function(nextStatusCode) {
-        //var content = this.ui.inputContent.val().trim();
-        var content = '内容'
+        var content = this.$('textarea.content').val().trim();
         this.model.set({
             work: {content: content}
         });

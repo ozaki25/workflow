@@ -39,6 +39,13 @@ module.exports = Backbone.Model.extend({
     isCompleted: function() {
         return !this.isNew() && this.get('status').code == StatusCodes.Completed;
     },
+    isRequested: function() {
+        var requestedStatus = [StatusCodes.WaitingAccept,
+                               StatusCodes.WaitingWorkComplete,
+                               StatusCodes.WaitingFinish,
+                               StatusCodes.Completed]
+        return !this.isNew() && _(requestedStatus).contains(this.get('status').code);
+    },
     getProgressBtnLabel: function() {
         if(this.isNew())                 return 'Submit';
         if(this.isCreating())            return 'Submit';

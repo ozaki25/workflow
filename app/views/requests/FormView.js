@@ -13,13 +13,16 @@ var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
 var SelectCategoryView = require('./SelectCategoryView');
 var UsersModalView = require('../UsersModalView');
+var FormItemView = require('../components/FormHorizontalItemView');
+var InputView = require('../components/InputView');
+var TextareaView = require('../components/TextareaView');
+var ParagraphView = require('../components/ParagraphView');
+
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
-        inputTitle: 'input.title',
-        inputContent: 'textarea.content',
         inputFile: 'input.file-tmp',
         removeFile: '.remove-file',
         openAuthorizerBtn: 'button.open-authorizer-modal',
@@ -46,7 +49,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     regions: {
         selectCategoryField: '#select_category_field',
         downloadFiles: '#download_file_list',
-        authorizerModal: '#select_authorizer_modal'
+        authorizerModal: '#select_authorizer_modal',
+
+        requestIdRegion: '#request_id_region',
+        statusRegion: '#status_region',
+        titleRegion: '#title_region',
+        contentRegion: '#content_region',
+
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -58,14 +67,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     templateHelpers: function() {
         return {
-            id     : this.model.isNew() ? '' : this.staticFormItemHtml('ID', this.model.id),
-            status : this.model.isNew() ? '' : this.staticFormItemHtml('Status', this.model.get('status').name),
-            inputTitle: this.canRequest() ?
-                '<input type="text" class="title form-control" name="title" value="' + this.model.get('title') + '" />' :
-                this.staticItemNameHtml(this.model.get('title')),
-            inputContent: this.canRequest() ?
-                '<textarea type="text" class="content form-control" name="content">' + this.model.get('content') + '</textarea>' :
-                this.staticItemNameHtml(this.replaceLine(this.model.get('content'))),
             inputFile: this.canRequest() ? '<input type="file" class="form-control file-tmp" />' : '',
             authorizer: function() {
                 var html = '';
@@ -100,7 +101,34 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.canRequest()) {
             var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'radio', findOptions: {data: {jobLevel: {lte: 2}}}});
             this.getRegion('authorizerModal').show(usersModalView);
+
+            var inputTitleModel = new Backbone.Model({className: 'title form-control', name: 'title', type: 'text', value: this.model.get('title')});
+            var titleDetailView  = new InputView({model: inputTitleModel});
+
+            var inputContentModel = new Backbone.Model({className: 'content form-control', name: 'content', value: this.replaceLine(this.model.get('content'))})
+            var contentDetailView  = new TextareaView({model: inputContentModel});
+        } else {
+            var paragraphRequestIdModel = new Backbone.Model({className: 'form-control-static', value: this.model.id});
+            var requestIdDetailView  = new ParagraphView({model: paragraphRequestIdModel});
+            var formRequestIdView       = new FormItemView({model: new Backbone.Model({label: 'ID'}), detailView: requestIdDetailView});
+            this.getRegion('requestIdRegion').show(formRequestIdView);
+
+            var paragraphStatusModel = new Backbone.Model({className: 'form-control-static', value: this.model.get('status').name});
+            var statusDetailView  = new ParagraphView({model: paragraphStatusModel});
+            var formStatusView       = new FormItemView({model: new Backbone.Model({label: 'Status'}), detailView: statusDetailView});
+            this.getRegion('statusRegion').show(formStatusView);
+
+            var paragraphTitleModel = new Backbone.Model({className: 'form-control-static', value: this.model.get('title')});
+            var titleDetailView  = new ParagraphView({model: paragraphTitleModel});
+
+            var paragraphContentModel = new Backbone.Model({className: 'form-control-static', value: this.replaceLine(this.model.get('content'))})
+            var contentDetailView  = new ParagraphView({model: paragraphContentModel});
         }
+        var formTitleView = new FormItemView({model: new Backbone.Model({label: 'Title'}), detailView: titleDetailView});
+        this.getRegion('titleRegion').show(formTitleView);
+        var formContentView = new FormItemView({model: new Backbone.Model({label: 'Content'}), detailView: contentDetailView});
+        this.getRegion('contentRegion').show(formContentView);
+
         var selectedDivision = this.model.isNew() ? new Division() : new Division(this.model.get('division'));
         var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList, canRequest: this.canRequest()});
         this.getRegion('selectCategoryField').show(selectCategoryView);
@@ -153,8 +181,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     setRequest: function(nextStatusCode, validate) {
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
-        var title = this.ui.inputTitle.val().trim();
-        var content = this.ui.inputContent.val().trim();
+        var title = this.$('input.title').val().trim();
+        var content = this.$('textarea.content').val().trim();
         var inputDivision = this.$('select.division').val();
         var division = !!inputDivision ? {id: inputDivision} : null;
         var inputAuthorizer = this.$('input.authorizer').val();
@@ -274,14 +302,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     staticItemNameHtml: function(value, className = '', attr = '') {
         return '<p class="form-control-static ' + className + '" ' + attr + '>' + value + '</p>';
-    },
-    staticFormItemHtml: function(name, value) {
-        return '<div class="form-group">' +
-                 '<label class="col-sm-2 control-label">' + name + '</label>' +
-                 '<div class="col-sm-10">' +
-                   '<p class="form-control-static">' + value + '</p>' +
-                 '</div>' +
-               '</div>'
     },
     replaceLine: function(text) {
         return text.replace(/\r\n/g, '<br />').replace(/(\n|\r)/g, '<br />');

@@ -300,7 +300,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     canDestroy: function() {
         return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());
     },
-    staticItemNameHtml: function(value, className = '', attr = '') {
+    staticItemNameHtml: function(value) {
+        this.staticItemNameHtml(value, '', '');
+    },
+    staticItemNameHtml: function(value, className) {
+        this.staticItemNameHtml(value, className, '');
+    },
+    staticItemNameHtml: function(value, className, attr) {
         return '<p class="form-control-static ' + className + '" ' + attr + '>' + value + '</p>';
     },
     replaceLine: function(text) {

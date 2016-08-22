@@ -188,13 +188,15 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var inputAuthorizer = this.$('input.authorizer').val();
         var authorizer = !!inputAuthorizer ? JSON.parse(inputAuthorizer) : null;
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
+        var removeFileIds = _(this.$('input.remove-file')).map(function(file) { return parseInt(this.$(file).val()) }.bind(this));
+        var documentIds = _(this.documents.models).reject(function(document) { return _(removeFileIds).contains(document.id) });
         this.model.set({
             title: title,
             content: content,
             division: division,
             authorizer: authorizer,
             applicant: applicant,
-            documents: []
+            documents: documentIds
         });
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode, true);
     },
@@ -213,7 +215,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             success: function(request) {
                 if(canEditFile) {
                     this.saveFile(request);
-                    this.deleteFile(request);
                 }
                 Backbone.history.navigate('/requests', {trigger: true});
             }.bind(this)
@@ -232,12 +233,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }
             this.documents.setUrl(request.id);
             this.documents.create({}, options);
-        }.bind(this));
-    },
-    deleteFile: function(request) {
-        _(this.$('input.remove-file')).each(function(file) {
-            var id = parseInt(this.$(file).val());
-            this.documents.findWhere({id: id}).destroy({wait: true});
         }.bind(this));
     },
     bindBackboneValidation: function() {

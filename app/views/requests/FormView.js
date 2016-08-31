@@ -23,8 +23,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
-        inputFile: 'input.file-tmp',
-        removeFile: '.remove-file',
+        inputFile: 'input.file',
         openAuthorizerBtn: 'button.open-authorizer-modal',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
@@ -34,8 +33,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         destroyBtn: '.destroy-btn'
     },
     events: {
-        'change @ui.inputFile': 'selectedFile',
-        'click @ui.removeFile': 'onClickRemoveFile',
+        'change @ui.inputFile': 'onSelectFile',
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit',
         'click @ui.workBtn': 'onClickWork',
@@ -44,7 +42,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.destroyBtn': 'onClickDestroy'
     },
     childEvents: {
-        'select:user': 'selectedAuthorizer'
+        'select:user': 'onSlectAuthorizer'
     },
     regions: {
         selectCategoryField: '#select_category_field',
@@ -63,11 +61,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.teamList = options.teamList;
         this.categoryList = options.categoryList;
         this.documents = new Documents(this.model.get('documents'));
-        if(!this.model.isNew()) this.documents.setUrl(this.model.id);
     },
     templateHelpers: function() {
         return {
-            inputFile: this.canRequest() ? '<input type="file" class="form-control file-tmp" />' : '',
+            inputFile: this.canRequest() ? '<input type="file" class="form-control file" />' : '',
             authorizer: function() {
                 var html = '';
                 if(this.model.has('authorizer')) {
@@ -94,10 +91,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         }
     },
     onRender: function() {
-        if(!this.model.isNew()) {
-            var downloadFilesView = new DownloadFilesView({collection: this.documents, canRequest: this.canRequest()});
-            this.getRegion('downloadFiles').show(downloadFilesView);
-        }
+        var downloadFilesView = new DownloadFilesView({collection: this.documents, canRequest: this.canRequest()});
+        this.getRegion('downloadFiles').show(downloadFilesView);
         if(this.canRequest()) {
             var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'radio', findOptions: {data: {jobLevel: {lte: 2}}}});
             this.getRegion('authorizerModal').show(usersModalView);
@@ -133,27 +128,27 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList, canRequest: this.canRequest()});
         this.getRegion('selectCategoryField').show(selectCategoryView);
     },
-    selectedAuthorizer: function(view, user) {
+    onSelectAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();
         this.$('input.authorizer').val(JSON.stringify(user));
         this.ui.openAuthorizerBtn.before(this.staticItemNameHtml(user.get('name') + '(' + user.get('uid') + ')', 'authorizer-name'));
     },
-    selectedFile: function(e) {
+    onSelectFile: function(e) {
         var input = this.$(e.target);
         var file = input.prop('files');
         if(file.length !== 0) {
-            var latestFileNo = this.$('input.file:last').attr('id');
-            var fileNo = latestFileNo ? parseInt(latestFileNo) + 1 : 1
-            var newInput = input.clone();
-            input.after(newInput);
-            input.after(this.staticItemNameHtml('<span>' + file[0].name + '</span><a href="#" class="btn btn-link btn-xs remove-file">&times;</a>', fileNo, 'data-file-no="' + fileNo + '"'));
-            input.attr('id', fileNo).addClass('file hide ' + fileNo).removeClass('file-tmp');
+            var formData = new FormData();
+            formData.append('file', file[0]);
+            formData.append('request', '');
+            var options = {
+                processData: false,
+                contentType: false,
+                data: formData,
+                wait: true
+            }
+            this.documents.create({}, options);
+            input.val('');
         }
-    },
-    onClickRemoveFile: function(e) {
-        e.preventDefault();
-        var fileNo = this.$(e.target).closest('p').attr('data-file-no');
-        this.$('.' + fileNo).remove();
     },
     onClickSave: function() {
         this.setRequest(this.model.getStatusAfterSave(), false);
@@ -188,17 +183,15 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var inputAuthorizer = this.$('input.authorizer').val();
         var authorizer = !!inputAuthorizer ? JSON.parse(inputAuthorizer) : null;
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
-        var removeFileIds = _(this.$('input.remove-file')).map(function(file) { return parseInt(this.$(file).val()) }.bind(this));
-        var documentIds = _(this.documents.models).reject(function(document) { return _(removeFileIds).contains(document.id) });
         this.model.set({
             title: title,
             content: content,
             division: division,
             authorizer: authorizer,
             applicant: applicant,
-            documents: documentIds
+            documents: this.documents
         });
-        if(this.model.isValid(true)) this.saveRequest(nextStatusCode, true);
+        if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
     },
     setWork: function(nextStatusCode) {
         //var content = this.ui.inputContent.val().trim();
@@ -208,32 +201,15 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         });
         this.saveRequest(nextStatusCode);
     },
-    saveRequest: function(nextStatusCode, canEditFile = false) {
+    saveRequest: function(nextStatusCode) {
         var statusId = this.statusList.findWhere({code: nextStatusCode}).id;
         var options = {
             wait: true,
             success: function(request) {
-                if(canEditFile) {
-                    this.saveFile(request);
-                }
                 Backbone.history.navigate('/requests', {trigger: true});
             }.bind(this)
         };
         this.model.save({status: {id: statusId}}, options);
-    },
-    saveFile: function(request) {
-        _(this.$('input.file')).each(function(file) {
-            var formData = new FormData();
-            formData.append('file', this.$(file).prop('files')[0]);
-            var options = {
-                processData: false,
-                contentType: false,
-                data: formData,
-                wait: true
-            }
-            this.documents.setUrl(request.id);
-            this.documents.create({}, options);
-        }.bind(this));
     },
     bindBackboneValidation: function() {
         Backbone.Validation.bind(this, {

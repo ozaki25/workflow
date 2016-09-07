@@ -18,6 +18,7 @@ var InputView = require('../components/InputView');
 var TextareaView = require('../components/TextareaView');
 var ParagraphView = require('../components/ParagraphView');
 
+var SelectboxView = require('../../lib/SelectboxView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -42,10 +43,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.destroyBtn': 'onClickDestroy'
     },
     childEvents: {
-        'select:user': 'onSlectAuthorizer'
+        'select:user': 'onSlectAuthorizer',
+        'change:category': 'onChangeCategorySelectbox',
+        'change:division': 'onChangeDivisionSelectbox',
     },
     regions: {
-        selectCategoryField: '#select_category_field',
         downloadFiles: '#download_file_list',
         authorizerModal: '#select_authorizer_modal',
 
@@ -59,11 +61,15 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.currentUser = options.currentUser;
         this.statusList = options.statusList;
         this.teamList = options.teamList;
-        this.categoryList = options.categoryList;
         this.documents = new Documents(this.model.get('documents'));
+        this.categoryList = options.categoryList;
+        this.divisionList = new Divisions();
+        this.getDivision(this.model.isNew() ? this.categoryList.first().id : this.model.get('division').category.id);
     },
     templateHelpers: function() {
         return {
+            category: this.canRequest() ? '' : '<p class="form-control-static">' + this.model.get('division').category.name + '</p>',
+            division: this.canRequest() ? '' : '<p class="form-control-static">' + this.model.get('division').name + '</p>',
             inputFile: this.canRequest() ? '<input type="file" class="form-control file" />' : '',
             authorizer: function() {
                 var html = '';
@@ -94,6 +100,28 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var downloadFilesView = new DownloadFilesView({collection: this.documents, canRequest: this.canRequest()});
         this.getRegion('downloadFiles').show(downloadFilesView);
         if(this.canRequest()) {
+
+
+
+            var categorySelectboxView = new SelectboxView({
+                collection: this.categoryList,
+                label: 'name',
+                value: 'id',
+                changeEventName: 'change:category',
+                selected: this.model.isNew() ? '' : this.model.get('division').category.id,
+            });
+            var divisionSelectboxView = new SelectboxView({
+                collection: this.divisionList,
+                label: 'name',
+                value: 'id',
+                _className: 'form-control division',
+                selected: this.model.isNew() ? '' : this.model.get('division').id,
+            });
+            this.renderView('#select_category_field', categorySelectboxView);
+            this.renderView('#select_division_field', divisionSelectboxView);
+
+
+
             var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'radio', findOptions: {data: {jobLevel: {lte: 2}}}});
             this.getRegion('authorizerModal').show(usersModalView);
 
@@ -123,10 +151,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('titleRegion').show(formTitleView);
         var formContentView = new FormItemView({model: new Backbone.Model({label: 'Content'}), detailView: contentDetailView});
         this.getRegion('contentRegion').show(formContentView);
-
-        var selectedDivision = this.model.isNew() ? new Division() : new Division(this.model.get('division'));
-        var selectCategoryView = new SelectCategoryView({collection: new Divisions(), model: selectedDivision, categoryList: this.categoryList, canRequest: this.canRequest()});
-        this.getRegion('selectCategoryField').show(selectCategoryView);
+    },
+    onChangeCategorySelectbox: function(view, id, model) {
+        this.getDivision(id);
+    },
+    getDivision: function(id) {
+        this.divisionList.setUrl(id);
+        this.divisionList.fetch();
     },
     onSelectAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();
@@ -282,5 +313,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     replaceLine: function(text) {
         return text.replace(/\r\n/g, '<br />').replace(/(\n|\r)/g, '<br />');
+    },
+    renderView: function(region, view) {
+        this.addRegion(region, region);
+        this.getRegion(region).show(view);
     }
 });

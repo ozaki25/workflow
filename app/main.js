@@ -8,6 +8,7 @@ var Bootstrap = require('./assets/js/bootstrap');
 var Request = require('./models/Request');
 var User = require('./models/User');
 var Category = require('./models/Category');
+var Page = require('./models/Page');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var StatusList = require('./collections/StatusList');
@@ -63,6 +64,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         requests: function() {
             var requestsView = new RequestsView({
                 collection: requests,
+                model: new Page(),
                 currentUser: currentUser,
                 statusList: statusList
             });

@@ -61,40 +61,41 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         requests: function() {
-            var requestsFetchOption = {
-                success: function() {
-                    var requestsView = new RequestsView({collection: requests,
-                                                         currentUser: currentUser,
-                                                         statusList: statusList});
-                    app.getRegion('main').show(requestsView);
-                }
-            };
-            requests.fetch(requestsFetchOption);
+            var requestsView = new RequestsView({
+                collection: requests,
+                currentUser: currentUser,
+                statusList: statusList
+            });
+            app.getRegion('main').show(requestsView);
         },
         newRequest: function() {
             var categoryFetchOptions = {
                 success: function() {
-                    var formView = new RequestFormView({model: new Request({}, {collection: requests}),
-                                                        currentUser: currentUser,
-                                                        statusList: statusList,
-                                                        categoryList: categories,
-                                                        teamList: teamList});
+                    var formView = new RequestFormView({
+                        model: new Request({}, { collection: requests }),
+                        currentUser: currentUser,
+                        statusList: statusList,
+                        categoryList: categories,
+                        teamList: teamList
+                    });
                     app.getRegion('main').show(formView);
                 }
             }
             categories.fetch(categoryFetchOptions);
         },
         request: function(id) {
-            var request = new Request({id: id}, {collection: requests});
+            var request = new Request({ id: id }, { collection: requests });
             var requestFetchOption = {
                 success: function() {
                     var categoryFetchOptions = {
                         success: function() {
-                            var formView = new RequestFormView({model: request,
-                                                                currentUser: currentUser,
-                                                                statusList: statusList,
-                                                                teamList: teamList,
-                                                                categoryList: categories});
+                            var formView = new RequestFormView({
+                                model: request,
+                                currentUser: currentUser,
+                                statusList: statusList,
+                                teamList: teamList,
+                                categoryList: categories
+                            });
                             app.getRegion('main').show(formView);
                         }
                     }
@@ -106,30 +107,30 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         users: function() {
             var usersFetchOption = {
                 success: function() {
-                    var usersMainView = new UsersMainView({collection: users});
+                    var usersMainView = new UsersMainView({ collection: users });
                     app.getRegion('main').show(usersMainView);
                 }
             };
             users.fetch(usersFetchOption);
         },
         statusList: function() {
-            var statusListView = new StatusListView({collection: statusList});
+            var statusListView = new StatusListView({ collection: statusList });
             app.getRegion('main').show(statusListView);
         },
         categories: function() {
             var categoriesFetchOption = {
                 success: function() {
-                    var categoriesMainView = new CategoriesMainView({collection: categories});
+                    var categoriesMainView = new CategoriesMainView({ collection: categories });
                     app.getRegion('main').show(categoriesMainView);
                 }
             };
             categories.fetch(categoriesFetchOption);
         },
         divisions: function(categoryId) {
-            var category = new Category({id: categoryId}, {collection: new Categories()});
+            var category = new Category({ id: categoryId }, { collection: new Categories() });
             var options = {
                 success: function() {
-                    var divisionsMainView = new DivisionsMainView({collection: new Divisions(), model: category});
+                    var divisionsMainView = new DivisionsMainView({ collection: new Divisions(), model: category });
                     divisionsMainView.collection.setUrl(categoryId);
                     divisionsMainView.collection.fetch();
                     app.getRegion('main').show(divisionsMainView);
@@ -138,7 +139,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             category.fetch(options);
         },
         receptnists: function(categoryId) {
-            var category = new Category({id: categoryId}, {collection: new Categories()});
+            var category = new Category({ id: categoryId }, { collection: new Categories() });
             var options = {
                 success: function() {
                     var receptnistsMainView = new ReceptnistsMainView({

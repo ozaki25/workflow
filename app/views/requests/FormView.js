@@ -9,7 +9,6 @@ var Divisions = require('../../collections/Divisions');
 var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
 var UsersModalView = require('../UsersModalView');
-var FormItemView = require('../components/FormHorizontalItemView');
 var ParagraphView = require('../ParagraphView');
 var SelectboxView = require('../../lib/SelectboxView');
 var InputView = require('../../lib/InputView');
@@ -38,7 +37,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.destroyBtn': 'onClickDestroy'
     },
     childEvents: {
-        'select:user': 'onSlectAuthorizer',
+        'select:user': 'onSelectAuthorizer',
         'change:category': 'onChangeCategorySelectbox',
     },
     regions: {
@@ -62,10 +61,18 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     templateHelpers: function() {
         return {
+            requestIdField: this.model.isNew() ? '' : '<div class="form-group">' +
+                                                          '<label class="col-sm-2 control-label">RequestId</label>' +
+                                                          '<div class="col-sm-10" id="request_id_region"></div>' +
+                                                      '</div>',
+            statusField: this.model.isNew() ? '' : '<div class="form-group">' +
+                                                       '<label class="col-sm-2 control-label">Status</label>' +
+                                                       '<div class="col-sm-10" id="status_region"></div>' +
+                                                   '</div>',
             authorizer: function() {
                 var html = '';
                 if(this.model.has('authorizer')) {
-                    html += this.staticItemNameHtml(this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')', 'authorizer-name');
+                    html += '<p class="form-control-static authorizer-name">' + this.model.get('authorizer').name + '(' + this.model.get('authorizer').uid + ')' + '</p>';
                 }
                 if(this.canRequest()) {
                     html += '<button type="button" class="btn btn-default open-authorizer-modal" data-toggle="modal" data-target="#select_users_modal">Selected Authorizer</button>';
@@ -88,22 +95,25 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         }
     },
     onRender: function() {
+        this.renderRequestId();
+        this.renderStatus();
         this.renderFiles()
         this.renderCategory();
         this.renderDivision();
         this.renderTitle();
         this.renderContent();
-        if(this.canRequest()) this.renderUserModal();
-        else {
-            var paragraphRequestIdModel = new Backbone.Model({className: 'form-control-static', value: this.model.id});
-            var requestIdDetailView  = new ParagraphView({model: paragraphRequestIdModel});
-            var formRequestIdView       = new FormItemView({model: new Backbone.Model({label: 'ID'}), detailView: requestIdDetailView});
-            this.getRegion('requestIdRegion').show(formRequestIdView);
-
-            var paragraphStatusModel = new Backbone.Model({className: 'form-control-static', value: this.model.get('status').name});
-            var statusDetailView  = new ParagraphView({model: paragraphStatusModel});
-            var formStatusView       = new FormItemView({model: new Backbone.Model({label: 'Status'}), detailView: statusDetailView});
-            this.getRegion('statusRegion').show(formStatusView);
+        this.renderUserModal();
+    },
+    renderRequestId: function() {
+        if(!this.model.isNew()) {
+            var requestIdView = new ParagraphView({ _className: 'form-control-static', _text: this.model.get('reqId') });
+            this.getRegion('requestIdRegion').show(requestIdView);
+        }
+    },
+    renderStatus: function() {
+        if(!this.model.isNew()) {
+            var statusView = new ParagraphView({ _className: 'form-control-static', _text: this.model.get('status').name });
+            this.getRegion('statusRegion').show(statusView);
         }
     },
     renderCategory: function() {
@@ -155,14 +165,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('contentRegion').show(contentView);
     },
     renderUserModal: function() {
-        var usersModalView = new UsersModalView({
-            collection: new Users(),
-            currentUser: this.currentUser,
-            teamList: this.teamList,
-            type: 'radio',
-            findOptions: { data: { jobLevel: { lte: 2 } } },
-        });
-        this.getRegion('authorizerModal').show(usersModalView);
+        if(this.canRequest()) {
+            var usersModalView = new UsersModalView({
+                collection: new Users(),
+                currentUser: this.currentUser,
+                teamList: this.teamList,
+                type: 'radio',
+                findOptions: { data: { jobLevel: { lte: 2 } } },
+            });
+            this.getRegion('authorizerModal').show(usersModalView);
+        }
     },
     renderFiles: function() {
         var downloadFilesView = new DownloadFilesView({ collection: this.documents, canRequest: this.canRequest() });
@@ -178,7 +190,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onSelectAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();
         this.$('input.authorizer').val(JSON.stringify(user));
-        this.ui.openAuthorizerBtn.before(this.staticItemNameHtml(user.get('name') + '(' + user.get('uid') + ')', 'authorizer-name'));
+        this.ui.openAuthorizerBtn.before('<p class="form-control-static authorizer-name">' + user.get('name') + '(' + user.get('uid') + ')' + '</p>');
     },
     onSelectFile: function(e) {
         var input = this.$(e.target);
@@ -317,15 +329,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canDestroy: function() {
         return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());
-    },
-    staticItemNameHtml: function(value) {
-        this.staticItemNameHtml(value, '', '');
-    },
-    staticItemNameHtml: function(value, className) {
-        this.staticItemNameHtml(value, className, '');
-    },
-    staticItemNameHtml: function(value, className, attr) {
-        return '<p class="form-control-static ' + className + '" ' + attr + '>' + value + '</p>';
     },
     replaceLine: function(text) {
         return text.replace(/\r\n/g, '<br />').replace(/(\n|\r)/g, '<br />');

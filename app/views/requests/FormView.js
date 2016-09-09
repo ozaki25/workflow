@@ -4,21 +4,16 @@ Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
-var Document = require('../../models/Document');
-var Category = require('../../models/category');
-var Division = require('../../models/Division');
 var Documents = require('../../collections/Documents');
 var Divisions = require('../../collections/Divisions');
 var Users = require('../../collections/Users');
 var DownloadFilesView = require('./DownloadFilesView');
-var SelectCategoryView = require('./SelectCategoryView');
 var UsersModalView = require('../UsersModalView');
 var FormItemView = require('../components/FormHorizontalItemView');
-var InputView = require('../components/InputView');
-var TextareaView = require('../components/TextareaView');
-var ParagraphView = require('../components/ParagraphView');
+var ParagraphView = require('../ParagraphView');
 var SelectboxView = require('../../lib/SelectboxView');
 var InputView = require('../../lib/InputView');
+var TextareaView = require('../../lib/TextareaView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -45,15 +40,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     childEvents: {
         'select:user': 'onSlectAuthorizer',
         'change:category': 'onChangeCategorySelectbox',
-        'change:division': 'onChangeDivisionSelectbox',
     },
     regions: {
-        downloadFiles: '#download_file_list',
-        authorizerModal: '#select_authorizer_modal',
         requestIdRegion: '#request_id_region',
         statusRegion: '#status_region',
+        categoryRegion: '#category_region',
+        divisionRegion: '#division_region',
+        titleRegion: '#title_region',
         contentRegion: '#content_region',
-
+        downloadFilesRegion: '#download_files_region',
+        authorizerModal: '#select_authorizer_modal',
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
@@ -66,8 +62,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     templateHelpers: function() {
         return {
-            category: this.canRequest() ? '' : '<p class="form-control-static">' + this.model.get('division').category.name + '</p>',
-            division: this.canRequest() ? '' : '<p class="form-control-static">' + this.model.get('division').name + '</p>',
             inputFile: this.canRequest() ? '<input type="file" class="form-control file" />' : '',
             authorizer: function() {
                 var html = '';
@@ -95,39 +89,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         }
     },
     onRender: function() {
-        var downloadFilesView = new DownloadFilesView({collection: this.documents, canRequest: this.canRequest()});
-        this.getRegion('downloadFiles').show(downloadFilesView);
-        if(this.canRequest()) {
-            var categorySelectboxView = new SelectboxView({
-                collection: this.categoryList,
-                label: 'name',
-                value: 'id',
-                changeEventName: 'change:category',
-                selected: this.model.isNew() ? '' : this.model.get('division').category.id,
-            });
-            var divisionSelectboxView = new SelectboxView({
-                collection: this.divisionList,
-                label: 'name',
-                value: 'id',
-                _className: 'form-control division',
-                selected: this.model.isNew() ? '' : this.model.get('division').id,
-            });
-            this.renderView('#select_category_field', categorySelectboxView);
-            this.renderView('#select_division_field', divisionSelectboxView);
-
-            var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'radio', findOptions: {data: {jobLevel: {lte: 2}}}});
-            this.getRegion('authorizerModal').show(usersModalView);
-
-            var inputTitleView = new InputView({
-                _className: 'form-control title',
-                value: this.model.get('title'),
-                attrs: { name: 'title' },
-            })
-            this.renderView('#title_region', inputTitleView);
-
-            var inputContentModel = new Backbone.Model({className: 'content form-control', name: 'content', value: this.replaceLine(this.model.get('content'))})
-            var contentDetailView  = new TextareaView({model: inputContentModel});
-        } else {
+        this.renderFiles()
+        this.renderCategory();
+        this.renderDivision();
+        this.renderTitle();
+        this.renderContent();
+        if(this.canRequest()) this.renderUserModal();
+        else {
             var paragraphRequestIdModel = new Backbone.Model({className: 'form-control-static', value: this.model.id});
             var requestIdDetailView  = new ParagraphView({model: paragraphRequestIdModel});
             var formRequestIdView       = new FormItemView({model: new Backbone.Model({label: 'ID'}), detailView: requestIdDetailView});
@@ -137,17 +105,69 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var statusDetailView  = new ParagraphView({model: paragraphStatusModel});
             var formStatusView       = new FormItemView({model: new Backbone.Model({label: 'Status'}), detailView: statusDetailView});
             this.getRegion('statusRegion').show(formStatusView);
-
-            //var paragraphTitleModel = new Backbone.Model({className: 'form-control-static', value: this.model.get('title')});
-            //var titleDetailView  = new ParagraphView({model: paragraphTitleModel});
-
-            var paragraphContentModel = new Backbone.Model({className: 'form-control-static', value: this.replaceLine(this.model.get('content'))})
-            var contentDetailView  = new ParagraphView({model: paragraphContentModel});
         }
-        //var formTitleView = new FormItemView({model: new Backbone.Model({label: 'Title'}), detailView: titleDetailView});
-        //this.getRegion('titleRegion').show(formTitleView);
-        var formContentView = new FormItemView({model: new Backbone.Model({label: 'Content'}), detailView: contentDetailView});
-        this.getRegion('contentRegion').show(formContentView);
+    },
+    renderCategory: function() {
+        var categoryView =
+            this.canRequest() ?
+            new SelectboxView({
+                collection: this.categoryList,
+                label: 'name',
+                value: 'id',
+                changeEventName: 'change:category',
+                selected: this.model.isNew() ? '' : this.model.get('division').category.id,
+            }) :
+            new ParagraphView({ _className: 'form-control-static', _text: this.model.get('division').category.name });
+        this.getRegion('categoryRegion').show(categoryView);
+    },
+    renderDivision: function() {
+        var divisionView =
+            this.canRequest() ?
+            new SelectboxView({
+                collection: this.divisionList,
+                label: 'name',
+                value: 'id',
+                _className: 'form-control division',
+                selected: this.model.isNew() ? '' : this.model.get('division').id,
+            }) :
+            new ParagraphView({ _className: 'form-control-static', _text: this.model.get('division').name });
+        this.getRegion('divisionRegion').show(divisionView);
+    },
+    renderTitle: function() {
+        var titleView =
+            this.canRequest() ?
+            new InputView({
+                _className: 'form-control title',
+                _value: this.model.get('title'),
+                attrs: { name: 'title' },
+            }) :
+            new ParagraphView({ _className: 'form-control-static', _text: this.model.get('title') });
+        this.getRegion('titleRegion').show(titleView);
+    },
+    renderContent: function() {
+        var contentView =
+            this.canRequest() ?
+            new TextareaView({
+                _className: 'form-control content',
+                _value: this.model.get('content'),
+                attrs: { name: 'content' }
+            }) :
+            new ParagraphView({ _className: 'form-control-static', _text: this.replaceLine(this.model.get('content')) });
+        this.getRegion('contentRegion').show(contentView);
+    },
+    renderUserModal: function() {
+        var usersModalView = new UsersModalView({
+            collection: new Users(),
+            currentUser: this.currentUser,
+            teamList: this.teamList,
+            type: 'radio',
+            findOptions: { data: { jobLevel: { lte: 2 } } },
+        });
+        this.getRegion('authorizerModal').show(usersModalView);
+    },
+    renderFiles: function() {
+        var downloadFilesView = new DownloadFilesView({ collection: this.documents, canRequest: this.canRequest() });
+        this.getRegion('downloadFilesRegion').show(downloadFilesView);
     },
     onChangeCategorySelectbox: function(view, id, model) {
         this.getDivision(id);
@@ -311,8 +331,4 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     replaceLine: function(text) {
         return text.replace(/\r\n/g, '<br />').replace(/(\n|\r)/g, '<br />');
     },
-    renderView: function(region, view) {
-        this.addRegion(region, region);
-        this.getRegion(region).show(view);
-    }
 });

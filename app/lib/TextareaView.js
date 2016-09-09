@@ -2,20 +2,24 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var InputView = Backbone.Marionette.ItemView.extend({
-    tagName: 'input',
+var TextareaView = Backbone.Marionette.ItemView.extend({
+    tagName: 'textarea',
     attributes: function() {
         return Backbone.$.extend(this.options.attrs, {
             id: this.options._id,
             class: this.options._className || 'form-control',
-            value: this.options._value,
-            type: this.options._type || 'text',
         });
     },
-    template: _.template(''),
+    template: _.template('<%= value %>'),
+    templateHelpers: function() {
+        return {
+            value: this.value,
+        }
+    },
     initialize: function(options) {
-        this.changeEventName = options.changeEventName || 'change:input';
-        this.keypressEventName = options.keypressEventName || 'keypress:input';
+        this.value = this.options._value;
+        this.changeEventName = options.changeEventName || 'change:textarea';
+        this.keypressEventName = options.keypressEventName || 'keypress:textarea';
     },
     events: {
         'change': 'onChange',
@@ -29,4 +33,4 @@ var InputView = Backbone.Marionette.ItemView.extend({
     },
 });
 
-module.exports = InputView;
+module.exports = TextareaView;

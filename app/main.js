@@ -8,7 +8,6 @@ var Bootstrap = require('./assets/js/bootstrap');
 var Request = require('./models/Request');
 var User = require('./models/User');
 var Category = require('./models/Category');
-var Page = require('./models/Page');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var StatusList = require('./collections/StatusList');
@@ -17,7 +16,7 @@ var Divisions = require('./collections/Divisions');
 var Receptnists = require('./collections/Receptnists');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
-var RequestsView = require('./views/requests/RequestsView');
+var RequestIndexView = require('./views/requests/IndexView');
 var RequestFormView = require('./views/requests/FormView');
 var UsersMainView = require('./views/users/MainView');
 var StatusListView = require('./views/statusList/StatusListView');
@@ -62,13 +61,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         requests: function() {
-            var requestsView = new RequestsView({
-                collection: requests,
-                model: new Page(),
-                currentUser: currentUser,
-                statusList: statusList
-            });
-            app.getRegion('main').show(requestsView);
+            var requestIndexView = new RequestIndexView({ collection: requests });
+            app.getRegion('main').show(requestIndexView);
         },
         newRequest: function() {
             var categoryFetchOptions = {

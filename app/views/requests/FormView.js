@@ -62,7 +62,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     templateHelpers: function() {
         return {
-            inputFile: this.canRequest() ? '<input type="file" class="form-control file" />' : '',
             authorizer: function() {
                 var html = '';
                 if(this.model.has('authorizer')) {

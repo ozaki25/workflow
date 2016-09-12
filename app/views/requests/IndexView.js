@@ -1,13 +1,13 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-var Page = require('../../models/Page');
 var RequestsView = require('./RequestsView');
-var PagingView = require('./PagingView');
+var PagingView = require('../../lib/PagingView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_index_view',
     childEvents: {
+        'click:changePage': 'onClickChangePageBtn',
     },
     regions: {
         requestsRegion: '#requests_region',
@@ -22,7 +22,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('requestsRegion').show(requestsView);
     },
     renderPaging: function() {
-        var pagingView = new PagingView({collection: this.collection,  model: new Page() });
+        var pagingView = new PagingView({collection: this.collection });
         this.getRegion('pagingRegion').show(pagingView);
+        this.onClickChangePageBtn(this.getRegion('pagingRegion').currentView);
+    },
+    onClickChangePageBtn: function(view) {
+        this.collection.fetch({ data: { page: view.model.get('pageNumber') - 1 } });
+        Backbone.$.get('/requests/total-page', function(totalPage) {
+            view.model.set({ totalPage: totalPage });
+        });
     },
 });

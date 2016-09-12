@@ -4,7 +4,7 @@ Backbone.Marionette = require('backbone.marionette');
 
 var Page = Backbone.Model.extend({
     defaults: {
-        pageNumber: 1,
+        pageNumber: 0,
         totalPage: 0,
     },
     isFirst: function() {
@@ -55,6 +55,7 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
     },
     initialize: function(options) {
         this.model = new Page();
+        this.model.set('pageNumber', options.page || 1);
         this.delegateEvents();
         this.prevLabel = this.options.prevLabel || '&larr; 前のページ';
         this.nextLabel = this.options.nextLabel || '次のページ &rarr;';

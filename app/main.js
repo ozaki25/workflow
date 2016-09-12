@@ -59,9 +59,23 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             });
         }
     },
+    execute: function(callback, args, name) {
+        if(args[0]) {
+            args.push(this._parseQuery(args.pop()));
+        }
+        if(callback) callback.apply(this, args);
+    },
+    _parseQuery: function(arg) {
+        var splitAmp = arg.split('&');
+        var splitEq = _(splitAmp).map(function(query) {
+            return query.split('=');
+        });
+        return _.object(splitEq);
+    },
     controller: {
-        requests: function() {
-            var requestIndexView = new RequestIndexView({ collection: requests });
+        requests: function(query) {
+            var page = parseInt(query.page) || 1;
+            var requestIndexView = new RequestIndexView({ collection: requests, page: page });
             app.getRegion('main').show(requestIndexView);
         },
         newRequest: function() {

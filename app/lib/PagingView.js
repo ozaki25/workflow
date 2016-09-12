@@ -38,7 +38,7 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
         'click @ui.nextBtn': 'onClickNextBtn',
     },
     modelEvents: {
-        'change': 'render',
+        'sync': 'render',
     },
     onRender: function() {
         this.getRegion('pageNumberRegion').show(new PageNumberView({ model: this.model }));
@@ -48,21 +48,22 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
     },
     onClickPrevBtn: function(e) {
         e.preventDefault();
-        if(!this.model.isFirst()) {
+        if(this.model.get('hasPrev')) {
             this.model.set({ pageNumber: this.model.get('pageNumber') - 1 });
             this.triggerMethod('click:changePage');
         }
     },
     onClickNextBtn: function(e) {
         e.preventDefault();
-        if(!this.model.isLast()) {
+        if(this.model.get('hasNext')) {
             this.model.set({ pageNumber: this.model.get('pageNumber') + 1 });
             this.triggerMethod('click:changePage');
         }
     },
     bothEndsCheck: function() {
-        if(this.model.isFirst()) this.ui.prevBtn.parent('li').addClass('disabled');
-        if(this.model.isLast()) this.ui.nextBtn.parent('li').addClass('disabled');
+        console.log(this.model);
+        if(!this.model.get('hasPrev')) this.ui.prevBtn.parent('li').addClass('disabled');
+        if(!this.model.get('hasNext')) this.ui.nextBtn.parent('li').addClass('disabled');
     },
 });
 

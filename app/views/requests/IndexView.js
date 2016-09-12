@@ -31,9 +31,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRequestsPage(this.getRegion('pagingRegion').currentView);
     },
     getRequestsPage: function(view) {
-        this.collection.fetch({ data: { page: view.model.get('pageNumber') - 1 } });
-        Backbone.$.get('/requests/total-page', function(totalPage) {
-            view.model.set({ totalPage: totalPage });
-        });
+        this.collection.fetch({ data: { page: this.model.get('pageNumber') } });
+        this.model.fetch({ data: { page: this.model.get('pageNumber') } });
     },
 });

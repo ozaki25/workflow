@@ -82,12 +82,8 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
         }
     },
     bothEndsCheck: function() {
-        this.model.isFirst() ?
-            this.ui.prevBtn.parent('li').addClass('disabled') :
-            this.ui.prevBtn.parent('li').removeClass('disabled');
-        this.model.isLast() ?
-            this.ui.nextBtn.parent('li').addClass('disabled') :
-            this.ui.nextBtn.parent('li').removeClass('disabled');
+        if(this.model.isFirst()) this.ui.prevBtn.parent('li').addClass('disabled');
+        if(this.model.isLast()) this.ui.nextBtn.parent('li').addClass('disabled');
     },
 });
 

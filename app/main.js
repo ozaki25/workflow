@@ -74,7 +74,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         requests: function(query) {
-            var page = parseInt(query.page) || 1;
+            var page = query ? parseInt(query.page) || 1 : 1;
             var requestIndexView = new RequestIndexView({ collection: requests, page: page });
             app.getRegion('main').show(requestIndexView);
         },

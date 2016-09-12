@@ -60,9 +60,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         }
     },
     execute: function(callback, args, name) {
-        if(args[0]) {
-            args.push(this._parseQuery(args.pop()));
-        }
+        if(_(args).last() && _(args).last().includes('=')) args.push(this._parseQuery(args.pop()));
         if(callback) callback.apply(this, args);
     },
     _parseQuery: function(arg) {

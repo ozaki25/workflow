@@ -52,6 +52,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
+        this.backUrlQuery = options.backUrlQuery || '';
         this.statusList = options.statusList;
         this.teamList = options.teamList;
         this.documents = new Documents(this.model.get('documents'));
@@ -228,8 +229,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var options = {
             wait: true,
             success: function() {
-                Backbone.history.navigate('/requests', {trigger: true});
-            }
+                Backbone.history.navigate('/requests' + this.backUrlQuery, { trigger: true });
+            }.bind(this)
         };
         this.model.destroy(options);
     },
@@ -265,7 +266,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var options = {
             wait: true,
             success: function(request) {
-                Backbone.history.navigate('/requests', {trigger: true});
+                Backbone.history.navigate('/requests' + this.backUrlQuery, {trigger: true});
             }.bind(this)
         };
         this.model.save({status: {id: statusId}}, options);

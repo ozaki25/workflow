@@ -7,8 +7,11 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click .open-request': 'onClickOpen'
     },
+    initialize: function(options) {
+        this.backUrlQuery = options.backUrlQuery || '';
+    },
     onClickOpen: function(e) {
         e.preventDefault();
-        Backbone.history.navigate('/requests/' + this.model.id, {trigger: true});
+        Backbone.history.navigate('/requests/' + this.model.id + this.backUrlQuery, { trigger: true });
     }
 });

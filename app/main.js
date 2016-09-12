@@ -8,6 +8,7 @@ var Bootstrap = require('./assets/js/bootstrap');
 var Request = require('./models/Request');
 var User = require('./models/User');
 var Category = require('./models/Category');
+var Page = require('./models/Page');
 var Requests = require('./collections/Requests');
 var Users = require('./collections/Users');
 var StatusList = require('./collections/StatusList');
@@ -72,8 +73,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         requests: function(query) {
-            var page = query ? parseInt(query.page) || 1 : 1;
-            var requestIndexView = new RequestIndexView({ collection: requests, page: page });
+            var pageNumber = query ? parseInt(query.page) || 1 : 1;
+            var requestIndexView = new RequestIndexView({ collection: requests, model: new Page({ pageNumber: pageNumber }) });
             app.getRegion('main').show(requestIndexView);
         },
         newRequest: function() {
@@ -91,7 +92,10 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             }
             categories.fetch(categoryFetchOptions);
         },
-        request: function(id) {
+        request: function(id, query) {
+            var backUrlQuery = '?' + _(query).map(function(value, key) {
+                return key + '=' + value;
+            }).join('&');
             var request = new Request({ id: id }, { collection: requests });
             var requestFetchOption = {
                 success: function() {
@@ -102,7 +106,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                                 currentUser: currentUser,
                                 statusList: statusList,
                                 teamList: teamList,
-                                categoryList: categories
+                                categoryList: categories,
+                                backUrlQuery: backUrlQuery,
                             });
                             app.getRegion('main').show(formView);
                         }

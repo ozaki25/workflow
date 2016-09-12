@@ -2,19 +2,6 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var Page = Backbone.Model.extend({
-    defaults: {
-        pageNumber: 0,
-        totalPage: 0,
-    },
-    isFirst: function() {
-        return this.get('pageNumber') <= 1;
-    },
-    isLast: function() {
-        return this.get('pageNumber') >= this.get('totalPage');
-    },
-});
-
 var PageNumberView = Backbone.Marionette.ItemView.extend({
     tagName: 'span',
     template: _.template('&nbsp;<%- pageNumber %>&nbsp;/&nbsp;<%- totalPage %>&nbsp;'),
@@ -25,11 +12,11 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
     template: _.template(
         '<ul class="pager">' +
           '<li>' +
-            '<a class="prev-btn" href="#"><%= prevLabel %></a>' +
+            '<a class="prev-btn" href="#">&larr; 前のページ</a>' +
           '</li>' +
           '<span id="page_number_region"></span>' +
           '<li>' +
-            '<a class="next-btn" href="#"><%= nextLabel %></a>' +
+            '<a class="next-btn" href="#">次のページ &rarr;</a>' +
           '</li>' +
         '</ul>'
     ),
@@ -53,16 +40,8 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
     modelEvents: {
         'change': 'render',
     },
-    initialize: function(options) {
-        this.model = new Page();
-        this.model.set('pageNumber', options.page || 1);
-        this.delegateEvents();
-        this.prevLabel = this.options.prevLabel || '&larr; 前のページ';
-        this.nextLabel = this.options.nextLabel || '次のページ &rarr;';
-        this.showPageNumber = options.showPageNumber || true;
-    },
     onRender: function() {
-        if(this.showPageNumber) this.getRegion('pageNumberRegion').show(new PageNumberView({ model: this.model }));
+        this.getRegion('pageNumberRegion').show(new PageNumberView({ model: this.model }));
     },
     onDomRefresh: function() {
         this.bothEndsCheck();

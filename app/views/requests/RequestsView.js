@@ -7,5 +7,13 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'table',
     childView: RequestView,
     childViewContainer: '#request_list',
+    childViewOptions: function() {
+        return {
+            backUrlQuery: this.backUrlQuery,
+        }
+    },
     template: '#requests_view',
+    initialize: function(options) {
+        this.backUrlQuery = options.backUrlQuery;
+    },
 });

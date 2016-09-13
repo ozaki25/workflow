@@ -66,9 +66,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     _parseQuery: function(arg) {
         var splitAmp = arg.split('&');
-        var splitEq = _(splitAmp).map(function(query) {
-            return query.split('=');
-        });
+        var splitEq = _(splitAmp).map(function(query) { return query.split('='); });
         return _.object(splitEq);
     },
     controller: {
@@ -87,7 +85,10 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             }
             categories.fetch(categoryFetchOptions);
         },
-        newRequest: function() {
+        newRequest: function(query) {
+            var backUrlQuery = '?' + _(query).map(function(value, key) {
+                return key + '=' + value;
+            }).join('&');
             var categoryFetchOptions = {
                 success: function() {
                     var formView = new RequestFormView({
@@ -95,7 +96,8 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                         currentUser: currentUser,
                         statusList: statusList,
                         categoryList: categories,
-                        teamList: teamList
+                        teamList: teamList,
+                        backUrlQuery: backUrlQuery,
                     });
                     app.getRegion('main').show(formView);
                 }

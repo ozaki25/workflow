@@ -5,9 +5,15 @@ var SelectboxView = require('../../lib/SelectboxView')
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel-body',
     template: '#request_search_view',
+    ui: {
+        submitBtn: '.search-submit-btn',
+    },
     regions: {
         statusRegion: '#search_status_region',
         categoryRegion: '#search_category_region',
+    },
+    events: {
+        'click @ui.submitBtn': 'onClickSubmitBtn',
     },
     initialize: function(options) {
         this.statusList = options.statusList;
@@ -34,6 +40,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             _className: 'form-control search-category',
         })
         this.getRegion('categoryRegion').show(selectboxView);
+    },
+    onClickSubmitBtn: function(e) {
+        e.preventDefault();
+        var statusId = this.$('.search-status').val();
+        var categoryId = this.$('.search-category').val();
+        var query = { statusId: statusId, categoryId: categoryId };
+        this.triggerMethod('submit:search', query);
     }
 });
 

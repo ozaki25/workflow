@@ -7,20 +7,23 @@ var PagingView = require('./PagingView');
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_index_view',
-    childEvents: {
-        'click:changePage': 'getRequestsPage',
-    },
     regions: {
         searchRegion: '#search_region',
         requestsRegion: '#requests_region',
         pagingRegion: '#paging_region',
     },
     modelEvents: {
-        'change': 'renderRequests'
+        'sync': 'renderRequests',
+    },
+    childEvents: {
+        'click:changePage': 'onClickChangePage',
+        'submit:search': 'onSubmitSearch',
     },
     initialize: function(options) {
         this.statusList = options.statusList;
         this.categoryList = options.categoryList;
+        this.query = {};
+        this.getRequestsPage();
     },
     onBeforeShow: function() {
         this.renderSearch();
@@ -37,12 +40,20 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('requestsRegion').show(requestsView);
     },
     renderPaging: function() {
-        var pagingView = new PagingView({collection: this.collection, model: this.model });
+        var pagingView = new PagingView({ collection: this.collection, model: this.model });
         this.getRegion('pagingRegion').show(pagingView);
-        this.getRequestsPage(this.getRegion('pagingRegion').currentView);
     },
-    getRequestsPage: function(view) {
-        this.collection.fetch({ data: { page: this.model.get('pageNumber') } });
-        this.model.fetch({ data: { page: this.model.get('pageNumber') } });
+    onClickChangePage: function(view) {
+        this.getRequestsPage();
+    },
+    onSubmitSearch: function(view, query) {
+        this.query = query;
+        this.model.set({ pageNumber: 1 });
+        this.getRequestsPage();
+    },
+    getRequestsPage: function() {
+        var options = Backbone.$.extend({}, this.query, { page: this.model.get('pageNumber') })
+        this.collection.fetch({ data: options });
+        this.model.fetch({ data: options });
     },
 });

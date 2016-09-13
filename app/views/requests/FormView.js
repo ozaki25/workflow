@@ -58,7 +58,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.documents = new Documents(this.model.get('documents'));
         this.categoryList = options.categoryList;
         this.divisionList = new Divisions();
-        this.getDivision(this.model.isNew() ? this.categoryList.first().id : this.model.get('division').category.id);
+        this.getDivision(this.model.isNew() ? this.categoryList.first().id : this.model.get('category').id);
     },
     templateHelpers: function() {
         return {
@@ -125,9 +125,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 label: 'name',
                 value: 'id',
                 changeEventName: 'change:category',
-                selected: this.model.isNew() ? '' : this.model.get('division').category.id,
+                selected: this.model.isNew() ? '' : this.model.get('category').id,
             }) :
-            new ParagraphView({ _className: 'form-control-static', _text: this.model.get('division').category.name });
+            new ParagraphView({ _className: 'form-control-static', _text: this.model.get('category').name });
         this.getRegion('categoryRegion').show(categoryView);
     },
     renderDivision: function() {

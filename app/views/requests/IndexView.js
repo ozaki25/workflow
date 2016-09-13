@@ -22,7 +22,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.statusList = options.statusList;
         this.categoryList = options.categoryList;
-        this.query = {};
+        this.query = options.searchQuery;
         this.getRequestsPage();
     },
     onBeforeShow: function() {
@@ -35,8 +35,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('searchRegion').show(searchView);
     },
     renderRequests: function() {
-        var backUrlQuery = this.model.has('pageNumber') ? '?page=' + this.model.get('pageNumber') : '';
-        var requestsView = new RequestsView({ collection: this.collection, backUrlQuery: backUrlQuery });
+        var requestsView = new RequestsView({ collection: this.collection, backUrlQuery: this.getBackUrlQuery() });
         this.getRegion('requestsRegion').show(requestsView);
     },
     renderPaging: function() {
@@ -55,5 +54,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var options = Backbone.$.extend({}, this.query, { page: this.model.get('pageNumber') })
         this.collection.fetch({ data: options });
         this.model.fetch({ data: options });
+    },
+    getBackUrlQuery: function() {
+        var queryObject = Backbone.$.extend({}, this.query, { page: this.model.get('pageNumber') })
+        return '?' + Backbone.$.param(queryObject);
     },
 });

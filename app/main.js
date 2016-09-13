@@ -31,17 +31,18 @@ var users = new Users();
 var statusList = new StatusList();
 var categories = new Categories();
 var teamList;
+var searchItems = ['statusId', 'categoryId'];
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
-        ""                         : "requests",
-        "requests"                 : "requests",
-        "requests/new"             : "newRequest",
-        "requests/:id"             : "request",
-        "users"                    : "users",
-        "status_list"              : "statusList",
-        "categories"               : "categories",
-        "categories/:id/divisions" : "divisions",
+        ""                          : "requests",
+        "requests"                  : "requests",
+        "requests/new"              : "newRequest",
+        "requests/:id"              : "request",
+        "users"                     : "users",
+        "status_list"               : "statusList",
+        "categories"                : "categories",
+        "categories/:id/divisions"  : "divisions",
         "categories/:id/receptnists": "receptnists"
     },
     initialize: function() {
@@ -61,27 +62,29 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         }
     },
     execute: function(callback, args, name) {
-        if(_(args).last() && _(args).last().includes('=')) args.push(this._parseQuery(args.pop()));
+        if(_(args).last() && _(args).last().includes('=')) args.push(this.parseQuery(args.pop()));
         if(callback) callback.apply(this, args);
     },
-    _parseQuery: function(arg) {
+    parseQuery: function(arg) {
         var splitAmp = arg.split('&');
         var splitEq = _(splitAmp).map(function(query) { return query.split('='); });
         return _.object(splitEq);
     },
     controller: {
         requests: function(query) {
+            var pageNumber = query ? parseInt(query.page) || 1 : 1;
+            var searchQuery = query ? _(query).pick(searchItems) : {};
             var categoryFetchOptions = {
                 success: function() {
-                    var pageNumber = query ? parseInt(query.page) || 1 : 1;
                     var requestIndexView = new RequestIndexView({
                         collection: requests,
                         model: new Page({ pageNumber: pageNumber }),
                         statusList: statusList,
                         categoryList: categories,
+                        searchQuery: searchQuery,
                     });
                     app.getRegion('main').show(requestIndexView);
-                }
+                }.bind(this)
             }
             categories.fetch(categoryFetchOptions);
         },

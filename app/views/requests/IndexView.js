@@ -1,7 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var RequestsView = require('./RequestsView');
-var PagingView = require('../../lib/PagingView');
+var PagingView = require('./PagingView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',

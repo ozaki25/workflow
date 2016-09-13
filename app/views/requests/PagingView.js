@@ -1,31 +1,10 @@
-var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var PageNumberView = require('./PageNumberView');
 
-var PageNumberView = Backbone.Marionette.ItemView.extend({
-    tagName: 'span',
-    template: _.template('&nbsp;<%- pageNumber %>&nbsp;/&nbsp;<%- totalPage %>&nbsp;'),
-});
-
-var pagingView = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.LayoutView.extend({
     tagName: 'nav',
-    template: _.template(
-        '<ul class="pager">' +
-          '<li>' +
-            '<a class="prev-btn" href="#">&larr; 前のページ</a>' +
-          '</li>' +
-          '<span id="page_number_region"></span>' +
-          '<li>' +
-            '<a class="next-btn" href="#">次のページ &rarr;</a>' +
-          '</li>' +
-        '</ul>'
-    ),
-    templateHelpers: function() {
-        return {
-            prevLabel: this.prevLabel,
-            nextLabel: this.nextLabel,
-        }
-    },
+    template: '#request_paging_view',
     regions: {
         pageNumberRegion: '#page_number_region',
     },
@@ -61,10 +40,8 @@ var pagingView = Backbone.Marionette.LayoutView.extend({
         }
     },
     bothEndsCheck: function() {
-        console.log(this.model);
         if(!this.model.get('hasPrev')) this.ui.prevBtn.parent('li').addClass('disabled');
         if(!this.model.get('hasNext')) this.ui.nextBtn.parent('li').addClass('disabled');
     },
 });
 
-module.exports = pagingView;

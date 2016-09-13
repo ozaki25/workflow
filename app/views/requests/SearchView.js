@@ -29,6 +29,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             label: 'name',
             value: 'id',
             _className: 'form-control search-status',
+            blank: true,
+            blankMessage: '指定なし',
         })
         this.getRegion('statusRegion').show(selectboxView);
     },
@@ -38,6 +40,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             label: 'name',
             value: 'id',
             _className: 'form-control search-category',
+            blank: true,
+            blankMessage: '指定なし',
         })
         this.getRegion('categoryRegion').show(selectboxView);
     },

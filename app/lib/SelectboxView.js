@@ -10,6 +10,9 @@ var selectboxView = new SelectboxView({
     attrs: { name: 'selectUser' },                // selectタグの属性
     optionAttrs: { class: 'select-option' },      // optionタグの属性
     selected: this.model.id,                      // デフォルトで選択済みにする項目のid
+    blank: true,                                  // 先頭に空のoptionを入れるかどうか
+    blankMessage: '未選択',                       // 空のoptionのラベル
+    blankValue: 'blank',                          // 空のoptionのvalue
 })
 this.getRegions('selectboxRegion').show(selectboxView);
 */
@@ -60,7 +63,11 @@ var SelectboxView = Backbone.Marionette.CollectionView.extend({
         this.value = options.value;
         this.optionAttrs = options.optionAttrs;
         this.selected = options.selected;
+        this.blank = options.blank;
+        this.blankMessage = options.blankMessage || '';
+        this.blankValue = options.blankValue || '';
         this.changeEventName = options.changeEventName || 'change:selectbox';
+        if(this.blank) this.appendBlankOption();
     },
     events: {
         'change': 'onChange'
@@ -70,7 +77,13 @@ var SelectboxView = Backbone.Marionette.CollectionView.extend({
         var value = this.$el.val();
         var model = this.collection.findWhere({ id: id }) || this.collection.findWhere({ id: parseInt(id) });
         this.triggerMethod(this.changeEventName, value, model);
-    }
+    },
+    appendBlankOption: function() {
+        var blankOption = Backbone.$('<option>');
+        blankOption.text(this.blankMessage);
+        blankOption.val(this.blankValue);
+        this.$el.append(blankOption);
+    },
 });
 
 module.exports = SelectboxView;

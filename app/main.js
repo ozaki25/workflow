@@ -73,9 +73,19 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         requests: function(query) {
-            var pageNumber = query ? parseInt(query.page) || 1 : 1;
-            var requestIndexView = new RequestIndexView({ collection: requests, model: new Page({ pageNumber: pageNumber }) });
-            app.getRegion('main').show(requestIndexView);
+            var categoryFetchOptions = {
+                success: function() {
+                    var pageNumber = query ? parseInt(query.page) || 1 : 1;
+                    var requestIndexView = new RequestIndexView({
+                        collection: requests,
+                        model: new Page({ pageNumber: pageNumber }),
+                        statusList: statusList,
+                        categoryList: categories,
+                    });
+                    app.getRegion('main').show(requestIndexView);
+                }
+            }
+            categories.fetch(categoryFetchOptions);
         },
         newRequest: function() {
             var categoryFetchOptions = {

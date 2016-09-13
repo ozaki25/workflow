@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var SearchView = require('./SearchView');
 var RequestsView = require('./RequestsView');
 var PagingView = require('./PagingView');
 
@@ -10,15 +11,25 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click:changePage': 'getRequestsPage',
     },
     regions: {
+        searchRegion: '#search_region',
         requestsRegion: '#requests_region',
         pagingRegion: '#paging_region',
     },
     modelEvents: {
         'change': 'renderRequests'
     },
+    initialize: function(options) {
+        this.statusList = options.statusList;
+        this.categoryList = options.categoryList;
+    },
     onBeforeShow: function() {
+        this.renderSearch();
         this.renderRequests();
         this.renderPaging()
+    },
+    renderSearch: function() {
+        var searchView = new SearchView({ statusList: this.statusList, categoryList: this.categoryList });
+        this.getRegion('searchRegion').show(searchView);
     },
     renderRequests: function() {
         var backUrlQuery = this.model.has('pageNumber') ? '?page=' + this.model.get('pageNumber') : '';

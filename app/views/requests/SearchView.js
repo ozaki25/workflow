@@ -1,6 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var SelectboxView = require('../../lib/SelectboxView')
+var InputView = require('../../lib/InputView')
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel-body',
@@ -11,6 +12,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     regions: {
         statusRegion: '#search_status_region',
         categoryRegion: '#search_category_region',
+        titleRegion: '#search_title_region',
     },
     events: {
         'click @ui.submitBtn': 'onClickSubmitBtn',
@@ -22,6 +24,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onRender: function() {
         this.renderStatus();
         this.renderCategory();
+        this.renderTitle();
     },
     renderStatus: function() {
         var selectboxView = new SelectboxView({
@@ -45,11 +48,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         })
         this.getRegion('categoryRegion').show(selectboxView);
     },
+    renderTitle: function() {
+        var inputView = new InputView({ _className: 'form-control input-title' })
+        this.getRegion('titleRegion').show(inputView);
+    },
     onClickSubmitBtn: function(e) {
         e.preventDefault();
         var statusId = this.$('.search-status').val();
         var categoryId = this.$('.search-category').val();
-        var query = { statusId: statusId, categoryId: categoryId };
+        var title = this.$('.input-title').val();
+        var query = { statusId: statusId, categoryId: categoryId, title: title };
         this.triggerMethod('submit:search', query);
     }
 });

@@ -1,8 +1,9 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var SearchView = require('./SearchView');
-var RequestsView = require('./RequestsView');
 var PagingView = require('./PagingView');
+var GridView = require('../../lib/GridView');
+var ButtonView = require('../../lib/ButtonView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -16,8 +17,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'sync': 'renderRequests',
     },
     childEvents: {
-        'click:changePage': 'onClickChangePage',
         'submit:search': 'onSubmitSearch',
+        'click:open': 'onClickOpen',
+        'click:changePage': 'onClickChangePage',
     },
     initialize: function(options) {
         this.statusList = options.statusList;
@@ -35,19 +37,33 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('searchRegion').show(searchView);
     },
     renderRequests: function() {
-        var requestsView = new RequestsView({ collection: this.collection, backUrlQuery: this.getBackUrlQuery() });
-        this.getRegion('requestsRegion').show(requestsView);
+        var columns = [
+            { label: 'ID', name: 'reqId' },
+            { label: 'Status', name: 'status.name' },
+            { label: 'Title', name: 'title' },
+            { label: 'User', name: 'applicant.name' },
+            { label: '#', child: { view: ButtonView, options: { label: 'Open', _className: 'btn btn-xs btn-default', clickEventName: 'click:open' } } },
+        ];
+        var gridView = new GridView({
+            collection: this.collection,
+            columns: columns,
+            eventNames: ['click:open'],
+        });
+        this.getRegion('requestsRegion').show(gridView);
     },
     renderPaging: function() {
         var pagingView = new PagingView({ collection: this.collection, model: this.model });
         this.getRegion('pagingRegion').show(pagingView);
     },
-    onClickChangePage: function(view) {
-        this.getRequestsPage();
-    },
     onSubmitSearch: function(view, query) {
         this.query = query;
         this.model.set({ pageNumber: 1 });
+        this.getRequestsPage();
+    },
+    onClickOpen: function(view) {
+        Backbone.history.navigate('/requests/' + view.model.id + this.getBackUrlQuery(), { trigger: true });
+    },
+    onClickChangePage: function(view) {
         this.getRequestsPage();
     },
     getRequestsPage: function() {

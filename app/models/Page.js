@@ -5,5 +5,7 @@ module.exports = Backbone.Model.extend({
         pageNumber: 0,
         totalPage: 0,
     },
-    url: '/requests/page'
+    setUrl: function() {
+        this.url = '/requests/page/' + this.get('pageNumber');
+    },
 });

@@ -53,7 +53,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     getRequestsPage: function() {
         var options = Backbone.$.extend({}, this.query, { page: this.model.get('pageNumber') })
         this.collection.fetch({ data: options });
-        this.model.fetch({ data: options });
+        this.model.setUrl();
+        this.model.fetch({ data: this.query });
     },
     getBackUrlQuery: function() {
         var queryObject = Backbone.$.extend({}, this.query, { page: this.model.get('pageNumber') })

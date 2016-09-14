@@ -42,7 +42,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             { label: 'Status', name: 'status.name' },
             { label: 'Title', name: 'title' },
             { label: 'User', name: 'applicant.name' },
-            { label: '#', child: { view: ButtonView, options: { label: 'Open', _className: 'btn btn-xs btn-default', clickEventName: 'click:open' } } },
+            { child: { view: ButtonView, options: { label: 'Open', _className: 'btn btn-xs btn-default', clickEventName: 'click:open' } } },
         ];
         var gridView = new GridView({
             collection: this.collection,

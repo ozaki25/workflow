@@ -73,7 +73,7 @@ var GridView = Backbone.Marionette.CompositeView.extend({
     templateHelpers: function() {
         return {
             tableHeader: _(this.columns).map(function(col) {
-                return '<th class="table-header" name="' + col.name + '">' + (col.label || col.name) + '</th>'
+                return '<th class="table-header" name="' + col.name + '">' + (col.label || col.name || '') + '</th>'
             }).join('')
         }
     },

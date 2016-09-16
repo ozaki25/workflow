@@ -34,7 +34,7 @@ var statusList = new StatusList();
 var categories = new Categories();
 var applicants = new Applicants();
 var teamList;
-var searchItems = ['statusId', 'categoryId', 'title', 'team', 'applicantName'];
+var searchItems = ['statusId', 'categoryId', 'title', 'team', 'name'];
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {

@@ -24,6 +24,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.statusList = options.statusList;
         this.categoryList = options.categoryList;
+        this.teamList = options.teamList;
         this.query = options.searchQuery;
         this.getRequestsPage();
     },
@@ -33,7 +34,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.renderPaging()
     },
     renderSearch: function() {
-        var searchView = new SearchView({ statusList: this.statusList, categoryList: this.categoryList });
+        var searchView = new SearchView({
+            statusList: this.statusList,
+            categoryList: this.categoryList,
+            teamList: this.teamList,
+        });
         this.getRegion('searchRegion').show(searchView);
     },
     renderRequests: function() {

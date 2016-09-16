@@ -51,6 +51,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         authorizerModal: '#select_authorizer_modal',
     },
     initialize: function(options) {
+        if(!this.model.isNew()) this.model.trimProp();
         this.currentUser = options.currentUser;
         this.backUrlQuery = options.backUrlQuery || '';
         this.statusList = options.statusList;
@@ -302,7 +303,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canAccept: function() {
         return this.model.isWaitingAccept() &&
-            (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.model.get('category').receptnists) || this.currentUser.isAdmin());
     },
     canReport: function() {
         return this.model.isWaitingWorkComplete() &&
@@ -310,11 +311,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canFinish: function() {
         return this.model.isWaitingFinish() &&
-            (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.model.get('category').receptnists) || this.currentUser.isAdmin());
     },
     canRestore: function() {
         return this.model.isCompleted() &&
-            (this.currentUser.isReceptionist(this.model.get('division').category.receptnists) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.model.get('category').receptnists) || this.currentUser.isAdmin());
     },
     canRequest: function() {
         return this.model.isNew() || this.canEdit();

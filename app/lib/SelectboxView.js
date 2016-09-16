@@ -24,7 +24,7 @@ Backbone.Marionette = require('backbone.marionette');
 var SelectboxOptionView = Backbone.Marionette.ItemView.extend({
     tagName: 'option',
     attributes: function() {
-        var selected = this.options.selected == this.model.id ? { selected: 'selected' } : {};
+        var selected = !!this.model.id && this.options.selected == this.model.id ? { selected: 'selected' } : {};
         return Backbone.$.extend(this.options.attrs, selected, {
             value: this.model.get(this.options.value),
             'data-model-id': this.model.id,

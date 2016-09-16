@@ -13,6 +13,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         statusRegion: '#search_status_region',
         categoryRegion: '#search_category_region',
         titleRegion: '#search_title_region',
+        teamRegion: '#search_team_region',
     },
     events: {
         'click @ui.submitBtn': 'onClickSubmitBtn',
@@ -20,11 +21,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.statusList = options.statusList;
         this.categoryList = options.categoryList;
+        this.teamList = options.teamList;
     },
     onRender: function() {
         this.renderStatus();
         this.renderCategory();
         this.renderTitle();
+        this.renderTeam();
     },
     renderStatus: function() {
         var selectboxView = new SelectboxView({
@@ -52,12 +55,24 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var inputView = new InputView({ _className: 'form-control input-title' })
         this.getRegion('titleRegion').show(inputView);
     },
+    renderTeam: function() {
+        var selectboxView = new SelectboxView({
+            collection: this.teamList,
+            label: 'name',
+            value: 'name',
+            _className: 'form-control search-team',
+            blank: true,
+            blankLabel: '指定なし',
+        })
+        this.getRegion('teamRegion').show(selectboxView);
+    },
     onClickSubmitBtn: function(e) {
         e.preventDefault();
         var statusId = this.$('.search-status').val();
         var categoryId = this.$('.search-category').val();
         var title = this.$('.input-title').val();
-        var query = { statusId: statusId, categoryId: categoryId, title: title };
+        var teamName = this.$('.search-team').val();
+        var query = { statusId: statusId, categoryId: categoryId, title: title, team: teamName };
         this.triggerMethod('submit:search', query);
     }
 });

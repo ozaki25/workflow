@@ -70,5 +70,14 @@ module.exports = Backbone.Model.extend({
         if(this.isCompleted())           return StatusCodes.WaitingFinish;
         console.warn('this request status can not reject.');
         return null;
-    }
+    },
+    trimProp: function() {
+        var tmp = this.get('category');
+        delete this.attributes.category;
+        this.set({ category: _(tmp).pick('id', 'name', 'code', 'receptnists') });
+
+        var tmp = this.get('division');
+        delete this.attributes.division;
+        this.set({ division: _(tmp).pick('id', 'name', 'code') });
+    },
 });

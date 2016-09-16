@@ -17,6 +17,7 @@ var Divisions = require('./collections/Divisions');
 var Receptnists = require('./collections/Receptnists');
 var Applicants = require('./collections/Applicants');
 var Teams = require('./collections/Teams');
+var RequestNumbers = require('./collections/RequestNumbers');
 var HeaderView = require('./views/HeaderView');
 var SideMenuView = require('./views/SideMenuView');
 var RequestIndexView = require('./views/requests/IndexView');
@@ -33,8 +34,9 @@ var users = new Users();
 var statusList = new StatusList();
 var categories = new Categories();
 var applicants = new Applicants();
+var requestNumbers = new RequestNumbers();
 var teamList;
-var searchItems = ['statusId', 'categoryId', 'title', 'team', 'name'];
+var searchItems = ['year', 'statusId', 'categoryId', 'title', 'team', 'name'];
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
@@ -87,6 +89,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                         statusList: statusList,
                         categoryList: categories,
                         teamList: new Teams(teams),
+                        requestNumberList: requestNumbers,
                         searchQuery: searchQuery,
                     });
                     app.getRegion('main').show(requestIndexView);
@@ -97,7 +100,12 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                     applicants.fetch(applicantFetchOptions);
                 }
             }
-            categories.fetch(categoryFetchOptions);
+            var requestNumbersFetchOptions = {
+                success: function() {
+                    categories.fetch(categoryFetchOptions);
+                }
+            }
+            requestNumbers.fetch(requestNumbersFetchOptions);
         },
         newRequest: function(query) {
             var categoryFetchOptions = {

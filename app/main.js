@@ -107,7 +107,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             }
             requestNumbers.fetch(requestNumbersFetchOptions);
         },
-        newRequest: function(query) {
+        newRequest: function() {
             var categoryFetchOptions = {
                 success: function() {
                     var formView = new RequestFormView({
@@ -122,8 +122,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             }
             categories.fetch(categoryFetchOptions);
         },
-        request: function(id, query) {
-            var backUrlQuery = '?' + Backbone.$.param(query);
+        request: function(id) {
             var request = new Request({ id: id }, { collection: requests });
             var requestFetchOption = {
                 success: function() {
@@ -135,7 +134,6 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                                 statusList: statusList,
                                 teamList: teamList,
                                 categoryList: categories,
-                                backUrlQuery: backUrlQuery,
                             });
                             app.getRegion('main').show(formView);
                         }

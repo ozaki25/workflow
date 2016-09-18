@@ -69,7 +69,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRequestsPage();
     },
     onClickOpen: function(view) {
-        Backbone.history.navigate('/requests/' + view.model.id + this.getBackUrlQuery(), { trigger: true });
+        localStorage.setItem('backIndexQuery', this.getBackUrlQuery());
+        Backbone.history.navigate('/requests/' + view.model.id, { trigger: true });
     },
     onClickChangePage: function(view) {
         this.getRequestsPage();

@@ -106,8 +106,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var year = this.$('.search-req-id').val();
         var statusId = this.$('.search-status').val();
         var categoryId = this.$('.search-category').val();
-        var title = this.$('.input-title').val();
-        var name = this.$('.input-name').val();
+        var title = this.$('.input-title').val().trim();
+        var name = this.$('.input-name').val().trim();
         var team = this.$('.search-team').val();
         var query = { year: year, statusId: statusId, categoryId: categoryId, title: title, team: team, name: name };
         this.triggerMethod('submit:search', query);

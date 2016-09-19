@@ -13,9 +13,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         requestsRegion: '#requests_region',
         pagingRegion: '#paging_region',
     },
-    modelEvents: {
-        'sync': 'renderRequests',
-    },
     childEvents: {
         'submit:search': 'onSubmitSearch',
         'click:open': 'onClickOpen',

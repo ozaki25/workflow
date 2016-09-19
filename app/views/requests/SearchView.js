@@ -21,6 +21,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click @ui.submitBtn': 'onClickSubmitBtn',
     },
     initialize: function(options) {
+        this.query = options.query;
         this.statusList = options.statusList;
         this.categoryList = options.categoryList;
         this.teamList = options.teamList;
@@ -35,6 +36,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.renderTeam();
     },
     renderYear: function() {
+        var selected = this.requestNumberList.findWhere({ year: parseInt(this.query.year) });
         var selectboxView = new SelectboxView({
             collection: this.requestNumberList,
             label: 'year',
@@ -42,10 +44,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             _className: 'form-control search-req-id',
             blank: true,
             blankLabel: '指定なし',
+            selected: selected,
         })
         this.getRegion('yearRegion').show(selectboxView);
     },
     renderStatus: function() {
+        var selected = this.statusList.findWhere({ id: parseInt(this.query.statusId) });
         var selectboxView = new SelectboxView({
             collection: this.statusList,
             label: 'name',
@@ -53,10 +57,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             _className: 'form-control search-status',
             blank: true,
             blankLabel: '指定なし',
+            selected: selected,
         })
         this.getRegion('statusRegion').show(selectboxView);
     },
     renderCategory: function() {
+        var selected = this.categoryList.findWhere({ id: parseInt(this.query.categoryId) });
         var selectboxView = new SelectboxView({
             collection: this.categoryList,
             label: 'name',
@@ -64,18 +70,26 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             _className: 'form-control search-category',
             blank: true,
             blankLabel: '指定なし',
+            selected: selected,
         })
         this.getRegion('categoryRegion').show(selectboxView);
     },
     renderTitle: function() {
-        var inputView = new InputView({ _className: 'form-control input-title' })
+        var inputView = new InputView({
+            _className: 'form-control input-title',
+            _value: this.query.title,
+        })
         this.getRegion('titleRegion').show(inputView);
     },
     renderName: function() {
-        var inputView = new InputView({ _className: 'form-control input-name' })
+        var inputView = new InputView({
+            _className: 'form-control input-name',
+            _value: this.query.name,
+        })
         this.getRegion('nameRegion').show(inputView);
     },
     renderTeam: function() {
+        var selected = this.teamList.findWhere({ name: this.query.team });
         var selectboxView = new SelectboxView({
             collection: this.teamList,
             label: 'name',
@@ -83,6 +97,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             _className: 'form-control search-team',
             blank: true,
             blankLabel: '指定なし',
+            selected: selected,
         })
         this.getRegion('teamRegion').show(selectboxView);
     },

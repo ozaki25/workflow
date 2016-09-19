@@ -32,10 +32,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onBeforeShow: function() {
         this.renderSearch();
         this.renderRequests();
-        this.renderPaging()
+        this.renderPaging();
     },
     renderSearch: function() {
         var searchView = new SearchView({
+            query: this.query,
             statusList: this.statusList,
             categoryList: this.categoryList,
             teamList: this.teamList,

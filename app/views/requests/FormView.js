@@ -47,6 +47,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         divisionRegion: '#division_region',
         titleRegion: '#title_region',
         contentRegion: '#content_region',
+        workContentRegion: '#work_content_region',
         downloadFilesRegion: '#download_files_region',
         authorizerModal: '#select_authorizer_modal',
     },
@@ -87,6 +88,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
                 return html;
             }.bind(this),
+            workContentField: this.canWork() ? '<div class="form-group">' +
+                                                   '<label class="col-sm-2 control-label">WorkContent</label>' +
+                                                   '<div class="col-sm-10" id="work_content_region"></div>' +
+                                               '</div>' : '',
             save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
             submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
             work    : this.canWork() ? '<button type="button" class="btn btn-default work-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
@@ -95,7 +100,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             destroy : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
         }
     },
-    onRender: function() {
+    onBeforeShow: function() {
         this.renderRequestId();
         this.renderStatus();
         this.renderFiles()
@@ -103,6 +108,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.renderDivision();
         this.renderTitle();
         this.renderContent();
+        this.renderWorkContent();
         this.renderUserModal();
     },
     renderRequestId: function() {
@@ -164,6 +170,19 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }) :
             new ParagraphView({ _className: 'form-control-static', _text: this.replaceLine(this.model.get('content')) });
         this.getRegion('contentRegion').show(contentView);
+    },
+    renderWorkContent: function() {
+        if(this.model.isWork()) {
+            var workContentView =
+                this.canWork() ?
+                new TextareaView({
+                    _className: 'form-control work-content',
+                    _value: this.model.get('workContent'),
+                    attrs: { name: 'workContent' }
+                }) :
+                new ParagraphView({ _className: 'form-control-static', _text: this.replaceLine(this.model.get('workContent')) });
+            this.getRegion('workContentRegion').show(workContentView);
+        }
     },
     renderUserModal: function() {
         if(this.canRequest()) {
@@ -256,11 +275,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
     },
     setWork: function(nextStatusCode) {
-        //var content = this.ui.inputContent.val().trim();
-        var content = '内容'
-        this.model.set({
-            work: {content: content}
-        });
+        var workContent = this.$('textarea.work-content').val().trim();
+        this.model.set({ workContent: workContent });
         this.saveRequest(nextStatusCode);
     },
     saveRequest: function(nextStatusCode) {
@@ -268,6 +284,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var options = {
             wait: true,
             success: function(request) {
+                console.log(request);
                 var backUrlQuery = localStorage.getItem('backIndexQuery') || '';
                 localStorage.removeItem('backIndexQuery');
                 Backbone.history.navigate('/requests' + backUrlQuery, {trigger: true});

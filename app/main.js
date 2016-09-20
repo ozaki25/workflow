@@ -9,15 +9,15 @@ var Request  = require('./models/Request');
 var User     = require('./models/User');
 var Category = require('./models/Category');
 var Page     = require('./models/Page');
-var Requests       = require('./collections/Requests');
-var Users          = require('./collections/Users');
-var StatusList     = require('./collections/StatusList');
-var Categories     = require('./collections/Categories');
-var Divisions      = require('./collections/Divisions');
-var Receptnists    = require('./collections/Receptnists');
-var Applicants     = require('./collections/Applicants');
-var Teams          = require('./collections/Teams');
-var RequestNumbers = require('./collections/RequestNumbers');
+var Requests           = require('./collections/Requests');
+var Users              = require('./collections/Users');
+var StatusList         = require('./collections/StatusList');
+var Categories         = require('./collections/Categories');
+var Divisions          = require('./collections/Divisions');
+var Receptnists        = require('./collections/Receptnists');
+var Teams              = require('./collections/Teams');
+var RequestNumbers     = require('./collections/RequestNumbers');
+var RequestDepartments = require('./collections/RequestDepartments');
 var HeaderView          = require('./views/HeaderView');
 var SideMenuView        = require('./views/SideMenuView');
 var RequestIndexView    = require('./views/requests/IndexView');
@@ -33,7 +33,7 @@ var requests = new Requests();
 var users = new Users();
 var statusList = new StatusList();
 var categories = new Categories();
-var applicants = new Applicants();
+var requestDepartments = new RequestDepartments();
 var requestNumbers = new RequestNumbers();
 var teamList;
 var searchItems = ['year', 'statusId', 'categoryId', 'title', 'team', 'name'];
@@ -79,16 +79,14 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
         requests: function(query) {
             var pageNumber = query ? parseInt(query.page) || 1 : 1;
             var searchQuery = query ? _(query).pick(searchItems) : {};
-            var applicantFetchOptions = {
-                data: { uniq: 'team' },
-                success: function(collection, teamArray) {
-                    var teamObj = _(teamArray).map(function(team) { return { name: team } });
+            var requestDepartmentFetchOptions = {
+                success: function() {
                     var requestIndexView = new RequestIndexView({
                         collection: requests,
                         model: new Page({ pageNumber: pageNumber }),
                         statusList: statusList,
                         categoryList: categories,
-                        teamList: new Teams(teamObj),
+                        teamList: requestDepartments,
                         requestNumberList: requestNumbers,
                         searchQuery: searchQuery,
                     });
@@ -96,7 +94,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 }.bind(this)
             }
             var categoryFetchOptions = {
-                success: function() { applicants.fetch(applicantFetchOptions); }
+                success: function() { requestDepartments.fetch(requestDepartmentFetchOptions); }
             }
             var requestNumbersFetchOptions = {
                 success: function() { categories.fetch(categoryFetchOptions); }

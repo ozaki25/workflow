@@ -88,10 +88,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
                 return html;
             }.bind(this),
-            workContentField: this.canWork() ? '<div class="form-group">' +
-                                                   '<label class="col-sm-2 control-label">WorkContent</label>' +
-                                                   '<div class="col-sm-10" id="work_content_region"></div>' +
-                                               '</div>' : '',
+            workContentField: this.model.isRequested() ? '<div class="form-group">' +
+                                                             '<label class="col-sm-2 control-label">WorkContent</label>' +
+                                                             '<div class="col-sm-10" id="work_content_region"></div>' +
+                                                         '</div>' : '',
             save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
             submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
             work    : this.canWork() ? '<button type="button" class="btn btn-default work-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
@@ -172,7 +172,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('contentRegion').show(contentView);
     },
     renderWorkContent: function() {
-        if(this.model.isWork()) {
+        if(this.model.isRequested()) {
             var workContentView =
                 this.canWork() ?
                 new TextareaView({
@@ -236,7 +236,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.setRequest(this.model.getStatusAfterProgressing(), true);
     },
     onClickWork: function() {
-        this.setWork(this.model.getStatusAfterProgressing());
+        this.setWork(this.model.getStatusAfterProgressing(), this.model.isWaitingWorkComplete());
     },
     onClickApprove: function() {
         this.saveRequest(this.model.getStatusAfterProgressing());
@@ -275,9 +275,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         });
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
     },
-    setWork: function(nextStatusCode) {
+    setWork: function(nextStatusCode, validate) {
         this.model.setWorkValidation();
-        this.bindBackboneValidation();
+        validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var workContent = this.$('textarea.work-content').val().trim();
         this.model.set({ workContent: workContent });
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
@@ -287,7 +287,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var options = {
             wait: true,
             success: function(request) {
-                console.log(request);
                 var backUrlQuery = localStorage.getItem('backIndexQuery') || '';
                 localStorage.removeItem('backIndexQuery');
                 Backbone.history.navigate('/requests' + backUrlQuery, {trigger: true});

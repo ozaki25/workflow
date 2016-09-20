@@ -49,7 +49,7 @@ module.exports = Backbone.Model.extend({
     isCompleted: function() {
         return !this.isNew() && this.get('status').code == StatusCodes.Completed;
     },
-    isWork: function() {
+    isRequested: function() {
         var workStatus = [
             StatusCodes.WaitingAccept,
             StatusCodes.WaitingWorkComplete,

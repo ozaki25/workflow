@@ -7,18 +7,28 @@ module.exports = Backbone.Model.extend({
         title: '',
         content: ''
     },
-    validation: {
-        title: {
-            required: true,
-            msg: '必須項目です。'
-        },
-        content: {
-            required: true,
-            msg: '必須項目です。'
-        },
-        authorizer: {
-            required: true,
-            msg: '必須項目です。'
+    setRequestValidation: function() {
+        this.validation = {
+            title: {
+                required: true,
+                msg: '必須項目です。'
+            },
+            content: {
+                required: true,
+                msg: '必須項目です。'
+            },
+            authorizer: {
+                required: true,
+                msg: '必須項目です。'
+            }
+        }
+    },
+    setWorkValidation: function() {
+        this.validation = {
+            workContent: {
+                required: true,
+                msg: '必須項目です。'
+            },
         }
     },
     isCreating: function() {

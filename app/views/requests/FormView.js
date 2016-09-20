@@ -256,6 +256,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.model.destroy(options);
     },
     setRequest: function(nextStatusCode, validate) {
+        this.model.setRequestValidation();
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.$('input.title').val().trim();
         var content = this.$('textarea.content').val().trim();
@@ -275,9 +276,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
     },
     setWork: function(nextStatusCode) {
+        this.model.setWorkValidation();
+        this.bindBackboneValidation();
         var workContent = this.$('textarea.work-content').val().trim();
         this.model.set({ workContent: workContent });
-        this.saveRequest(nextStatusCode);
+        if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
     },
     saveRequest: function(nextStatusCode) {
         var statusId = this.statusList.findWhere({code: nextStatusCode}).id;

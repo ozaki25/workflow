@@ -58,20 +58,10 @@ module.exports = Backbone.Model.extend({
         ];
         return !this.isNew() && _(workStatus).contains(this.get('status').code);
     },
-    getProgressBtnLabel: function() {
-        if(this.isNew())                 return 'Submit';
-        if(this.isCreating())            return 'Submit';
-        if(this.isWaitingApprove())      return 'Approve';
-        if(this.isWaitingAccept())       return 'Accept';
-        if(this.isWaitingWorkComplete()) return 'Report';
-        if(this.isWaitingFinish())       return 'Complete';
-        console.warn('this request status can not progress.');
-        return '';
-    },
     getStatusAfterSave: function() {
         return StatusCodes.Creating;
     },
-    getStatusAfterProgressing: function() {
+    getStatusAfterProgress: function() {
         if(this.isNew())                 return StatusCodes.WaitingApprove;
         if(this.isCreating())            return StatusCodes.WaitingApprove;
         if(this.isWaitingApprove())      return StatusCodes.WaitingAccept;

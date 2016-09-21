@@ -1,4 +1,3 @@
-var _ = require('underscore');
 var Backbone = require('backbone');
 var Team = require('../models/Team');
 

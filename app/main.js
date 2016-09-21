@@ -18,6 +18,7 @@ var Receptnists        = require('./collections/Receptnists');
 var Teams              = require('./collections/Teams');
 var RequestNumbers     = require('./collections/RequestNumbers');
 var RequestDepartments = require('./collections/RequestDepartments');
+var Histories          = require('./collections/Histories');
 var HeaderView          = require('./views/HeaderView');
 var SideMenuView        = require('./views/SideMenuView');
 var RequestIndexView    = require('./views/requests/IndexView');
@@ -35,6 +36,7 @@ var statusList = new StatusList();
 var categories = new Categories();
 var requestDepartments = new RequestDepartments();
 var requestNumbers = new RequestNumbers();
+var histories = new Histories();
 var teamList;
 var searchItems = ['year', 'statusId', 'categoryId', 'title', 'team', 'name'];
 
@@ -126,6 +128,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                         statusList: statusList,
                         teamList: teamList,
                         categoryList: categories,
+                        historyList: histories,
                     });
                     app.getRegion('main').show(formView);
                 }
@@ -133,7 +136,11 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             var requestFetchOption = {
                 success: function() { categories.fetch(categoryFetchOptions); }
             };
-            request.fetch(requestFetchOption);
+            var historyFetchOption = {
+                success: function() {request.fetch(requestFetchOption); }
+            };
+            histories.setUrl(id);
+            histories.fetch(historyFetchOption);
         },
         users: function() {
             var usersFetchOption = {

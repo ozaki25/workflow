@@ -7,9 +7,11 @@ Backbone.csrf();
 var Documents = require('../../collections/Documents');
 var Divisions = require('../../collections/Divisions');
 var Users = require('../../collections/Users');
+var Histories = require('../../collections/Histories');
 var DownloadFilesView = require('./DownloadFilesView');
 var UsersModalView = require('../UsersModalView');
 var ParagraphView = require('../ParagraphView');
+var GridView = require('../../lib/GridView');
 var SelectboxView = require('../../lib/SelectboxView');
 var InputView = require('../../lib/InputView');
 var TextareaView = require('../../lib/TextareaView');
@@ -22,8 +24,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         openAuthorizerBtn: 'button.open-authorizer-modal',
         saveBtn: '.save-btn',
         submitBtn: '.submit-btn',
-        workBtn: '.work-btn',
         approveBtn: '.approve-btn',
+        acceptBtn: '.accept-btn',
+        reportBtn: '.report-btn',
+        finishBtn: '.finish-btn',
         rejectBtn: '.reject-btn',
         destroyBtn: '.destroy-btn'
     },
@@ -31,8 +35,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'change @ui.inputFile': 'onSelectFile',
         'click @ui.saveBtn': 'onClickSave',
         'click @ui.submitBtn': 'onClickSubmit',
-        'click @ui.workBtn': 'onClickWork',
         'click @ui.approveBtn': 'onClickApprove',
+        'click @ui.acceptBtn': 'onClickAccept',
+        'click @ui.reportBtn': 'onClickReport',
+        'click @ui.finishBtn': 'onClickFinish',
         'click @ui.rejectBtn': 'onClickReject',
         'click @ui.destroyBtn': 'onClickDestroy'
     },
@@ -50,6 +56,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         workContentRegion: '#work_content_region',
         downloadFilesRegion: '#download_files_region',
         authorizerModal: '#select_authorizer_modal',
+        historiesRegion: '#histories_region',
     },
     initialize: function(options) {
         if(!this.model.isNew()) this.model.trimProp();
@@ -60,6 +67,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.categoryList = options.categoryList;
         this.divisionList = new Divisions();
         this.getDivision(this.model.isNew() ? this.categoryList.first().id : this.model.get('category').id);
+        this.historyList = options.historyList || new Histories();
     },
     templateHelpers: function() {
         return {
@@ -92,24 +100,27 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                                                              '<label class="col-sm-2 control-label">WorkContent</label>' +
                                                              '<div class="col-sm-10" id="work_content_region"></div>' +
                                                          '</div>' : '',
-            save    : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
-            submit  : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
-            work    : this.canWork() ? '<button type="button" class="btn btn-default work-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
-            approve : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">' + this.model.getProgressBtnLabel() + '</button>' : '',
-            reject  : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
-            destroy : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
+            save     : this.canRequest() ? '<button type="button" class="btn btn-default save-btn">Save</button>' : '',
+            submit   : this.canRequest() ? '<button type="button" class="btn btn-default submit-btn">Submit</button>' : '',
+            approve  : this.canApprove() ? '<button type="button" class="btn btn-default approve-btn">Approve</button>' : '',
+            accept   : this.canAccept() ? '<button type="button" class="btn btn-default accept-btn">Accept</button>' : '',
+            report   : this.canReport() ? '<button type="button" class="btn btn-default report-btn">Report</button>' : '',
+            finish   : this.canFinish() ? '<button type="button" class="btn btn-default finish-btn">Finish</button>' : '',
+            reject   : this.canReject() ? '<button type="button" class="btn btn-default reject-btn">Reject</button>' : '',
+            destroy  : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : ''
         }
     },
     onBeforeShow: function() {
         this.renderRequestId();
         this.renderStatus();
-        this.renderFiles()
         this.renderCategory();
         this.renderDivision();
         this.renderTitle();
         this.renderContent();
         this.renderWorkContent();
         this.renderUserModal();
+        this.renderFiles()
+        this.renderHistories();
     },
     renderRequestId: function() {
         if(!this.model.isNew()) {
@@ -200,6 +211,22 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var downloadFilesView = new DownloadFilesView({ collection: this.documents, canRequest: this.canRequest() });
         this.getRegion('downloadFilesRegion').show(downloadFilesView);
     },
+    renderHistories: function() {
+        if(this.historyList.length) {
+            var columns = [
+                { label: '操作', name: 'action' },
+                { label: '名前', name: 'name' },
+                { label: '部署', name: 'team' },
+                { label: '日付', name: 'createdDate' },
+            ];
+            var gridView = new GridView({
+                collection: this.historyList,
+                columns: columns,
+                _className: 'table table-bordered',
+            });
+            this.getRegion('historiesRegion').show(gridView);
+        }
+    },
     onChangeCategorySelectbox: function(view, id, model) {
         this.getDivision(id);
     },
@@ -230,19 +257,25 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         }
     },
     onClickSave: function() {
-        this.setRequest(this.model.getStatusAfterSave(), false);
+        this.setRequest(this.model.getStatusAfterSave(), false, '保存');
     },
     onClickSubmit: function() {
-        this.setRequest(this.model.getStatusAfterProgressing(), true);
-    },
-    onClickWork: function() {
-        this.setWork(this.model.getStatusAfterProgressing(), this.model.isWaitingWorkComplete());
+        this.setRequest(this.model.getStatusAfterProgress(), true, '申請');
     },
     onClickApprove: function() {
-        this.saveRequest(this.model.getStatusAfterProgressing());
+        this.saveRequest(this.model.getStatusAfterProgress(), '承認');
+    },
+    onClickAccept: function() {
+        this.setWork(this.model.getStatusAfterProgress(), false, '受付');
+    },
+    onClickReport: function() {
+        this.setWork(this.model.getStatusAfterProgress(), true, '作業完了報告');
+    },
+    onClickFinish: function() {
+        this.saveRequest(this.model.getStatusAfterProgress(), '作業完了承認');
     },
     onClickReject: function() {
-        this.saveRequest(this.model.getStatusAfterRejection());
+        this.saveRequest(this.model.getStatusAfterRejection(), '否認');
     },
     onClickDestroy: function() {
         var options = {
@@ -251,11 +284,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 var backUrlQuery = localStorage.getItem('backIndexQuery') || '';
                 localStorage.removeItem('backIndexQuery');
                 Backbone.history.navigate('/requests' + backUrlQuery, {trigger: true});
-            }.bind(this)
+            }
         };
         this.model.destroy(options);
     },
-    setRequest: function(nextStatusCode, validate) {
+    setRequest: function(nextStatusCode, validate, action) {
         this.model.setRequestValidation();
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var title = this.$('input.title').val().trim();
@@ -273,16 +306,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             applicant: applicant,
             documents: this.documents
         });
-        if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
+        if(this.model.isValid(true)) this.saveRequest(nextStatusCode, action);
     },
-    setWork: function(nextStatusCode, validate) {
+    setWork: function(nextStatusCode, validate, action) {
         this.model.setWorkValidation();
         validate ? this.bindBackboneValidation() : this.unbindBackboneValidation();
         var workContent = this.$('textarea.work-content').val().trim();
         this.model.set({ workContent: workContent });
-        if(this.model.isValid(true)) this.saveRequest(nextStatusCode);
+        if(this.model.isValid(true)) this.saveRequest(nextStatusCode, action);
     },
-    saveRequest: function(nextStatusCode) {
+    saveRequest: function(nextStatusCode, action) {
         var statusId = this.statusList.findWhere({code: nextStatusCode}).id;
         var options = {
             wait: true,
@@ -292,7 +325,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 Backbone.history.navigate('/requests' + backUrlQuery, {trigger: true});
             }.bind(this)
         };
-        this.model.save({status: {id: statusId}}, options);
+        this.model.save({ status: { id: statusId }, action: action }, options);
     },
     bindBackboneValidation: function() {
         Backbone.Validation.bind(this, {
@@ -319,7 +352,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         return this.model.isCreating() &&
             (this.currentUser.isApplicant(this.model) || this.currentUser.isAdmin());
     },
-    canApproveRequest: function() {
+    canApprove: function() {
         return this.model.isWaitingApprove() &&
             (this.currentUser.isAuthorizer(this.model) || this.currentUser.isAdmin());
     },
@@ -345,11 +378,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     canWork: function() {
         return this.canAccept() || this.canReport();
     },
-    canApprove: function() {
-        return this.canApproveRequest() || this.canFinish();
-    },
     canReject: function() {
-        return this.canApprove() || this.canWork() || this.canRestore();
+        return this.canApprove() || this.canWork() || this.canFinish() || this.canRestore();
     },
     canDestroy: function() {
         return this.canEdit() || (!this.model.isNew() && this.currentUser.isAdmin());

@@ -16,6 +16,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     childEvents: {
         'submit:search': 'onSubmitSearch',
         'click:open': 'onClickOpen',
+        'click:header' : 'onClickHeader',
         'click:changePage': 'onClickChangePage',
     },
     initialize: function(options) {
@@ -69,6 +70,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onClickOpen: function(view) {
         localStorage.setItem('backIndexQuery', this.getBackUrlQuery());
         Backbone.history.navigate('/requests/' + view.model.id, { trigger: true });
+    },
+    onClickHeader: function(view, name, e) {
+        if(name === 'title') {
+            this.model.set({ pageNumber: 1 });
+            this.query.order = this.query.order && this.query.order === 'title.asc' ? 'title.desc' : 'title.asc';
+            this.getRequestsPage();
+        }
     },
     onClickChangePage: function(view) {
         this.getRequestsPage();

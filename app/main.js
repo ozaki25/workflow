@@ -38,7 +38,7 @@ var requestDepartments = new RequestDepartments();
 var requestNumbers = new RequestNumbers();
 var histories = new Histories();
 var teamList;
-var searchItems = ['year', 'statusId', 'categoryId', 'title', 'team', 'name'];
+var searchItems = ['year', 'statusId', 'categoryId', 'title', 'team', 'name', 'order'];
 
 var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {

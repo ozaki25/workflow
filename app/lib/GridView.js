@@ -86,9 +86,9 @@ var GridView = Backbone.Marionette.CompositeView.extend({
         }
     },
     initialize: function(options) {
-        this.sortable = options.sort;
         this.columns = options.columns;
         this.clickRowEventName = options.clickRowEventName || 'click:row';
+        this.clickHeaderEventName = options.clickHeaderEventName || 'click:header';
         this.eventNames = options.eventNames;
     },
     ui: {
@@ -98,10 +98,7 @@ var GridView = Backbone.Marionette.CompositeView.extend({
         'click @ui.tableHeader': 'onClickTableHeader',
     },
     onClickTableHeader: function(e) {
-        if(this.sortable) {
-            this.collection.comparator = this.$(e.target).attr('name');
-            this.collection.sort();
-        }
+        this.triggerMethod(this.clickHeaderEventName, this.$(e.target).attr('name'), e);
     }
 });
 

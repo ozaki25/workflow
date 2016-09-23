@@ -1,7 +1,6 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-var ButtonView = require('./ButtonView');
 
 var GridRowView = Backbone.Marionette.LayoutView.extend({
     tagName: 'tr',
@@ -21,11 +20,15 @@ var GridRowView = Backbone.Marionette.LayoutView.extend({
             }.bind(this))
         }
     },
+    events: {
+        'click': 'onClick',
+    },
     initialize: function(options) {
         this.columns = options.columns;
         _(this.columns).map(function(col) {
             if(col.child) col.view = new col.child.view(col.child.options);
         });
+        this.clickRowEventName = options.clickRowEventName;
         this.eventNames = options.eventNames;
         this.addChildEvents();
     },
@@ -36,6 +39,10 @@ var GridRowView = Backbone.Marionette.LayoutView.extend({
                 this.getRegion(this.model.id + col.view.cid).show(col.view);
             }
         }.bind(this));
+    },
+    onClick: function(e) {
+        e.preventDefault();
+        this.triggerMethod(this.clickRowEventName, e);
     },
     addChildEvents: function() {
         _(this.eventNames).each(function(eventName) {
@@ -61,6 +68,7 @@ var GridView = Backbone.Marionette.CompositeView.extend({
     childViewOptions: function() {
         return {
             columns: this.columns,
+            clickRowEventName: this.clickRowEventName,
             eventNames: this.eventNames,
         }
     },
@@ -80,7 +88,8 @@ var GridView = Backbone.Marionette.CompositeView.extend({
     initialize: function(options) {
         this.sortable = options.sort;
         this.columns = options.columns;
-        this.eventNames = options.eventNames
+        this.clickRowEventName = options.clickRowEventName || 'click:row';
+        this.eventNames = options.eventNames;
     },
     ui: {
          tableHeader: 'th.table-header',

@@ -15,6 +15,7 @@ var GridView = require('../../lib/GridView');
 var SelectboxView = require('../../lib/SelectboxView');
 var InputView = require('../../lib/InputView');
 var TextareaView = require('../../lib/TextareaView');
+var AlertView = require('../../lib/AlertView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
@@ -47,6 +48,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'change:category': 'onChangeCategorySelectbox',
     },
     regions: {
+        alertRegion: '#alert_region',
         requestIdRegion: '#request_id_region',
         statusRegion: '#status_region',
         categoryRegion: '#category_region',
@@ -227,6 +229,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             this.getRegion('historiesRegion').show(gridView);
         }
     },
+    renderError: function() {
+        var alertView = new AlertView({ alertType: 'danger', message: '操作に失敗しました。もう一度やり直して下さい。' })
+        this.getRegion('alertRegion').show(alertView);
+    },
     onChangeCategorySelectbox: function(view, id, model) {
         this.getDivision(id);
     },
@@ -284,7 +290,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 var backUrlQuery = localStorage.getItem('backIndexQuery') || '';
                 localStorage.removeItem('backIndexQuery');
                 Backbone.history.navigate('/requests' + backUrlQuery, {trigger: true});
-            }
+            },
+            error: function(model, response) {
+                this.renderError();
+            }.bind(this),
         };
         this.model.destroy(options);
     },
@@ -323,7 +332,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 var backUrlQuery = localStorage.getItem('backIndexQuery') || '';
                 localStorage.removeItem('backIndexQuery');
                 Backbone.history.navigate('/requests' + backUrlQuery, {trigger: true});
-            }.bind(this)
+            }.bind(this),
+            error: function(model, response) {
+                this.renderError();
+            }.bind(this),
         };
         this.model.save({ status: { id: statusId }, action: action }, options);
     },

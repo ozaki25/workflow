@@ -20,7 +20,14 @@ module.exports = Backbone.Model.extend({
             authorizer: {
                 required: true,
                 msg: '必須項目です。'
-            }
+            },
+            workDate: function(value, name, form) {
+                if(!form.workDateFrom || !form.workDateTo) return '必須項目です。'
+                var fromDate = new Date(form.workDateFrom);
+                var toDate = new Date(form.workDateTo);
+                if(fromDate.toString() === "Invalid Date" || toDate.toString() === "Invalid Date") return '日付を入力して下さい。';
+                if(fromDate > toDate) return '終了日は開始日以前を入力して下さい。';
+            },
         }
     },
     setWorkValidation: function() {

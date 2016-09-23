@@ -10,6 +10,7 @@ var Users = require('../../collections/Users');
 var Histories = require('../../collections/Histories');
 var DownloadFilesView = require('./DownloadFilesView');
 var UsersModalView = require('../UsersModalView');
+var WorkDateTermView = require('./WorkDateTermView');
 var ParagraphView = require('../ParagraphView');
 var GridView = require('../../lib/GridView');
 var SelectboxView = require('../../lib/SelectboxView');
@@ -55,6 +56,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         divisionRegion: '#division_region',
         titleRegion: '#title_region',
         contentRegion: '#content_region',
+        workDateRegion: '#work_date_region',
         workContentRegion: '#work_content_region',
         downloadFilesRegion: '#download_files_region',
         authorizerModal: '#select_authorizer_modal',
@@ -119,6 +121,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.renderDivision();
         this.renderTitle();
         this.renderContent();
+        this.renderWorkDate();
         this.renderWorkContent();
         this.renderUserModal();
         this.renderFiles()
@@ -183,6 +186,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             }) :
             new ParagraphView({ _className: 'form-control-static', _text: this.replaceLine(this.model.get('content')) });
         this.getRegion('contentRegion').show(contentView);
+    },
+    renderWorkDate: function() {
+        if(this.canRequest()) this.getRegion('workDateRegion').show(new WorkDateTermView());
     },
     renderWorkContent: function() {
         if(this.model.isRequested()) {
@@ -307,13 +313,17 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var inputAuthorizer = this.$('input.authorizer').val();
         var authorizer = !!inputAuthorizer ? JSON.parse(inputAuthorizer) : null;
         var applicant = this.model.isNew() ? this.currentUser : this.model.get('applicant');
+        var fromDate = this.$('input.from-date').val().trim();
+        var toDate = this.$('input.to-date').val().trim();
         this.model.set({
             title: title,
             content: content,
             division: division,
             authorizer: authorizer,
             applicant: applicant,
-            documents: this.documents
+            workDateFrom: fromDate,
+            workDateTo: toDate,
+            documents: this.documents,
         });
         if(this.model.isValid(true)) this.saveRequest(nextStatusCode, action);
     },

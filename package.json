@@ -9,6 +9,7 @@
     "backbone.localstorage": "^1.1.16",
     "backbone.marionette": "^2.4.5",
     "backbone.validation": "^0.7.1",
+    "bootstrap-datepicker": "^1.6.4",
     "browserify": "^13.0.0",
     "gulp": "^3.9.1",
     "jquery": "^2.2.1",

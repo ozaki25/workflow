@@ -1,3 +1,4 @@
+require('bootstrap-datepicker');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var InputView = require('../../lib/InputView');
@@ -17,19 +18,25 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onBeforeShow: function() {
         this.renderFromDate();
         this.renderToDate();
+        this.setupDatepicker();
     },
     renderFromDate: function() {
         var inputView = new InputView({
             _className: 'form-control from-date',
-            attrs: { name: 'workDateFrom' },
         });
         this.getRegion('fromDateRegion').show(inputView);
     },
     renderToDate: function() {
         var inputView = new InputView({
             _className: 'form-control to-date',
-            attrs: { name: 'workDateTo' },
         });
         this.getRegion('toDateRegion').show(inputView);
     },
+    setupDatepicker: function() {
+        this.$('.from-date, .to-date').datepicker({
+            format: "yyyy/mm/dd",
+            autoclose: true,
+            todayHighlight: true
+        });
+    }
 });

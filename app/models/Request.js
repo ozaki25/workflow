@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var moment = require('moment');
 var Backbone = require('backbone');
 var StatusCodes = require('../const/StatusCodes');
 
@@ -6,6 +7,12 @@ module.exports = Backbone.Model.extend({
     defaults: {
         title: '',
         content: ''
+    },
+    parse: function(data) {
+        _(data.histories).each(function(history) {
+            history.createdDate = moment(new Date(history.createdDate)).format('YYYY/MM/DD HH:mm');
+        });
+        return data;
     },
     setRequestValidation: function() {
         this.validation = {

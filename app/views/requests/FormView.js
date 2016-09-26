@@ -71,7 +71,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.categoryList = options.categoryList;
         this.divisionList = new Divisions();
         this.getDivision(this.model.isNew() ? this.categoryList.first().id : this.model.get('category').id);
-        this.historyList = options.historyList || new Histories();
     },
     templateHelpers: function() {
         return {
@@ -220,7 +219,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('downloadFilesRegion').show(downloadFilesView);
     },
     renderHistories: function() {
-        if(this.historyList.length) {
+        if(this.model.has('histories')) {
             var columns = [
                 { label: '操作', name: 'action' },
                 { label: '名前', name: 'name' },
@@ -228,7 +227,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 { label: '日付', name: 'createdDate' },
             ];
             var gridView = new GridView({
-                collection: this.historyList,
+                collection: new Histories(this.model.get('histories')),
                 columns: columns,
                 _className: 'table table-bordered',
             });

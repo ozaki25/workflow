@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var User = require('../models/User');
+var Teams = require('./Teams');
 
 module.exports = Backbone.Collection.extend({
     model: User,
@@ -11,6 +12,9 @@ module.exports = Backbone.Collection.extend({
         });
     },
     getTeamList: function() {
-        return _(this.pluck('team')).uniq();
+        var teamList = _(_(this.pluck('team')).uniq()).map(function(team) {
+            return { name: team }
+        });
+        return new Teams(teamList);
     }
 });

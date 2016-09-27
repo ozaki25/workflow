@@ -4,11 +4,16 @@ Backbone.Marionette = require('backbone.marionette');
 
 var GridRowView = Backbone.Marionette.LayoutView.extend({
     tagName: 'tr',
+    attributes: function() {
+        return {
+            id: this.model.id || this.model.cid,
+        }
+    },
     template: _.template('<%= values %>'),
     templateHelpers: function() {
         return {
             values: _(this.columns).map(function(col) {
-                var id = 'table_data_' + this.model.id + '_' + (col.view ? col.view.cid : col.name);
+                var id = 'table_data_' + (this.model.id || this.model.cid) + '_' + (col.view ? col.view.cid : col.name);
                 var value = '';
                 if(!col.view) {
                     var nameSplit = col.name.split('.');
@@ -35,8 +40,9 @@ var GridRowView = Backbone.Marionette.LayoutView.extend({
     onRender: function() {
         _(this.columns).each(function(col) {
             if(col.view) {
-                this.addRegion(this.model.id + col.view.cid, '#table_data_' + this.model.id + '_' + col.view.cid);
-                this.getRegion(this.model.id + col.view.cid).show(col.view);
+                var modelId = this.model.id || this.model.cid;
+                this.addRegion(modelId + col.view.cid, '#table_data_' + (modelId + '_' + col.view.cid));
+                this.getRegion(modelId + col.view.cid).show(col.view);
             }
         }.bind(this));
     },
@@ -81,7 +87,7 @@ var GridView = Backbone.Marionette.CompositeView.extend({
     templateHelpers: function() {
         return {
             tableHeader: _(this.columns).map(function(col) {
-                return '<th class="table-header" name="' + col.name + '">' + (col.label || col.name || '') + '</th>'
+                return '<th class="table-header" name="' + (col.name || '') + '">' + (col.label || col.name || '') + '</th>'
             }).join('')
         }
     },

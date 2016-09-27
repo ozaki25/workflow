@@ -108,19 +108,8 @@
             <h4 class="modal-title">User List</h4>
           </div>
           <div class="modal-body">
-            <select class="form-control team-select">{{= teamList() }}</select>
-            <table class="table">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td>Uid</td>
-                  <td>Name</td>
-                  <td>Team</td>
-                  <td>JobLevel</td>
-                </tr>
-              </thead>
-              <tbody id="select_user_list"></tbody>
-            </table>
+            <div id="team_selectbox_region"></div>
+            <div id="user_table_region"></div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary submit">Add</button>
@@ -128,14 +117,6 @@
           </div>
         </div>
       </div>
-    </script>
-
-    <script id="user_modal_view" type="text/template">
-      <td><input type="{{= type }}" value="{{- uid }}" /></td>
-      <td>{{- uid }}</td>
-      <td>{{- name }}</td>
-      <td>{{- team }}</td>
-      <td>{{- jobLevel }}</td>
     </script>
 
     <script id="request_form_view" type="text/template">

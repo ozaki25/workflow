@@ -10,7 +10,7 @@ module.exports = Backbone.Model.extend({
     },
     parse: function(data) {
         _(data.histories).each(function(history) {
-            history.createdDate = moment(new Date(history.createdDate)).format('YYYY/MM/DD HH:mm');
+            history.createdDate = moment(new Date(history.createdDate)).format('YYYY-MM-DD');
         });
         return data;
     },

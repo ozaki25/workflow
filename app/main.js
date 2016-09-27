@@ -56,7 +56,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
             app.getRegion('header').show(new HeaderView({ model: currentUser }));
         });
         statusList.fetch();
-        users.fetch({ success: function() { teamList = users.getTeamList(); } });
+        users.fetch({ success: function() { teamList = new Teams(users.getTeamList()); } });
         app.getRegion('sideMenu').show(new SideMenuView());
     },
     onRoute: function() {

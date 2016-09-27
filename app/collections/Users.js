@@ -11,6 +11,10 @@ module.exports = Backbone.Collection.extend({
         });
     },
     getTeamList: function() {
-        return _(this.pluck('team')).uniq();
-    }
+        return _(this.models).reduce(function(tmp, model) {
+            var team = model.pick('team');
+            if(!_(tmp).some(function(t) { return t.team == team.team })) tmp.push(team);
+            return tmp;
+        }, []);
+    },
 });

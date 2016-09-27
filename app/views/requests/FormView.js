@@ -209,7 +209,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 currentUser: this.currentUser,
                 teamList: this.teamList,
                 type: 'radio',
-                findOptions: { data: { jobLevel: { lte: 2 } } },
+                findOptions: { jobLevel: { lte: 2 } },
             });
             this.getRegion('authorizerModal').show(usersModalView);
         }

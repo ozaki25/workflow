@@ -1,63 +1,99 @@
-var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-var UserModalView = require('./UserModalView');
+var GridView = require('../lib/GridView');
+var InputView = require('../lib/InputView');
+var SelectboxView = require('../lib/SelectboxView');
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = Backbone.Marionette.LayoutView.extend({
     id: 'select_users_modal',
     className: 'modal fade',
-    childView: UserModalView,
-    childViewContainer: '#select_user_list',
-    childViewOptions: function() {
-        return {
-            type: this.type
-        }
-    },
     template: '#users_modal_view',
+    regions: {
+        'teamSelectboxRegion': '#team_selectbox_region',
+        'userTableRegion': '#user_table_region',
+    },
     ui: {
-        selectTeam: 'select.team-select',
         submitBtn: 'button.submit'
     },
     events: {
-        'change @ui.selectTeam': 'changeSelectedTeam',
         'click @ui.submitBtn': 'onClickSubmitBtn'
+    },
+    childEvents: {
+        'change:selectbox': 'onChangeSelectbox',
+        'click:row': 'onClickRow',
     },
     initialize: function(options) {
         this.type = options.type || 'radio';
         this.currentUser = options.currentUser;
         this.teamList = options.teamList;
         this.findOptions = options.findOptions;
-    },
-    templateHelpers: function() {
-        return {
-            teamList: function() {
-                return _(this.teamList).map(function(team) {
-                    return '<option value="' + team + '">' + team + '</option>';
-                }).join('');
-            }.bind(this)
-        }
+        this._getUsers(this.currentUser.get('team'));
     },
     onRender: function() {
-        var currentUserTeam = this.ui.selectTeam.val(this.currentUser.get('team'));
-        if(currentUserTeam.length) this.changeSelectedTeam();
+        this.renderTeamSelectbox();
+        this.renderUserTable();
     },
-    changeSelectedTeam: function() {
-        var selectedTeam = this.ui.selectTeam.val();
-        var fetchOptions = {data: {team: selectedTeam}};
-        $.extend(true, fetchOptions, this.findOptions);
-        this.collection.fetch(fetchOptions);
+    renderTeamSelectbox: function() {
+        var selected = this.teamList.findWhere({ name: this.currentUser.get('team') });
+        var selectboxView = new SelectboxView({
+            collection: this.teamList,
+            label: 'team',
+            value: 'team',
+            selected: selected,
+        });
+        this.getRegion('teamSelectboxRegion').show(selectboxView);
+    },
+    renderUserTable: function() {
+        var columns = [
+            { child: { view: InputView, options: { _type: this.type, _className: ' ', attrs: { name: 'user' } } } },
+            { label: 'Uid', name: 'uid' },
+            { label: 'Name', name: 'name' },
+            { label: 'Team', name: 'team' },
+            { label: 'JobLevel', name: 'jobLevel' },
+        ];
+        var gridView = new GridView({
+            collection: this.collection,
+            columns: columns,
+        });
+        this.getRegion('userTableRegion').show(gridView);
     },
     onClickSubmitBtn: function(e) {
         e.preventDefault();
-        var selectedInputs = this.$('input[type="' + this.type + '"]:checked');
-        var selectedUsers = _(selectedInputs).map(function(input) {
-            return this.collection.findWhere({uid: this.$(input).val()});
+        var selectedUsers = _(this.$('input[name="user"]:checked')).map(function(input) {
+            this._uncheck(input);
+            var cid = this.$(input).parent('td').attr('data-row-id');
+            return _(this.collection.models).findWhere({ cid: cid });
         }.bind(this));
-        this.$(selectedInputs).removeAttr('checked');
-        this.$el.modal('hide');
-        if(this.type === 'checkbox') this.triggerMethod('select:users', selectedUsers);
         if(this.type === 'radio') this.triggerMethod('select:user', selectedUsers[0]);
-    }
+        if(this.type === 'checkbox') this.triggerMethod('select:users', selectedUsers);
+        this.$el.modal('hide');
+    },
+    onChangeSelectbox: function(view, value, model) {
+        this._getUsers(value);
+    },
+    onClickRow: function(view, e) {
+        e.preventDefault();
+        var input = view.$('input')[0];
+        if(this.type === 'radio') {
+            _(this.$('input[type="radio"]')).each(function(i) { this._uncheck(i); }.bind(this));
+            this._check(input);
+        }
+        if(this.type === 'checkbox') {
+            this.$(input).attr('checked') ? this._uncheck(input) : this._check(input);
+        }
+    },
+    _getUsers: function(team) {
+        var fetchOptions = Backbone.$.extend({}, { team: team }, this.findOptions);
+        this.collection.fetch({ data: fetchOptions });
+    },
+    _check: function(element) {
+        element.checked =  true;
+        this.$(element).attr('checked', 'checked');
+    },
+    _uncheck: function(element) {
+        element.checked = false;
+        this.$(element).removeAttr('checked');
+    },
 });
 

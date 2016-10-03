@@ -9,13 +9,17 @@
     <meta name="csrf-token" th:content="${_csrf.token}"/>
   </head>
   <body>
-    <div id="header"></div>
-    <div class="container">
-      <div class="row">
-        <div id="side_menu" class="col-sm-2"></div>
-        <div id="main" class="col-sm-10"></div>
+    <div id="root_region" />
+
+    <script id="root_view" type="text/template">
+      <div id="header_region" />
+      <div class="container">
+        <div class="row">
+          <div id="side_menu_region" class="col-sm-2" />
+          <div id="main_region" class="col-sm-10" />
+        </div>
       </div>
-    </div>
+    </script>
 
     <script id="header_view" type="text/template">
       <nav class="navbar navbar-default">

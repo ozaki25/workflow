@@ -66,11 +66,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         if(!this.model.isNew()) this.model.trimProp();
         this.currentUser = options.currentUser;
         this.statusList = options.statusList;
-        this.teamList = options.teamList;
+        this.teams = options.teams;
         this.documents = new Documents(this.model.get('documents'));
-        this.categoryList = options.categoryList;
-        this.divisionList = new Divisions();
-        this.getDivision(this.model.isNew() ? this.categoryList.first().id : this.model.get('category').id);
+        this.categories = options.categories;
+        this.divisions = new Divisions();
+        this.getDivision(this.model.isNew() ? this.categories.first().id : this.model.get('category').id);
     },
     templateHelpers: function() {
         return {
@@ -142,7 +142,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var categoryView =
             this.canRequest() ?
             new SelectboxView({
-                collection: this.categoryList,
+                collection: this.categories,
                 label: 'name',
                 value: 'id',
                 changeEventName: 'change:category',
@@ -155,7 +155,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         var divisionView =
             this.canRequest() ?
             new SelectboxView({
-                collection: this.divisionList,
+                collection: this.divisions,
                 label: 'name',
                 value: 'id',
                 _className: 'form-control division',
@@ -207,7 +207,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             var usersModalView = new UsersModalView({
                 collection: new Users(),
                 currentUser: this.currentUser,
-                teamList: this.teamList,
+                teams: this.teams,
                 type: 'radio',
                 findOptions: { jobLevel: { lte: 2 } },
             });
@@ -242,8 +242,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getDivision(id);
     },
     getDivision: function(id) {
-        this.divisionList.setUrl(id);
-        this.divisionList.fetch();
+        this.divisions.setUrl(id);
+        this.divisions.fetch();
     },
     onSelectAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();

@@ -5,23 +5,24 @@ Backbone.csrf = require('./csrf');
 Backbone.csrf();
 window.jQuery = Backbone.$;
 require('./assets/js/bootstrap');
-var Request  = require('./models/Request');
+
 var User     = require('./models/User');
 var Category = require('./models/Category');
-var Page     = require('./models/Page');
-var Requests           = require('./collections/Requests');
+
 var Users              = require('./collections/Users');
 var StatusList         = require('./collections/StatusList');
 var Categories         = require('./collections/Categories');
 var Divisions          = require('./collections/Divisions');
 var Receptnists        = require('./collections/Receptnists');
 var Teams              = require('./collections/Teams');
-var RequestNumbers     = require('./collections/RequestNumbers');
-var RequestDepartments = require('./collections/RequestDepartments');
+
+var RequestsRootView = require('./views/requests/RootView.js');
+var RequestRootView  = require('./views/request/RootView.js');
+
 var HeaderView          = require('./views/HeaderView');
 var SideMenuView        = require('./views/SideMenuView');
 var RequestIndexView    = require('./views/requests/IndexView');
-var RequestFormView     = require('./views/requests/FormView');
+var RequestFormView     = require('./views/request/FormView');
 var UsersMainView       = require('./views/users/MainView');
 var StatusListView      = require('./views/statusList/StatusListView');
 var CategoriesMainView  = require('./views/categories/MainView');
@@ -29,12 +30,9 @@ var DivisionsMainView   = require('./views/divisions/MainView');
 var ReceptnistsMainView = require('./views/receptnists/MainView');
 
 var currentUser;
-var requests = new Requests();
 var users = new Users();
 var statusList = new StatusList();
 var categories = new Categories();
-var requestDepartments = new RequestDepartments();
-var requestNumbers = new RequestNumbers();
 var teamList;
 var searchItems = ['year', 'statusId', 'categoryId', 'title', 'team', 'name', 'order'];
 
@@ -42,7 +40,7 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     appRoutes: {
         ""                          : "requests",
         "requests"                  : "requests",
-        "requests/new"              : "newRequest",
+        "requests/new"              : "request",
         "requests/:id"              : "request",
         "users"                     : "users",
         "status"                    : "statusList",
@@ -53,18 +51,11 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     initialize: function() {
         Backbone.$.get('/current-user', function(user) {
             currentUser = new User(user);
-            app.getRegion('header').show(new HeaderView({ model: currentUser }));
+            //app.getRegion('header').show(new HeaderView({ model: currentUser }));
         });
         statusList.fetch();
         users.fetch({ success: function() { teamList = new Teams(users.getTeamList()); } });
-        app.getRegion('sideMenu').show(new SideMenuView());
-    },
-    onRoute: function() {
-        if(!currentUser) {
-            Backbone.$.get('/current-user', function(user) {
-                currentUser = new User(user);
-            });
-        }
+        //app.getRegion('sideMenu').show(new SideMenuView());
     },
     execute: function(callback, args, name) {
         if(_(args).last() && _(args).last().includes('=')) args.push(this.parseQuery(args.pop()));
@@ -77,63 +68,18 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
     },
     controller: {
         requests: function(query) {
-            var pageNumber = query ? parseInt(query.page) || 1 : 1;
-            var searchQuery = query ? _(query).pick(searchItems) : {};
-            var requestDepartmentFetchOptions = {
-                success: function() {
-                    var requestIndexView = new RequestIndexView({
-                        collection: requests,
-                        model: new Page({ pageNumber: pageNumber }),
-                        statusList: statusList,
-                        categoryList: categories,
-                        teamList: requestDepartments,
-                        requestNumberList: requestNumbers,
-                        searchQuery: searchQuery,
-                    });
-                    app.getRegion('main').show(requestIndexView);
-                }.bind(this)
-            }
-            var categoryFetchOptions = {
-                success: function() { requestDepartments.fetch(requestDepartmentFetchOptions); }
-            }
-            var requestNumbersFetchOptions = {
-                success: function() { categories.fetch(categoryFetchOptions); }
-            }
-            requestNumbers.fetch(requestNumbersFetchOptions);
-        },
-        newRequest: function() {
-            var categoryFetchOptions = {
-                success: function() {
-                    var formView = new RequestFormView({
-                        model: new Request({}, { collection: requests }),
-                        currentUser: currentUser,
-                        statusList: statusList,
-                        categoryList: categories,
-                        teamList: teamList,
-                    });
-                    app.getRegion('main').show(formView);
-                }
-            }
-            categories.fetch(categoryFetchOptions);
+            Backbone.$.get('/current-user', function(user) {
+                var pageNumber = query ? parseInt(query.page) || 1 : 1;
+                var searchQuery = query ? _(query).pick(searchItems) : {};
+                currentUser = new User(user);
+                app.getRegion('rootRegion').show(new RequestsRootView({ currentUser: currentUser, pageNumber: pageNumber, searchQuery: searchQuery }));
+            });
         },
         request: function(id) {
-            var request = new Request({ id: id }, { collection: requests });
-            var categoryFetchOptions = {
-                success: function() {
-                    var formView = new RequestFormView({
-                        model: request,
-                        currentUser: currentUser,
-                        statusList: statusList,
-                        teamList: teamList,
-                        categoryList: categories,
-                    });
-                    app.getRegion('main').show(formView);
-                }
-            }
-            var requestFetchOption = {
-                success: function() { categories.fetch(categoryFetchOptions); }
-            };
-            request.fetch(requestFetchOption);
+            Backbone.$.get('/current-user', function(user) {
+                currentUser = new User(user);
+                app.getRegion('rootRegion').show(new RequestRootView({ currentUser: currentUser, requestId: id }));
+            });
         },
         users: function() {
             var usersFetchOption = {
@@ -191,9 +137,10 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
 
 var app = new Backbone.Marionette.Application({
     regions: {
-        header: '#header',
-        sideMenu: '#side_menu',
-        main: '#main'
+        //header: '#header',
+        //sideMenu: '#side_menu',
+        //main: '#main',
+        rootRegion: '#root_region',
     },
     onBeforeStart: function() {
         // springbootのviewでunderscoreのtemplateを使えるようにタグを変更

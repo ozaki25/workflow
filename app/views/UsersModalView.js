@@ -26,7 +26,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.type = options.type || 'radio';
         this.currentUser = options.currentUser;
-        this.teamList = options.teamList;
+        this.teams = options.teams;
         this.findOptions = options.findOptions;
         this._getUsers(this.currentUser.get('team'));
     },
@@ -35,9 +35,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.renderUserTable();
     },
     renderTeamSelectbox: function() {
-        var selected = this.teamList.findWhere({ name: this.currentUser.get('team') });
+        var selected = this.teams.findWhere({ name: this.currentUser.get('team') });
         var selectboxView = new SelectboxView({
-            collection: this.teamList,
+            collection: this.teams,
             label: 'team',
             value: 'team',
             selected: selected,

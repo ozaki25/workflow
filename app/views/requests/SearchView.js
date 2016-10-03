@@ -23,9 +23,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     initialize: function(options) {
         this.query = options.query;
         this.statusList = options.statusList;
-        this.categoryList = options.categoryList;
-        this.teamList = options.teamList;
-        this.requestNumberList = options.requestNumberList;
+        this.categories = options.categories;
+        this.teams = options.teams;
+        this.requestNumbers = options.requestNumbers;
     },
     onRender: function() {
         this.renderYear();
@@ -36,9 +36,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.renderTeam();
     },
     renderYear: function() {
-        var selected = this.requestNumberList.findWhere({ year: parseInt(this.query.year) });
+        var selected = this.requestNumbers.findWhere({ year: parseInt(this.query.year) });
         var selectboxView = new SelectboxView({
-            collection: this.requestNumberList,
+            collection: this.requestNumbers,
             label: 'year',
             value: 'year',
             _className: 'form-control search-req-id',
@@ -62,9 +62,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('statusRegion').show(selectboxView);
     },
     renderCategory: function() {
-        var selected = this.categoryList.findWhere({ id: parseInt(this.query.categoryId) });
+        var selected = this.categories.findWhere({ id: parseInt(this.query.categoryId) });
         var selectboxView = new SelectboxView({
-            collection: this.categoryList,
+            collection: this.categories,
             label: 'name',
             value: 'id',
             _className: 'form-control search-category',
@@ -89,9 +89,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('nameRegion').show(inputView);
     },
     renderTeam: function() {
-        var selected = this.teamList.findWhere({ name: this.query.team });
+        var selected = this.teams.findWhere({ name: this.query.team });
         var selectboxView = new SelectboxView({
-            collection: this.teamList,
+            collection: this.teams,
             label: 'name',
             value: 'name',
             _className: 'form-control search-team',

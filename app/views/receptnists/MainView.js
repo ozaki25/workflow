@@ -21,12 +21,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
-        this.teamList = options.teamList;
+        this.teams = options.teams;
     },
     onRender: function() {
         var receptnistsView = new ReceptnistsView({collection: this.collection, model: this.model});
         this.getRegion('receptnistsMain').show(receptnistsView);
-        var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teamList: this.teamList, type: 'checkbox'});
+        var usersModalView = new UsersModalView({collection: new Users(), currentUser: this.currentUser, teams: this.teams, type: 'checkbox'});
         this.getRegion('receptnistsModal').show(usersModalView);
     },
     showEdit: function(view) {

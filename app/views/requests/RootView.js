@@ -16,9 +16,9 @@ var IndexView    = require('./IndexView');
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#root_view',
     regions: {
-        headerRegion: '#header_region',
+        headerRegion  : '#header_region',
         sideMenuRegion: '#side_menu_region',
-        mainRegion: '#main_region',
+        mainRegion    : '#main_region',
     },
     initialize: function(options) {
         this.currentUser= options.currentUser;
@@ -28,7 +28,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onRender: function() {
         this.renderHeader();
         this.renderSideMenu();
-        this.renderIndex();
+        this.renderMain();
     },
     renderHeader: function() {
         this.getRegion('headerRegion').show(new HeaderView({ model: this.currentUser }));
@@ -36,7 +36,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     renderSideMenu: function() {
         this.getRegion('sideMenuRegion').show(new SideMenuView());
     },
-    renderIndex: function() {
+    renderMain: function() {
         var requests = new Requests();
         var statusList = new StatusList();
         var categories = new Categories();

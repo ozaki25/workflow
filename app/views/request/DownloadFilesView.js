@@ -18,5 +18,5 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     initialize: function(options) {
         this.canRequest = options.canRequest;
-    }
+    },
 });

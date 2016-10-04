@@ -21,15 +21,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.setupDatepicker();
     },
     renderFromDate: function() {
-        var inputView = new InputView({
-            _className: 'form-control from-date',
-        });
+        var inputView = new InputView({ _className: 'form-control from-date' });
         this.getRegion('fromDateRegion').show(inputView);
     },
     renderToDate: function() {
-        var inputView = new InputView({
-            _className: 'form-control to-date',
-        });
+        var inputView = new InputView({ _className: 'form-control to-date' });
         this.getRegion('toDateRegion').show(inputView);
     },
     setupDatepicker: function() {

@@ -1,7 +1,5 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-Backbone.csrf = require('../../csrf');
-Backbone.csrf();
 
 module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'tr',
@@ -28,6 +26,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     onClickDeleteBtn: function(e) {
         e.preventDefault();
-        this.model.destroy({wait: true});
+        this.model.destroy({ wait: true });
     }
 });

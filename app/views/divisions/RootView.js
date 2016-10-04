@@ -35,9 +35,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     renderMain: function() {
         var category = new Category({ id: this.categoryId }, { collection: new Categories() });
         var divisions = new Divisions();
-        this.getRegion('mainRegion').show(new MainView({ collection: divisions, model: category }));
-        category.fetch();
         divisions.setUrl(this.categoryId);
-        divisions.fetch();
+        Backbone.$.when(
+            category.fetch(),
+            divisions.fetch()
+        ).done(function() {
+            this.getRegion('mainRegion').show(new MainView({ collection: divisions, model: category }));
+        }.bind(this));
     },
 });

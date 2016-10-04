@@ -5,7 +5,7 @@ var DivisionView = require('./DivisionView');
 module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'panel panel-default',
     childView: DivisionView,
-    childViewContainer: '#division_list',
+    childViewContainer: '#divisions_child_container',
     childViewOptions: function() {
         return {
             categoryName: this.model.get('name')

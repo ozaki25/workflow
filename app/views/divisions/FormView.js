@@ -2,7 +2,6 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
-var Division = require('../../models/Division');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
@@ -10,33 +9,24 @@ module.exports = Backbone.Marionette.ItemView.extend({
     ui: {
         inputCode: 'input.code',
         inputName: 'input.name',
-        newDivisionBtn: '.new-division'
+        submitBtn: '.submit-division'
     },
     events: {
-        'click @ui.newDivisionBtn': 'onClickNew'
+        'click @ui.submitBtn': 'onClickSubmit'
     },
     templateHelpers: function() {
         return {
-            submit: !!this.model ? 'Update' : 'Create'
+            action: this.model.isNew() ? 'Create' : 'Update',
+            code: this.model.isNew() ? '' : this.model.get('code'),
+            name: this.model.isNew() ? '' : this.model.get('name'),
         }
     },
-    onRender: function() {
-        if(this.model) {
-            this.ui.inputCode.val(this.model.get('code'));
-            this.ui.inputName.val(this.model.get('name'));
-        }
-    },
-    onClickNew: function() {
-        if(!this.model) this.model = new Division();
+    onClickSubmit: function() {
         this.bindBackboneValidation();
-
         var code = this.ui.inputCode.val().trim();
         var name = this.ui.inputName.val().trim();
-        var category = this.model.isNew() ? this.options.category : this.model.get('category');
-        this.model.set({code: code, name: name, category: category});
-        if(this.model.isValid(true)) {
-            this.collection.create(this.model, {wait: true});
-        }
+        this.model.set({ code: code, name: name });
+        if(this.model.isValid(true)) this.collection.create(this.model, { wait: true });
     },
     bindBackboneValidation: function() {
         Backbone.Validation.bind(this, {

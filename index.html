@@ -350,7 +350,7 @@
     </script>
 
     <script id="divisions_main_view" type="text/template">
-      <div id="divisions_main"></div>
+      <div id="divisions_main_region"></div>
     </script>
 
     <script id="divisions_view" type="text/template">
@@ -368,7 +368,7 @@
           <th></th>
           <th></th>
         </tr>
-        <tbody id="division_list"></tbody>
+        <tbody id="divisions_child_container"></tbody>
       </table>
     </script>
 
@@ -381,24 +381,24 @@
     </script>
 
     <script id="division_form_view" type="text/template">
-      <div class="panel-heading">New Division</div>
+      <div class="panel-heading">{{= action }} Division</div>
       <div class="panel-body">
         <form class="form-horizontal">
           <div class="form-group">
             <label class="col-sm-2 control-label">Code</label>
             <div class="col-sm-10">
-              <input type="text" class="code form-control" name="code" />
+              <input type="text" class="code form-control" name="code" value="{{=  code }}" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Name</label>
             <div class="col-sm-10">
-              <input type="text" class="name form-control" name="name" />
+              <input type="text" class="name form-control" name="name" value="{{= name }}" />
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="button" class="btn btn-default new-division">{{= submit }}</button>
+              <button type="button" class="btn btn-default submit-division">{{= action }}</button>
             </div>
           </div>
         </form>

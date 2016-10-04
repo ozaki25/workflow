@@ -1,35 +1,37 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var Division = require('../../models/Division');
 var DivisionsView = require('./DivisionsView');
 var FormView = require('./FormView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#divisions_main_view',
     regions: {
-        divisionsMain: '#divisions_main'
+        divisionsMainRegion: '#divisions_main_region'
     },
     collectionEvents: {
-        'add change': 'showIndex'
+        'sync': 'renderIndex',
     },
     childEvents: {
-        'click:new': 'showNew',
-        'click:edit': 'showEdit'
+        'click:new': 'onClickNew',
+        'click:edit': 'onClickEdit'
     },
     onRender: function() {
-        var divisionsView = new DivisionsView({collection: this.collection, model: this.model});
-        this.getRegion('divisionsMain').show(divisionsView);
+        this.renderIndex();
     },
-    showNew: function() {
-        var formView = new FormView({collection: this.collection, category: this.model});
-        this.getRegion('divisionsMain').show(formView);
+    renderIndex: function() {
+        var divisionsView = new DivisionsView({ collection: this.collection, model: this.model });
+        this.getRegion('divisionsMainRegion').show(divisionsView);
     },
-    showEdit: function(view) {
-        var formView = new FormView({collection: this.collection, model: view.model});
-        this.getRegion('divisionsMain').show(formView);
+    renderForm: function(model) {
+        var formView = new FormView({ collection: this.collection, model: model });
+        this.getRegion('divisionsMainRegion').show(formView);
     },
-    showIndex: function() {
-        var divisionsView = new DivisionsView({collection: this.collection, model: this.model});
-        this.getRegion('divisionsMain').show(divisionsView);
-    }
+    onClickNew: function() {
+        this.renderForm(new Division({ category: this.model }))
+    },
+    onClickEdit: function(view) {
+        this.renderForm(view.model);
+    },
 });
 

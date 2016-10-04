@@ -1,7 +1,5 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-Backbone.csrf = require('../../csrf');
-Backbone.csrf();
 var Divisions = require('../../collections/Divisions');
 var DivisionColView = require('./DivisionColView');
 
@@ -9,7 +7,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     tagName: 'tr',
     template: '#category_view',
     childView: DivisionColView,
-    childViewContainer: '#division_col_list',
+    childViewContainer: '#divisions_child_container',
     ui: {
         toDivisionsBtn: '.to-divisions',
         toReceptnistsBtn: '.to-receptnists',
@@ -41,6 +39,6 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     onClickDeleteBtn: function(e) {
         e.preventDefault();
-        this.model.destroy({wait: true});
+        this.model.destroy({ wait: true });
     }
 });

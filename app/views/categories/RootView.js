@@ -5,7 +5,7 @@ var Categories = require('../../collections/Categories');
 
 var HeaderView   = require('../HeaderView');
 var SideMenuView = require('../SideMenuView');
-var MainView    = require('./MainView');
+var MainView     = require('./MainView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#root_view',
@@ -30,7 +30,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     renderMain: function() {
         var categories = new Categories();
-        categories.fetch();
-        this.getRegion('mainRegion').show(new MainView({ collection: categories }));
+        categories.fetch().done(function() {
+            this.getRegion('mainRegion').show(new MainView({ collection: categories }));
+        }.bind(this));
     },
 });

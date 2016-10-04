@@ -5,9 +5,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     template: '#header_view',
     templateHelpers: function() {
         return {
-            username: function() {
-                if(this.model) return this.model.get('name') + '(' + this.model.get('uid') + ')';
-            }.bind(this)
+            username: this.model ? this.model.get('name') + '(' + this.model.get('uid') + ')' : '',
         }
     }
 });

@@ -34,7 +34,7 @@
           </div>
           <div class="collapse navbar-collapse" id="navbar_links">
             <ul class="nav navbar-nav pull-right">
-              <li><a href="/login">{{= username() }}</a></li>
+              <li><a href="/login">{{= username }}</a></li>
             </ul>
           </div>
         </div>
@@ -286,7 +286,7 @@
     </script>
 
     <script id="categories_main_view" type="text/template">
-      <div id="categories_main"></div>
+      <div id="categories_main_region"></div>
     </script>
 
     <script id="categories_view" type="text/template">
@@ -306,14 +306,14 @@
           <th></th>
           <th></th>
         </tr>
-        <tbody id="category_list"></tbody>
+        <tbody id="categories_child_container"></tbody>
       </table>
     </script>
 
     <script id="category_view" type="text/template">
       <td>{{- code }}</td>
       <td>{{- name }}</td>
-      <td id="division_col_list"></td>
+      <td id="divisions_child_container"></td>
       <td><a class="btn btn-default btn-xs to-divisions">Divisions</a></td>
       <td><a class="btn btn-default btn-xs to-receptnists">Receptnists</a></td>
       <td><a class="btn btn-default btn-xs edit">Edit</a></td>
@@ -325,24 +325,24 @@
     </script>
 
     <script id="category_form_view" type="text/template">
-      <div class="panel-heading">New Category</div>
+      <div class="panel-heading">{{= action }} Category</div>
       <div class="panel-body">
         <form class="form-horizontal">
           <div class="form-group">
             <label class="col-sm-2 control-label">Code</label>
             <div class="col-sm-10">
-              <input type="text" class="code form-control" name="code" />
+              <input type="text" class="code form-control" name="code" value="{{= code }}" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">Name</label>
             <div class="col-sm-10">
-              <input type="text" class="name form-control" name="name" />
+              <input type="text" class="name form-control" name="name" value="{{= name }}" />
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="button" class="btn btn-default new-category">{{= submit }}</button>
+              <button type="button" class="btn btn-default submit-category">{{= action }}</button>
             </div>
           </div>
         </form>

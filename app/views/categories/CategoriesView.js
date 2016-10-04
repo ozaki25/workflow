@@ -6,7 +6,7 @@ var CategoryView = require('./CategoryView');
 module.exports = Backbone.Marionette.CompositeView.extend({
     className: 'panel panel-default',
     childView: CategoryView,
-    childViewContainer: '#category_list',
+    childViewContainer: '#categories_child_container',
     template: '#categories_view',
     ui: {
         newCategoryBtn: '.new-category'

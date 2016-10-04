@@ -1,43 +1,45 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+var Category = require('../../models/Category');
 var CategoriesView = require('./CategoriesView');
 var FormView = require('./FormView');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#categories_main_view',
     regions: {
-        categoriesMain: '#categories_main'
+        categoriesMainRegion: '#categories_main_region'
     },
     collectionEvents: {
-        'add change': 'showIndex'
+        'sync': 'renderIndex',
     },
     childEvents: {
-        'click:new': 'showNew',
-        'click:edit': 'showEdit',
-        'click:divisions': 'showDivisions',
-        'click:receptnists': 'showReceptnists'
+        'click:new'        : 'onClickNew',
+        'click:edit'       : 'onClickEdit',
+        'click:divisions'  : 'onClickDivisions',
+        'click:receptnists': 'onClickReceptnists',
     },
     onRender: function() {
-        var categoriesView = new CategoriesView({collection: this.collection});
-        this.getRegion('categoriesMain').show(categoriesView);
+        this.renderIndex();
     },
-    showNew: function() {
-        var formView = new FormView({collection: this.collection});
-        this.getRegion('categoriesMain').show(formView);
+    renderIndex: function() {
+        var categoriesView = new CategoriesView({ collection: this.collection });
+        this.getRegion('categoriesMainRegion').show(categoriesView);
     },
-    showEdit: function(view) {
-        var formView = new FormView({collection: this.collection, model: view.model});
-        this.getRegion('categoriesMain').show(formView);
+    renderForm: function(model) {
+        var formView = new FormView({ collection: this.collection, model: model });
+        this.getRegion('categoriesMainRegion').show(formView);
     },
-    showIndex: function() {
-        var categoriesView = new CategoriesView({collection: this.collection});
-        this.getRegion('categoriesMain').show(categoriesView);
+    onClickNew: function() {
+        this.renderForm(new Category());
     },
-    showDivisions: function(view) {
+    onClickEdit: function(view) {
+        this.renderForm(view.model);
+    },
+    onClickDivisions: function(view) {
         Backbone.history.navigate('#/categories/' + view.model.id + '/divisions', {trigger: true});
     },
-    showReceptnists: function(view) {
+    onClickReceptnists: function(view) {
         Backbone.history.navigate('#/categories/' + view.model.id + '/receptnists', {trigger: true});
-    }
+    },
 });
 

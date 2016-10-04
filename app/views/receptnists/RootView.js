@@ -37,6 +37,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     renderMain: function() {
         var category = new Category({ id: this.categoryId }, { collection: new Categories() });
         var receptnists = new Receptnists();
+            receptnists.setUrl(this.categoryId);
         var users = new Users();
 
         users.fetch().done(function() {
@@ -48,7 +49,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             });
             this.getRegion('mainRegion').show(mainView);
             category.fetch();
-            receptnists.setUrl(this.categoryId);
             receptnists.fetch();
         }.bind(this));
     },

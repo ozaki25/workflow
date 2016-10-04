@@ -13,7 +13,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#work_date_term_view',
     regions: {
         fromDateRegion: '#from_date_region',
-        toDateRegion: '#to_date_region',
+        toDateRegion  : '#to_date_region',
     },
     onBeforeShow: function() {
         this.renderFromDate();

@@ -11,7 +11,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#users_modal_view',
     regions: {
         'teamSelectboxRegion': '#team_selectbox_region',
-        'userTableRegion': '#user_table_region',
+        'userTableRegion'    : '#user_table_region',
     },
     ui: {
         submitBtn: 'button.submit'
@@ -21,12 +21,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     childEvents: {
         'change:selectbox': 'onChangeSelectbox',
-        'click:row': 'onClickRow',
+        'click:row'       : 'onClickRow',
     },
     initialize: function(options) {
-        this.type = options.type || 'radio';
+        this.type        = options.type || 'radio';
         this.currentUser = options.currentUser;
-        this.teams = options.teams;
+        this.teams       = options.teams;
         this.findOptions = options.findOptions;
         this._getUsers(this.currentUser.get('team'));
     },

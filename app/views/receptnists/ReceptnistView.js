@@ -5,11 +5,11 @@ module.exports = Backbone.Marionette.ItemView.extend({
     tagName: 'tr',
     template: '#receptnist_view',
     ui: {
-        editBtn: '.edit',
+        editBtn  : '.edit',
         deleteBtn: '.delete'
     },
     events: {
-        'click @ui.editBtn': 'onClickEditBtn',
+        'click @ui.editBtn'  : 'onClickEditBtn',
         'click @ui.deleteBtn': 'onClickDeleteBtn'
     },
     initialize: function(options) {

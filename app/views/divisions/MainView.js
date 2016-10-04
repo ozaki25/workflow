@@ -13,8 +13,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'sync': 'renderIndex',
     },
     childEvents: {
-        'click:new': 'onClickNew',
-        'click:edit': 'onClickEdit'
+        'click:new' : 'onClickNew',
+        'click:edit': 'onClickEdit',
     },
     onRender: function() {
         this.renderIndex();

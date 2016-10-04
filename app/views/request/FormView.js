@@ -218,7 +218,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('downloadFilesRegion').show(downloadFilesView);
     },
     renderHistories: function() {
-        if(this.model.ges('histories')) {
+        if(this.model.get('histories')) {
             var columns = [
                 { label: '操作', name: 'action' },
                 { label: '名前', name: 'name' },

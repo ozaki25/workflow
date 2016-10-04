@@ -9,19 +9,19 @@ var UsersModalView = require('../UsersModalView');
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: '#receptnists_main_view',
     regions: {
-        receptnistsMainRegion: '#receptnists_main_region',
+        receptnistsMainRegion : '#receptnists_main_region',
         receptnistsModalRegion: '#select_receptnists_modal_region'
     },
     collectionEvents: {
         'sync': 'renderIndex'
     },
     childEvents: {
-        'click:edit': 'onClickEdit',
+        'click:edit'  : 'onClickEdit',
         'select:users': 'onSelectUsers'
     },
     initialize: function(options) {
         this.currentUser = options.currentUser;
-        this.teams = options.teams;
+        this.teams       = options.teams;
     },
     onRender: function() {
         this.renderIndex();

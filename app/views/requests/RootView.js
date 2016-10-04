@@ -21,8 +21,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         mainRegion    : '#main_region',
     },
     initialize: function(options) {
-        this.currentUser= options.currentUser;
-        this.pageNumber = options.pageNumber;
+        this.currentUser = options.currentUser;
+        this.pageNumber  = options.pageNumber;
         this.searchQuery = options.searchQuery;
     },
     onRender: function() {
@@ -37,10 +37,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('sideMenuRegion').show(new SideMenuView());
     },
     renderMain: function() {
-        var requests = new Requests();
-        var statusList = new StatusList();
-        var categories = new Categories();
-        var teams = new RequestDepartments();
+        var requests       = new Requests();
+        var statusList     = new StatusList();
+        var categories     = new Categories();
+        var teams          = new RequestDepartments();
         var requestNumbers = new RequestNumbers();
         Backbone.$.when(
             requests.fetch(),

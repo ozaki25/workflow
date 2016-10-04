@@ -12,7 +12,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'add change': 'showIndex'
     },
     childEvents: {
-        'click:new': 'showNew',
+        'click:new' : 'showNew',
         'click:edit': 'showEdit'
     },
     onRender: function() {

@@ -8,12 +8,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-default',
     template: '#user_form_view',
     ui: {
-        inputUid: 'input.uid',
-        inputName: 'input.name',
-        inputTeam: 'input.team',
+        inputUid     : 'input.uid',
+        inputName    : 'input.name',
+        inputTeam    : 'input.team',
         inputJobLevel: 'select.job-level',
-        inputAdmin: 'input.admin',
-        newUserBtn: '.new-user'
+        inputAdmin   : 'input.admin',
+        newUserBtn   : '.new-user'
     },
     events: {
         'click @ui.newUserBtn': 'onClickNew'

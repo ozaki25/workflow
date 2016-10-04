@@ -9,16 +9,16 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     childView: DivisionColView,
     childViewContainer: '#divisions_child_container',
     ui: {
-        toDivisionsBtn: '.to-divisions',
+        toDivisionsBtn  : '.to-divisions',
         toReceptnistsBtn: '.to-receptnists',
-        editBtn: '.edit',
-        deleteBtn: '.delete'
+        editBtn         : '.edit',
+        deleteBtn       : '.delete',
     },
     events: {
-        'click @ui.toDivisionsBtn': 'onClickToDivisionsBtn',
+        'click @ui.toDivisionsBtn'  : 'onClickToDivisionsBtn',
         'click @ui.toReceptnistsBtn': 'onClickToReceptnistsBtn',
-        'click @ui.editBtn': 'onClickEditBtn',
-        'click @ui.deleteBtn': 'onClickDeleteBtn'
+        'click @ui.editBtn'         : 'onClickEditBtn',
+        'click @ui.deleteBtn'       : 'onClickDeleteBtn'
     },
     initialize: function() {
         this.collection = new Divisions();

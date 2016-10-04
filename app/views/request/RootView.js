@@ -22,8 +22,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         mainRegion    : '#main_region',
     },
     initialize: function(options) {
-        this.requestId = options.requestId;
-        this.currentUser= options.currentUser;
+        this.requestId   = options.requestId;
+        this.currentUser = options.currentUser;
     },
     onRender: function() {
         this.renderHeader();

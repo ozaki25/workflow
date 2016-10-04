@@ -9,22 +9,22 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     className: 'panel panel-default',
     template: '#request_index_view',
     regions: {
-        searchRegion: '#search_region',
+        searchRegion  : '#search_region',
         requestsRegion: '#requests_region',
-        pagingRegion: '#paging_region',
+        pagingRegion  : '#paging_region',
     },
     childEvents: {
-        'submit:search': 'onSubmitSearch',
-        'click:open': 'onClickOpen',
-        'click:header' : 'onClickHeader',
+        'submit:search'   : 'onSubmitSearch',
+        'click:open'      : 'onClickOpen',
+        'click:header'    : 'onClickHeader',
         'click:changePage': 'onClickChangePage',
     },
     initialize: function(options) {
-        this.statusList = options.statusList;
-        this.categories = options.categories;
-        this.teams = options.teams;
+        this.statusList     = options.statusList;
+        this.categories     = options.categories;
+        this.teams          = options.teams;
         this.requestNumbers = options.requestNumbers;
-        this.query = options.searchQuery;
+        this.query          = options.searchQuery;
         this.getRequestsPage();
     },
     onBeforeShow: function() {
@@ -34,10 +34,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     renderSearch: function() {
         var searchView = new SearchView({
-            query: this.query,
-            statusList: this.statusList,
-            categories: this.categories,
-            teams: this.teams,
+            query         : this.query,
+            statusList    : this.statusList,
+            categories    : this.categories,
+            teams         : this.teams,
             requestNumbers: this.requestNumbers,
         });
         this.getRegion('searchRegion').show(searchView);
@@ -53,7 +53,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         ];
         var gridView = new GridView({
             collection: this.collection,
-            columns: columns,
+            columns   : columns,
             eventNames: ['click:open'],
         });
         this.getRegion('requestsRegion').show(gridView);

@@ -6,7 +6,7 @@ Backbone.csrf();
 window.jQuery = Backbone.$;
 require('./assets/js/bootstrap');
 
-var User     = require('./models/User');
+var User = require('./models/User');
 
 var RequestsRootView    = require('./views/requests/RootView.js');
 var RequestRootView     = require('./views/request/RootView.js');

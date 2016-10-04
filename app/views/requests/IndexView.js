@@ -72,13 +72,24 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         Backbone.history.navigate('/requests/' + view.model.id, { trigger: true });
     },
     onClickHeader: function(view, name, e) {
-        if(name === 'title') {
-            this.model.set({ pageNumber: 1 });
-            this.query.order = this.query.order && this.query.order === 'title.asc' ? 'title.desc' : 'title.asc';
-            this.getRequestsPage();
-        }
+        var sortColumn =
+            name === 'reqId'       ? 'id' :
+            name === 'status.name' ? 'status' :
+            name === 'title'       ? 'title' : '';
+        if(sortColumn) this.setSortQuery(sortColumn);
     },
     onClickChangePage: function(view) {
+        this.getRequestsPage();
+    },
+    setSortQuery: function(name) {
+        this.model.set({ pageNumber: 1 });
+
+        var sorted = this.query.order ? this.query.order.split('.') : [];
+        if(sorted.length <= 1) sorted = ['id', 'desc'];
+
+        var orderRule = sorted[0] === name && sorted[1] === 'desc' ? 'asc' : 'desc';
+
+        this.query.order = [name, orderRule].join('.');
         this.getRequestsPage();
     },
     getRequestsPage: function() {

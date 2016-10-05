@@ -17,6 +17,10 @@ module.exports = Backbone.Model.extend({
             required: true
         }
     },
+    parse: function(data) {
+        delete data.id;
+        return data;
+    },
     isAdmin: function() {
         return this.get('admin');
     },

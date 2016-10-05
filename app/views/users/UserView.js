@@ -18,6 +18,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
     onClickDeleteBtn: function(e) {
         e.preventDefault();
-        this.model.destroy({wait: true});
+        console.log(this.model);
+        this.model.destroy({ wait: true });
     }
 });

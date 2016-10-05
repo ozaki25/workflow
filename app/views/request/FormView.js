@@ -5,10 +5,8 @@ Backbone.Validation = require('backbone.validation');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
 
-var Documents = require('../../collections/Documents');
 var Divisions = require('../../collections/Divisions');
 var Users     = require('../../collections/Users');
-var Histories = require('../../collections/Histories');
 
 var DownloadFilesView = require('./DownloadFilesView');
 var UsersModalView    = require('../UsersModalView');
@@ -70,7 +68,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.currentUser = options.currentUser;
         this.statusList  = options.statusList;
         this.teams       = options.teams;
-        this.documents   = new Documents(this.model.get('documents'));
+        this.histories   = options.histories;
+        this.documents   = options.documents;
+        this.receptnists = options.receptnists;
         this.categories  = options.categories;
         this.divisions   = new Divisions();
         this.getDivision(this.model.isNew() ? this.categories.first().id : this.model.get('category').id);
@@ -131,7 +131,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             this.renderUserModal();
         }
         if(this.model.isRequested()) this.renderWorkContent();
-        this.renderHistories();
+        if(this.histories.length) this.renderHistories();
     },
     renderRequestId: function() {
         var requestIdView = new ParagraphView({ _className: 'form-control-static', _text: this.model.get('reqId') });
@@ -218,20 +218,18 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('downloadFilesRegion').show(downloadFilesView);
     },
     renderHistories: function() {
-        if(this.model.get('histories')) {
-            var columns = [
-                { label: '操作', name: 'action' },
-                { label: '名前', name: 'name' },
-                { label: '部署', name: 'team' },
-                { label: '日付', name: 'createdDate' },
-            ];
-            var gridView = new GridView({
-                collection: new Histories(this.model.get('histories')),
-                columns: columns,
-                _className: 'table table-bordered',
-            });
-            this.getRegion('historiesRegion').show(gridView);
-        }
+        var columns = [
+            { label: '操作', name: 'action' },
+            { label: '名前', name: 'name' },
+            { label: '部署', name: 'team' },
+            { label: '日付', name: 'createdDate' },
+        ];
+        var gridView = new GridView({
+            collection: this.histories,
+            columns: columns,
+            _className: 'table table-bordered',
+        });
+        this.getRegion('historiesRegion').show(gridView);
     },
     renderError: function() {
         var alertView = new AlertView({ alertType: 'danger', message: '操作に失敗しました。もう一度やり直して下さい。' })
@@ -248,7 +246,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     onSelectAuthorizer: function(view, user) {
         this.$('.authorizer-name').remove();
         this.$('input.authorizer').val(JSON.stringify(user));
-        this.ui.openAuthorizerBtn.before('<p class="form-control-static authorizer-name">' + user.get('name') + '(' + user.get('uid') + ')' + '</p>');
+        this.ui.openModalBtn.before('<p class="form-control-static authorizer-name">' + user.get('name') + '(' + user.get('uid') + ')' + '</p>');
     },
     onSelectFile: function(e) {
         var input = this.$(e.target);
@@ -371,7 +369,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canAccept: function() {
         return this.model.isWaitingAccept() &&
-            (this.currentUser.isReceptionist(this.model.get('category').receptnists) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.receptnists.toJSON()) || this.currentUser.isAdmin());
     },
     canReport: function() {
         return this.model.isWaitingWorkComplete() &&
@@ -379,11 +377,11 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     canFinish: function() {
         return this.model.isWaitingFinish() &&
-            (this.currentUser.isReceptionist(this.model.get('category').receptnists) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.receptnists.toJSON()) || this.currentUser.isAdmin());
     },
     canRestore: function() {
         return this.model.isCompleted() &&
-            (this.currentUser.isReceptionist(this.model.get('category').receptnists) || this.currentUser.isAdmin());
+            (this.currentUser.isReceptionist(this.receptnists.toJSON()) || this.currentUser.isAdmin());
     },
     canRequest: function() {
         return this.model.isNew() || this.canEdit();

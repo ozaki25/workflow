@@ -47,42 +47,49 @@ var appRouter = Backbone.Marionette.AppRouter.extend({
                 var pageNumber = query ? parseInt(query.page) || 1 : 1;
                 var searchQuery = query ? _(query).pick(searchItems) : {};
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new RequestsRootView({ currentUser: currentUser, pageNumber: pageNumber, searchQuery: searchQuery }));
             });
         },
         request: function(id) {
             getCurrentUser.done(function(user) {
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new RequestRootView({ currentUser: currentUser, requestId: id }));
             });
         },
         users: function() {
             getCurrentUser.done(function(user) {
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new UsersRootView({ currentUser: currentUser }));
             });
         },
         categories: function() {
             getCurrentUser.done(function(user) {
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new CategoriesRootView({ currentUser: currentUser }));
             });
         },
         divisions: function(categoryId) {
             getCurrentUser.done(function(user) {
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new DivisionsRootView({ currentUser: currentUser, categoryId: categoryId }));
             });
         },
         receptnists: function(categoryId) {
             getCurrentUser.done(function(user) {
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new ReceptnistsRootView({ currentUser: currentUser, categoryId: categoryId }));
             });
         },
         statusList: function() {
             getCurrentUser.done(function(user) {
                 var currentUser = new User(user);
+                currentUser.unset('id');
                 app.getRegion('rootRegion').show(new StatusRootView({ currentUser: currentUser }));
             });
         },

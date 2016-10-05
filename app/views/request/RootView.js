@@ -4,11 +4,14 @@ Backbone.Marionette = require('backbone.marionette');
 
 var Request = require('../../models/Request');
 
-var Requests   = require('../../collections/Requests');
-var StatusList = require('../../collections/StatusList');
-var Categories = require('../../collections/Categories');
-var Users      = require('../../collections/Users')
-var Teams      = require('../../collections/Teams')
+var Requests    = require('../../collections/Requests');
+var StatusList  = require('../../collections/StatusList');
+var Categories  = require('../../collections/Categories');
+var Users       = require('../../collections/Users')
+var Teams       = require('../../collections/Teams')
+var Documents   = require('../../collections/Documents');
+var Histories   = require('../../collections/Histories')
+var Receptnists = require('../../collections/Receptnists')
 
 var HeaderView   = require('../HeaderView');
 var SideMenuView = require('../SideMenuView');
@@ -37,26 +40,43 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.getRegion('sideMenuRegion').show(new SideMenuView());
     },
     renderMain: function() {
-        var request =  new Request({}, { collection: new Requests() });
-        if(!!this.requestId) request.set({ id: this.requestId });
-        var statusList = new StatusList();
-        var categories = new Categories();
-        var users = new Users();
+        var request     = new Request({}, { collection: new Requests() });
+        var statusList  = new StatusList();
+        var categories  = new Categories();
+        var users       = new Users();
+        var histories   = new Histories();
+        var receptnists = new Receptnists();
+        if(!!this.requestId) {
+            request.set({ id: this.requestId });
+            histories.setUrl(this.requestId);
+        }
 
         Backbone.$.when(
             request.has('id') ? request.fetch() : _.noop(),
             statusList.fetch(),
             categories.fetch(),
-            users.fetch()
+            users.fetch(),
+            histories.url ? histories.fetch() : _.noop()
         ).done(function() {
             var formView = new FormView({
                 model      : request,
                 statusList : statusList,
                 categories : categories,
                 teams      : new Teams(users.getTeamList()),
+                documents  : new Documents(request.get('documents')),
+                histories  : histories,
+                receptnists: receptnists,
                 currentUser: this.currentUser,
             });
-            this.getRegion('mainRegion').show(formView);
+            if(request.isRequested()) {
+                receptnists.setUrl(request.get('category').id);
+                receptnists.fetch().done(function() {
+                    formView.receptnists = receptnists;
+                    this.getRegion('mainRegion').show(formView);
+                }.bind(this));
+            } else {
+                this.getRegion('mainRegion').show(formView);
+            }
         }.bind(this));
     },
 });

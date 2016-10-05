@@ -11,7 +11,7 @@ module.exports = Backbone.Marionette.View.extend({
     collectionEvents: {
         'add change': 'showIndex'
     },
-    childEvents: {
+    childViewEvents: {
         'click:new' : 'showNew',
         'click:edit': 'showEdit'
     },

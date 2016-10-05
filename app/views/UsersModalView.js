@@ -19,7 +19,7 @@ module.exports = Backbone.Marionette.View.extend({
     events: {
         'click @ui.submitBtn': 'onClickSubmitBtn'
     },
-    childEvents: {
+    childViewEvents: {
         'change:selectbox': 'onChangeSelectbox',
         'click:row'       : 'onClickRow',
     },

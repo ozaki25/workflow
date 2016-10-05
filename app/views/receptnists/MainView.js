@@ -15,7 +15,7 @@ module.exports = Backbone.Marionette.View.extend({
     collectionEvents: {
         'sync': 'renderIndex'
     },
-    childEvents: {
+    childViewEvents: {
         'click:edit'  : 'onClickEdit',
         'select:users': 'onSelectUsers'
     },

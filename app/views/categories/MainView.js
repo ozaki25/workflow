@@ -12,7 +12,7 @@ module.exports = Backbone.Marionette.View.extend({
     collectionEvents: {
         'sync': 'renderIndex',
     },
-    childEvents: {
+    childViewEvents: {
         'click:new'        : 'onClickNew',
         'click:edit'       : 'onClickEdit',
         'click:divisions'  : 'onClickDivisions',

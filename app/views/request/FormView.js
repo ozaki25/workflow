@@ -45,7 +45,7 @@ module.exports = Backbone.Marionette.View.extend({
         'click @ui.rejectBtn' : 'onClickReject',
         'click @ui.destroyBtn': 'onClickDestroy',
     },
-    childEvents: {
+    childViewEvents: {
         'select:user'    : 'onSelectAuthorizer',
         'change:category': 'onChangeCategorySelectbox',
     },

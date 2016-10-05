@@ -55,7 +55,7 @@ var GridRowView = Backbone.Marionette.View.extend({
             event[eventName] = function() {
                 this.triggerMethod.apply(this, [eventName].concat(_(arguments).rest()));
             };
-            this.childEvents = Backbone.$.extend({}, this.childEvents, event);
+            this.childViewEvents = Backbone.$.extend({}, this.childViewEvents, event);
         }.bind(this));
     },
 });

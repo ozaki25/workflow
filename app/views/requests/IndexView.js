@@ -13,7 +13,7 @@ module.exports = Backbone.Marionette.View.extend({
         requestsRegion: '#requests_region',
         pagingRegion  : '#paging_region',
     },
-    childEvents: {
+    childViewEvents: {
         'submit:search'   : 'onSubmitSearch',
         'click:open'      : 'onClickOpen',
         'click:header'    : 'onClickHeader',

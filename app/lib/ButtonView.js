@@ -25,7 +25,7 @@ var ButtonView = Backbone.Marionette.View.extend({
     },
     onClick: function(e) {
         e.preventDefault();
-        this.triggerMethod(this.clickEventName);
+        this.triggerMethod(this.clickEventName, this);
     }
 });
 

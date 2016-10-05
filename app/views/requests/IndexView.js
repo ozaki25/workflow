@@ -62,7 +62,7 @@ module.exports = Backbone.Marionette.View.extend({
         var pagingView = new PagingView({ collection: this.collection, model: this.model });
         this.getRegion('pagingRegion').show(pagingView);
     },
-    onSubmitSearch: function(view, query) {
+    onSubmitSearch: function(query) {
         this.query = query;
         this.model.set({ pageNumber: 1 });
         this.getRequestsPage();
@@ -78,7 +78,7 @@ module.exports = Backbone.Marionette.View.extend({
             name === 'title'       ? 'title' : '';
         if(sortColumn) this.setSortQuery(sortColumn);
     },
-    onClickChangePage: function(view) {
+    onClickChangePage: function() {
         this.getRequestsPage();
     },
     setSortQuery: function(name) {

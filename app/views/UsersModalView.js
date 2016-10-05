@@ -65,8 +65,8 @@ module.exports = Backbone.Marionette.View.extend({
             var cid = this.$(input).parent('td').attr('data-row-id');
             return _(this.collection.models).findWhere({ cid: cid });
         }.bind(this));
-        if(this.type === 'radio') this.triggerMethod('select:user', selectedUsers[0]);
-        if(this.type === 'checkbox') this.triggerMethod('select:users', selectedUsers);
+        if(this.type === 'radio') this.triggerMethod('select:user', this, selectedUsers[0]);
+        if(this.type === 'checkbox') this.triggerMethod('select:users', this, selectedUsers);
         this.$el.modal('hide');
     },
     onChangeSelectbox: function(view, value, model) {

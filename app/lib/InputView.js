@@ -22,10 +22,10 @@ var InputView = Backbone.Marionette.View.extend({
         'keypress': 'onKeyPress',
     },
     onChange: function() {
-        this.triggerMethod(this.changeEventName, this.$el.val());
+        this.triggerMethod(this.changeEventName, this, this.$el.val());
     },
     onKeyPress: function() {
-        this.triggerMethod(this.keypressEventName, this.$el.val());
+        this.triggerMethod(this.keypressEventName, this, this.$el.val());
     },
 });
 

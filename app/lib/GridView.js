@@ -47,7 +47,7 @@ var GridRowView = Backbone.Marionette.View.extend({
     },
     onClick: function(e) {
         e.preventDefault();
-        this.triggerMethod(this.clickRowEventName, e);
+        this.triggerMethod(this.clickRowEventName, this, e);
     },
     addChildEvents: function() {
         _(this.eventNames).each(function(eventName) {
@@ -103,7 +103,7 @@ var GridView = Backbone.Marionette.CompositeView.extend({
         'click @ui.tableHeader': 'onClickTableHeader',
     },
     onClickTableHeader: function(e) {
-        this.triggerMethod(this.clickHeaderEventName, this.$(e.target).attr('name'), e);
+        this.triggerMethod(this.clickHeaderEventName, this, this.$(e.target).attr('name'), e);
     }
 });
 

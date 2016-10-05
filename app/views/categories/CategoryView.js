@@ -27,15 +27,15 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     },
     onClickToDivisionsBtn: function(e) {
         e.preventDefault();
-        this.triggerMethod('click:divisions');
+        this.triggerMethod('click:divisions', this);
     },
     onClickToReceptnistsBtn: function(e) {
         e.preventDefault();
-        this.triggerMethod('click:receptnists');
+        this.triggerMethod('click:receptnists', this);
     },
     onClickEditBtn: function(e) {
         e.preventDefault();
-        this.triggerMethod('click:edit');
+        this.triggerMethod('click:edit', this);
     },
     onClickDeleteBtn: function(e) {
         e.preventDefault();

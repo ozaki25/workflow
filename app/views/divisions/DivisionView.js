@@ -22,7 +22,7 @@ module.exports = Backbone.Marionette.View.extend({
     },
     onClickEditBtn: function(e) {
         e.preventDefault();
-        this.triggerMethod('click:edit');
+        this.triggerMethod('click:edit', this);
     },
     onClickDeleteBtn: function(e) {
         e.preventDefault();

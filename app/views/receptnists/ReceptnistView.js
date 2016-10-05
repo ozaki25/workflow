@@ -5,7 +5,6 @@ module.exports = Backbone.Marionette.View.extend({
     tagName: 'tr',
     template: '#receptnist_view',
     ui: {
-        editBtn  : '.edit',
         deleteBtn: '.delete'
     },
     events: {
@@ -19,10 +18,6 @@ module.exports = Backbone.Marionette.View.extend({
         return {
             categoryName: this.categoryName
         }
-    },
-    onClickEditBtn: function(e) {
-        e.preventDefault();
-        this.triggerMethod('click:edit');
     },
     onClickDeleteBtn: function(e) {
         e.preventDefault();

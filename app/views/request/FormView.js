@@ -116,7 +116,7 @@ module.exports = Backbone.Marionette.View.extend({
             destroy  : this.canDestroy() ? '<button type="button" class="btn btn-default destroy-btn">Destroy</button>' : '',
         }
     },
-    onBeforeShow: function() {
+    onRender: function() {
         if(!this.model.isNew()) {
             this.renderRequestId();
             this.renderStatus();

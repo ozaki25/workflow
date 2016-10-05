@@ -43,7 +43,7 @@ module.exports = Backbone.Marionette.View.extend({
     initialize: function(options) {
         this.message = options.message || '';
     },
-    onBeforeShow: function() {
+    onRender: function() {
         if(typeof this.message === 'object') {
             this.addRegion('messageRegion', '#message_region');
             this.getRegion('messageRegion').show(this.message);

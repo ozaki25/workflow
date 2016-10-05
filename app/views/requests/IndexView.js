@@ -27,7 +27,7 @@ module.exports = Backbone.Marionette.View.extend({
         this.query          = options.searchQuery;
         this.getRequestsPage();
     },
-    onBeforeShow: function() {
+    onRender: function() {
         this.renderSearch();
         this.renderRequests();
         this.renderPaging();

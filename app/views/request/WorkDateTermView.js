@@ -15,7 +15,7 @@ module.exports = Backbone.Marionette.View.extend({
         fromDateRegion: '#from_date_region',
         toDateRegion  : '#to_date_region',
     },
-    onBeforeShow: function() {
+    onRender: function() {
         this.renderFromDate();
         this.renderToDate();
         this.setupDatepicker();

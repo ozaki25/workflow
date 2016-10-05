@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: function() {
         var classNames = (this.options._className || '') + ' alert alert-dismissible ';
         switch(this.options.alertType) {
@@ -35,7 +35,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         '</button>' +
         '<%= message %>'
     ),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             message: typeof this.message === 'string' ? this.message : '<div id="message_region"></div>',
         }

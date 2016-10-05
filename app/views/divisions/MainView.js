@@ -4,7 +4,7 @@ var Division = require('../../models/Division');
 var DivisionsView = require('./DivisionsView');
 var FormView = require('./FormView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     template: '#divisions_main_view',
     regions: {
         divisionsMainRegion: '#divisions_main_region'

@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var GridRowView = Backbone.Marionette.LayoutView.extend({
+var GridRowView = Backbone.Marionette.View.extend({
     tagName: 'tr',
     attributes: function() {
         return {
@@ -10,7 +10,7 @@ var GridRowView = Backbone.Marionette.LayoutView.extend({
         }
     },
     template: _.template('<%= rowData %>'),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             rowData: _(this.columns).map(function(col) {
                 var id = this.model.cid + '_' + (col.view ? col.view.cid : col.name);
@@ -83,7 +83,7 @@ var GridView = Backbone.Marionette.CompositeView.extend({
       '</thead>' +
       '<tbody id="grid_child_container"></tbody>'
     ),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             tableHeader: _(this.columns).map(function(col) {
                 return '<th name="' + (col.name || '') + '">' + (col.label || col.name || '') + '</th>'

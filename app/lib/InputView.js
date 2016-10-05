@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var InputView = Backbone.Marionette.ItemView.extend({
+var InputView = Backbone.Marionette.View.extend({
     tagName: 'input',
     attributes: function() {
         return Backbone.$.extend(this.options.attrs, {

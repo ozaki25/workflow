@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var ButtonView = Backbone.Marionette.ItemView.extend({
+var ButtonView = Backbone.Marionette.View.extend({
     tagName: 'button',
     attributes: function() {
         return Backbone.$.extend(this.options.attrs, {
@@ -11,7 +11,7 @@ var ButtonView = Backbone.Marionette.ItemView.extend({
         });
     },
     template: _.template('<%= label %>'),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             label: this.label
         }

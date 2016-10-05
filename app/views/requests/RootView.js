@@ -13,7 +13,7 @@ var HeaderView   = require('../HeaderView');
 var SideMenuView = require('../SideMenuView');
 var IndexView    = require('./IndexView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     template: '#root_view',
     regions: {
         headerRegion  : '#header_region',

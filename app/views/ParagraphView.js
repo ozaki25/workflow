@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var ParagraphView = Backbone.Marionette.ItemView.extend({
+var ParagraphView = Backbone.Marionette.View.extend({
     tagName: 'p',
     attributes: function() {
         return Backbone.$.extend(this.options.attrs, {
@@ -11,7 +11,7 @@ var ParagraphView = Backbone.Marionette.ItemView.extend({
         });
     },
     template: _.template('<%= text %>'),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             text: this._text,
         }

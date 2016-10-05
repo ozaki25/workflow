@@ -4,7 +4,7 @@ Backbone.csrf = require('../../csrf');
 Backbone.csrf();
 var User = require('../../models/User');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: 'panel panel-default',
     template: '#user_form_view',
     ui: {
@@ -18,7 +18,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click @ui.newUserBtn': 'onClickNew'
     },
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             submit: !!this.model ? 'Update' : 'Create'
         }

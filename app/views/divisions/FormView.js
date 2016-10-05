@@ -3,7 +3,7 @@ Backbone.Marionette = require('backbone.marionette');
 Backbone.csrf = require('../../csrf');
 Backbone.csrf();
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: 'panel panel-default',
     template: '#division_form_view',
     ui: {
@@ -14,7 +14,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     events: {
         'click @ui.submitBtn': 'onClickSubmit'
     },
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             action: this.model.isNew() ? 'Create' : 'Update',
             code: this.model.isNew() ? '' : this.model.get('code'),

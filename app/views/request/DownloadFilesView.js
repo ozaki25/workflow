@@ -11,7 +11,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         }
     },
     template: '#download_files_view',
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             inputFile: this.canRequest ? '<input type="file" class="form-control file" />' : '',
         }

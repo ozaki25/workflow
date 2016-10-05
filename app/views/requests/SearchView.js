@@ -3,7 +3,7 @@ Backbone.Marionette = require('backbone.marionette');
 var SelectboxView = require('../../lib/SelectboxView')
 var InputView = require('../../lib/InputView')
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: 'panel-body',
     template: '#request_search_view',
     ui: {

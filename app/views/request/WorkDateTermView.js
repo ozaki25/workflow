@@ -3,7 +3,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var InputView = require('../../lib/InputView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: 'input-group',
     attributes: function() {
         return {

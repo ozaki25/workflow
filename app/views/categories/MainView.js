@@ -4,7 +4,7 @@ var Category = require('../../models/Category');
 var CategoriesView = require('./CategoriesView');
 var FormView = require('./FormView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     template: '#categories_main_view',
     regions: {
         categoriesMainRegion: '#categories_main_region'

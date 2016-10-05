@@ -6,7 +6,7 @@ var Users = require('../../collections/Users');
 var ReceptnistsView = require('./ReceptnistsView');
 var UsersModalView = require('../UsersModalView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     template: '#receptnists_main_view',
     regions: {
         receptnistsMainRegion : '#receptnists_main_region',

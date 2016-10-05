@@ -1,7 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.View.extend({
     tagName: 'tr',
     template: '#receptnist_view',
     ui: {
@@ -15,7 +15,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     initialize: function(options) {
         this.categoryName = options.categoryName;
     },
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             categoryName: this.categoryName
         }

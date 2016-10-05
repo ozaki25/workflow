@@ -2,7 +2,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var PageNumberView = require('./PageNumberView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     tagName: 'nav',
     template: '#request_paging_view',
     regions: {

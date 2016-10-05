@@ -1,7 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.View.extend({
     ui: {
         fileRemoveLink: '.file-remove-link'
     },
@@ -9,7 +9,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
         'click @ui.fileRemoveLink': 'onClickFileRemoveLink'
     },
     template: '#download_file_view',
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             url: this.model.url(),
             removeLink: this.canRequest ? '<a href="#" class="btn btn-link btn-xs file-remove-link">&times;</a>' : ''

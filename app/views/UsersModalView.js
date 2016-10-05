@@ -5,7 +5,7 @@ var GridView = require('../lib/GridView');
 var InputView = require('../lib/InputView');
 var SelectboxView = require('../lib/SelectboxView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     id: 'select_users_modal',
     className: 'modal fade',
     template: '#users_modal_view',

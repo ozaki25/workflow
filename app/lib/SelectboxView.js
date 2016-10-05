@@ -21,7 +21,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var SelectboxOptionView = Backbone.Marionette.ItemView.extend({
+var SelectboxOptionView = Backbone.Marionette.View.extend({
     tagName: 'option',
     attributes: function() {
         var selected = this.options.selected && this.options.selected.cid == this.model.cid ? { selected: 'selected' } : {};
@@ -31,7 +31,7 @@ var SelectboxOptionView = Backbone.Marionette.ItemView.extend({
         });
     },
     template: _.template('<%= label %>'),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             label: this.model.get(this.label),
         }

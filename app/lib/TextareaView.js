@@ -2,7 +2,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
-var TextareaView = Backbone.Marionette.ItemView.extend({
+var TextareaView = Backbone.Marionette.View.extend({
     tagName: 'textarea',
     attributes: function() {
         return Backbone.$.extend(this.options.attrs, {
@@ -11,7 +11,7 @@ var TextareaView = Backbone.Marionette.ItemView.extend({
         });
     },
     template: _.template('<%= value %>'),
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             value: this.value,
         }

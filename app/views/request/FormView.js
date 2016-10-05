@@ -19,7 +19,7 @@ var InputView     = require('../../lib/InputView');
 var TextareaView  = require('../../lib/TextareaView');
 var AlertView     = require('../../lib/AlertView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: 'panel panel-default',
     template: '#request_form_view',
     ui: {
@@ -75,7 +75,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.divisions   = new Divisions();
         this.getDivision(this.model.isNew() ? this.categories.first().id : this.model.get('category').id);
     },
-    templateHelpers: function() {
+    templateContext: function() {
         return {
             requestIdField: this.model.isNew() ? '' : '<div class="form-group">' +
                                                           '<label class="col-sm-2 control-label">RequestId</label>' +

@@ -5,7 +5,7 @@ var PagingView = require('./PagingView');
 var GridView = require('../../lib/GridView');
 var ButtonView = require('../../lib/ButtonView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     className: 'panel panel-default',
     template: '#request_index_view',
     regions: {

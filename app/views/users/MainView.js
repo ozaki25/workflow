@@ -3,7 +3,7 @@ Backbone.Marionette = require('backbone.marionette');
 var UsersView = require('./UsersView');
 var FormView = require('./FormView');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = Backbone.Marionette.View.extend({
     template: '#users_main_view',
     regions: {
         usersMain: '#users_main'
